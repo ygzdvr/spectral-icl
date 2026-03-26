@@ -143,28 +143,31 @@ The source tree contains 60 Python files across packages + scripts. The list bel
 
 ### `dynamics/`
 
+Core research logic. Each module implements one aspect of the paper's theory or its extensions.
+
 - `dynamics/__init__.py` - central export surface for most dynamics functions.
-- `dynamics/linear_icl_dynamics.py` - hand-coded analytical attention variants + evaluators:
+- `dynamics/linear_icl_dynamics.py` - Hand-coded analytical attention model that implements optimal preconditioned in-context GD (Section 2.2 / Appendix B.2). Constructs structured weight matrices {W_x, W_y, W_q, W_k, W_v, w_out} encoding the [x, Delta] residual-stream representation. Variants:
   - coupled / decoupled / frozen-embedding / softmax-frozen modes
-  - synthetic task samplers
+  - synthetic task samplers for ISO/FS data
   - `run_hand_coded_eval`, `run_hard_power_law_depth_eval`
-- `dynamics/pretrain_icl_powerlaw.py` - main pretraining & sweep engine:
-  - sample modes (`iid`, `spec`, `spec_rotate`, `gauss_rotate`)
-  - power-law problem builders
-  - `train_model`, `train_model_softmax`
-  - sweep runners (`run_*_sweep`)
-  - DMFT helper (`isotropic_dmft`)
-- `dynamics/linear_attention_dynamics.py` - isotropic and dimension-free frozen-embedding dynamics:
-  - model eval + training for both variants
-  - reduced 4-variable theory solvers
-- `dynamics/reduced_gamma_dynamics.py` - reduced Gamma matrix SGD model + loss landscape.
-- `dynamics/reduced_gamma_fixed_dynamics.py` - fixed-covariance reduced Gamma + OOD rotation loss.
-- `dynamics/reduced_gamma_decoupled_dynamics.py` - decoupled-layer reduced Gamma depth dynamics.
-- `dynamics/sgd_isotropic_dynamics.py` - isotropic and RMT SGD dynamics + theoretical trajectories.
-- `dynamics/toy_model_dynamics.py` - scalar/two-variable toy pretraining dynamics.
-- `dynamics/solve_n_final.py` - Newton solver for asymptotic `N`-dependent loss floor.
-- `dynamics/ood_covariance.py` - OOD covariance generalization eval routines.
-- `dynamics/random_init_covariance.py` - random-initialization covariance eval routines.
+- `dynamics/pretrain_icl_powerlaw.py` - Main pretraining engine. Implements all three data settings from the paper:
+  - `sample_data` (ISO, "iid"), `sample_data_spec` (FS, "spec"), `sample_data_spec_rotate` (RRS, "spec_rotate"), `sample_data_gauss_rotate` (Wishart variant, "gauss_rotate")
+  - `make_powerlaw_problem` builds spectrum lambda_k ~ k^{-alpha} with source/capacity structure
+  - `train_model` / `train_model_softmax` - online SGD training loops
+  - Sweep runners for depth, P_tr, and joint sweeps
+  - `isotropic_dmft` - solves the DMFT fixed-point equations for the ISO setting (Result 1 / Appendix C.2)
+- `dynamics/linear_attention_dynamics.py` - Full weight dynamics for Result 9. Trains separate {W_x, W_q, W_k, W_v} with frozen {w_y, w_o}. Includes:
+  - Isotropic and dimension-free (power-law) variants
+  - Reduced 4-variable theory solver implementing the w^5 reparameterization
+  - Predicts time exponent t^{-5beta/(5beta+2)}
+- `dynamics/reduced_gamma_dynamics.py` - Reduced-Gamma model (Section 2.2): trains a D x D matrix Gamma directly via SGD on RRS data. The scalar reduction gamma(t) drives the loss landscape. Includes loss landscape computation.
+- `dynamics/reduced_gamma_fixed_dynamics.py` - Reduced-Gamma on FS setting (Section 3.2). Implements eigenvalue decoupling (Result 4) and OOD rotation loss (Result 5): Sigma' = exp(theta S) Sigma exp(-theta S).
+- `dynamics/reduced_gamma_decoupled_dynamics.py` - Untied layers: separate gamma^l per layer (Appendix G.1). Tests permutation symmetry and balance condition gamma^l(t) = gamma(t).
+- `dynamics/sgd_isotropic_dynamics.py` - Exact SGD dynamics for shallow ISO model (Appendix C.1, Result 10). Computes the linear recursion C(t+1) = a*C(t) + b with dependence on (eta, alpha, kappa, tau). RMT variants use Marchenko-Pastur eigenvalue predictions.
+- `dynamics/toy_model_dynamics.py` - Scalar and two-variable toy pretraining dynamics. Minimal models for the gradient flow ODE d gamma/dt = beta * gamma^{-beta-1}.
+- `dynamics/solve_n_final.py` - Newton solver for the asymptotic N-dependent loss floor. Solves the width bottleneck equation from Appendix F.5: sum_k lambda_k / (i*omega + lambda_k) = N/D.
+- `dynamics/ood_covariance.py` - OOD covariance generalization evaluation (Result 5). Tests brittleness under heterogeneous task covariances.
+- `dynamics/random_init_covariance.py` - Random-initialization covariance evaluation. Studies loss landscape before training.
 
 ### Package Root
 
@@ -172,50 +175,65 @@ The source tree contains 60 Python files across packages + scripts. The list bel
 
 ## Script Catalog (`scripts/*.py`)
 
-Each script is a CLI experiment entrypoint. Most write `.png` figures plus `.npz`/`.pt` artifacts.
+Each script is a CLI experiment entrypoint. Most write `.png` figures plus `.npz`/`.pt` artifacts. Scripts are organized by which aspect of the scaling law theory they test.
 
-### Pretraining / Depth / Scaling
+### Pretraining / Depth / Scaling (RRS and ISO settings)
 
-- `scripts/run_pretrain_icl_powerlaw.py` - full pretraining run on power-law data (`run_pretrain_icl_powerlaw`).
-- `scripts/run_powerlaw_depth_sweep.py` - depth sweep over `L` on rotated power-law data.
-- `scripts/run_depth_scaling_nonrotate.py` - depth sweep without random rotations.
-- `scripts/run_offline_depth_sweep.py` - offline variant of non-rotated depth sweep.
-- `scripts/run_ptr_scaling.py` - sweep over context length `P_tr`.
-- `scripts/run_isotropic_depth_vs_alpha.py` - isotropic depth-vs-`P_tr/d` sweep with theory curves.
-- `scripts/run_unrestricted_depth_vs_alpha.py` - unrestricted-parameter variant of isotropic depth-vs-alpha sweep.
-- `scripts/run_softmax_depth_sweep.py` - softmax-attention depth sweep (`train_model_softmax`).
+These scripts train the full attention model on ICL tasks and study how depth `L`, context length `P`, and spectral exponents affect the loss.
+
+- `scripts/run_pretrain_icl_powerlaw.py` - Full pretraining run on power-law **RRS** data. Trains all attention parameters with SGD under `spec_rotate` sampling. Plots loss curves with theoretical power-law reference lines (`t^{-beta/(2+beta)}` for reduced-Gamma, `t^{-7beta/(2+7beta)}` for full coupled parameterization). Core experiment for verifying Result 8/9 time exponents.
+- `scripts/run_powerlaw_depth_sweep.py` - Depth sweep over `L` on **RRS** rotated power-law data. Tests the `L^{-beta}` depth scaling law (Result 8) by training models at multiple depths and comparing final losses.
+- `scripts/run_depth_scaling_nonrotate.py` - Depth sweep on **FS** (fixed covariance, no rotation). Uses `spec` sampling mode with normalized power-law spectrum. Tests Result 3: depth should be unnecessary at long contexts for fixed covariance.
+- `scripts/run_offline_depth_sweep.py` - Offline (fixed batch, not online SGD) variant of the non-rotated depth sweep. Tests whether overfitting effects from repeated data change the depth scaling.
+- `scripts/run_ptr_scaling.py` - Sweep over context length `P_tr` at fixed depth. Tests the `P^{-nu*beta}` context scaling law from Result 8.
+- `scripts/run_isotropic_depth_vs_alpha.py` - Joint sweep over `(P_tr, L)` grid on **ISO** data. Compares trained model losses against DMFT theory curves (`isotropic_dmft`). Tests Results 1-2: depth helps at finite alpha but is unnecessary as alpha -> infinity.
+- `scripts/run_unrestricted_depth_vs_alpha.py` - Same as above but with all 6 parameters trainable (unrestricted), not just decoupled. Tests whether the unrestricted parameterization changes the ISO depth-vs-alpha landscape.
+- `scripts/run_softmax_depth_sweep.py` - Depth sweep with **softmax attention** + Adam. Tests Section 5.2: whether the qualitative depth separation from linear attention theory persists under nonlinear attention.
 
 ### Analytical / Hand-Coded Evaluations
 
-- `scripts/run_hand_coded_model_eval.py` - baseline hand-coded model evaluation.
-- `scripts/run_hard_power_law_depth.py` - hard power-law covariance depth evaluation.
-- `scripts/run_ood_covariance_generalization.py` - OOD covariance exponent sweep evaluation.
-- `scripts/run_random_init_covariance.py` - random-initialization covariance evaluation.
+These scripts evaluate the analytically-constructed weight matrices (the "hand-coded" model that implements optimal preconditioned GD) rather than training.
 
-### Reduced Gamma and Related Scaling
+- `scripts/run_hand_coded_model_eval.py` - Evaluates the hand-coded analytical model (`init_hand_coded_params`) on isotropic data. Provides the baseline loss that trained models should approach.
+- `scripts/run_hard_power_law_depth.py` - Hand-coded model on power-law covariance data across depths. Studies how the analytical solution interacts with spectral structure and depth.
+- `scripts/run_ood_covariance_generalization.py` - OOD evaluation of hand-coded model under heterogeneous task covariances (exponents sampled from Uniform(0, exp_scale)). Tests Result 5: brittleness of FS solutions to distribution shift.
+- `scripts/run_random_init_covariance.py` - Evaluates the hand-coded model with random Gaussian weights (not optimal). Studies the loss landscape at random initialization before any training.
 
-- `scripts/run_reduced_gamma_dynamics.py` - reduced Gamma SGD + optional landscape.
-- `scripts/run_reduced_gamma_depth_sweep.py` - reduced Gamma depth sweep over `L`.
-- `scripts/run_reduced_gamma_beta_sweep.py` - reduced Gamma sweep over `beta`.
-- `scripts/run_decoupled_layers.py` - decoupled-layer reduced Gamma depth dynamics.
-- `scripts/run_fixed_covariance.py` - fixed-covariance reduced Gamma + OOD theta sweep.
-- `scripts/run_compute_scaling.py` - width-scaling style sweep for reduced Gamma setting.
-- `scripts/run_compute_scaling_width.py` - explicit width (`N`) scaling sweep.
-- `scripts/run_compute_scaling_depth.py` - depth scaling + infinite-depth floor estimate.
-- `scripts/run_compute_scaling_joint.py` - joint scaling analysis with theoretical `N` solver.
-- `scripts/run_loss_vs_w.py` - closed-form loss landscape over scalar weight grid.
-- `scripts/run_loss_landscape.py` - reduced-Gamma landscape visualization (`lambda`, `gamma` grid).
+### Reduced-Gamma Model and Compute Scaling
+
+These scripts work with the reduced-Gamma parameterization (a single D x D matrix Gamma, or its scalar reduction gamma), which is the key theoretical object from the paper (Section 2.2). The compute scaling scripts test Result 8's separable scaling law.
+
+- `scripts/run_reduced_gamma_dynamics.py` - Trains the reduced Gamma matrix via SGD on **RRS** power-law data. Optionally computes and plots the loss landscape over gamma. Core experiment for the Gamma-model dynamics.
+- `scripts/run_reduced_gamma_depth_sweep.py` - Depth sweep over `L` in the reduced-Gamma model. Tests the `L^{-beta}` scaling directly on the simplified model.
+- `scripts/run_reduced_gamma_beta_sweep.py` - Sweep over source exponent `beta` in the reduced-Gamma model. Tests how the power-law exponents in the scaling law depend on source/capacity conditions.
+- `scripts/run_decoupled_layers.py` - Decoupled-layer reduced-Gamma dynamics: separate `gamma^l` per layer instead of tied weights. Tests Result from Appendix G.1: that balanced init leads to `gamma^l(t) = gamma(t)` for all l (permutation symmetry).
+- `scripts/run_fixed_covariance.py` - Reduced-Gamma model on **FS** (fixed covariance). Includes OOD evaluation under rotations `Sigma' = exp(theta S) Sigma exp(-theta S)`. Tests Results 4-5: eigenvalue decoupling and brittleness.
+- `scripts/run_compute_scaling.py` - Width-scaling sweep in the reduced-Gamma setting. Tests how finite width `N` bottlenecks the loss.
+- `scripts/run_compute_scaling_width.py` - Explicit width (`N`) scaling sweep. Tests the `N^{-nu*beta}` width scaling law from Result 8.
+- `scripts/run_compute_scaling_depth.py` - Depth scaling with infinite-depth floor estimation. Computes asymptotic loss floor via Newton solver (`solve_n_final`).
+- `scripts/run_compute_scaling_joint.py` - Joint width + depth scaling analysis. Tests the compute-optimal shape prediction `L ~ N^nu` from Result 8 by sweeping N and L simultaneously.
+- `scripts/run_loss_vs_w.py` - Closed-form loss landscape over a scalar weight grid. Visualizes the 1D loss function that gradient flow descends (as in Result 1/6).
+- `scripts/run_loss_landscape.py` - 2D reduced-Gamma landscape visualization over (`lambda`, `gamma`) grid. Shows how spectral structure shapes the optimization landscape.
+
+### Full Linear Attention Dynamics (Result 9)
+
+These scripts train the full set of attention weight matrices {W_x, W_k, W_q, W_v} separately (not the reduced-Gamma shortcut), testing the reparameterization theory from Result 9.
+
+- `scripts/run_linear_attention_dynamics.py` - Compares isotropic linear-attention training dynamics against the 4-variable reduced theory. Tests weight balancing and the `gamma -> w^5` reparameterization prediction.
+- `scripts/run_dim_free_dynamics.py` - Dimension-free linear-attention dynamics across depth values on power-law data. Tests the `t^{-5beta/(5beta+2)}` time exponent from Result 9 in the frozen-embedding setting.
 
 ### Isotropic / RMT SGD and Toy Dynamics
 
-- `scripts/run_sgd_isotropic.py` - isotropic SGD experiments across `(tau, alpha)` grid.
-- `scripts/run_sgd_rmt_isotropic.py` - RMT isotropic SGD sweep runner.
-- `scripts/run_pretrain_dynamics.py` - toy pretraining dynamics (`pretrain_dynamics`, two-var variant).
-- `scripts/run_beta_sweep_dynamics.py` - beta sweep for two-variable toy dynamics.
+These scripts study the SGD dynamics in detail (finite batch effects, SGD noise floor) and simplified toy models for building intuition.
 
-### Other Training Entry Point
+- `scripts/run_sgd_isotropic.py` - Isotropic SGD experiments across `(tau, alpha)` grid. Tests Result 10 (Appendix C.1): the exact SGD recursion for shallow L=1 ISO models, including dependence on batch size tau and context ratio alpha.
+- `scripts/run_sgd_rmt_isotropic.py` - RMT (random matrix theory) isotropic SGD sweep. Tests the Marchenko-Pastur-based theoretical predictions against finite-dimensional simulations.
+- `scripts/run_pretrain_dynamics.py` - Toy scalar/two-variable pretraining dynamics. Minimal models for understanding the interplay of time and depth exponents.
+- `scripts/run_beta_sweep_dynamics.py` - Beta sweep for two-variable toy dynamics. Studies how the source exponent beta controls the loss power-law across the simplified dynamical system.
 
-- `scripts/train_first_cells.py` - trains a `SimpleTransformer` directly on synthetic ICL with configurable depth/width and optional softmax attention.
+### SimpleTransformer Training
+
+- `scripts/train_first_cells.py` - Trains a `SimpleTransformer` (with LayerNorm, optional softmax attention) directly on synthetic ICL data. Configurable depth/width/heads. Serves as a bridge between the analytical linear-attention theory and more realistic architectures.
 
 ## Typical Outputs
 
