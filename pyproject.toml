@@ -1,0 +1,14 @@
+[project]
+name = "spectral-scaling"
+version = "0.1.0"
+description = "Spectral scaling experiments for transformer in-context learning"
+requires-python = ">=3.10"
+dependencies = [
+    "matplotlib",
+    "numpy",
+    "seaborn",
+    "torch",
+]
+
+[tool.uv]
+package = false
