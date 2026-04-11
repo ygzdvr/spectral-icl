@@ -27,4 +27,4 @@ source "$SCRIPT_DIR/starter.sh"
 nvidia-smi
 
 echo "Running loss landscape experiment..."
-python -u scripts/run_loss_landscape.py --no-show --device cuda
+python -u scripts/run_loss_landscape.py --no-show

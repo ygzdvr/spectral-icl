@@ -43,7 +43,7 @@ def main() -> None:
         sweep_var="tau",
         sweep_vals=[0.1, 0.2, 0.4, 0.8, 1.6],
         d=args.d, tau_fixed=0.1, alpha_fixed=1.0, kappa_fixed=4.0,
-        eta=args.eta, T=args.steps,
+        eta=args.eta, t_steps=args.steps,
         out=out, device=args.device, dtype=dtype,
     )
 
@@ -53,7 +53,7 @@ def main() -> None:
         sweep_var="alpha",
         sweep_vals=[0.1, 0.2, 0.4, 0.8, 1.6],
         d=args.d, tau_fixed=1.0, alpha_fixed=1.0, kappa_fixed=4.0,
-        eta=args.eta, T=args.steps,
+        eta=args.eta, t_steps=args.steps,
         out=out, device=args.device, dtype=dtype,
     )
 
@@ -63,7 +63,7 @@ def main() -> None:
         sweep_var="kappa",
         sweep_vals=[0.1, 0.2, 0.4, 0.8, 1.6],
         d=args.d, tau_fixed=1.0, alpha_fixed=1.0, kappa_fixed=4.0,
-        eta=args.eta, T=args.steps,
+        eta=args.eta, t_steps=args.steps,
         out=out, device=args.device, dtype=dtype,
     )
 
@@ -73,7 +73,7 @@ def main() -> None:
         sweep_var="tau",
         sweep_vals=[0.1, 0.2, 0.4, 0.8, 1.6],
         d=args.d, tau_fixed=0.1, alpha_fixed=8.0, kappa_fixed=2.0,
-        eta=args.eta, T=args.steps,
+        eta=args.eta, t_steps=args.steps,
         out=out, device=args.device, dtype=dtype,
         use_semilogy=True,
     )
