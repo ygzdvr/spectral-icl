@@ -8,15 +8,14 @@ import seaborn as sns
 import torch
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
+if str(Path(__file__).resolve().parents[1]) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from dynamics import (
     reduced_gamma_structured_sgd_rmt_isotropic_dynamics,
     solve_n_final,
 )
-from utils import make_powerlaw_spec_and_wstar, parse_int_list
+from utils import OutputDir, make_powerlaw_spec_and_wstar, parse_int_list
 
 
 def main() -> None:
@@ -59,8 +58,7 @@ def main() -> None:
     beta = args.beta
     T = args.steps
 
-    output_dir = Path(args.output_dir) if args.output_dir else PROJECT_ROOT / "outputs"
-    output_dir.mkdir(parents=True, exist_ok=True)
+    out = OutputDir(__file__, base=args.output_dir)
 
     spec, w_star = make_powerlaw_spec_and_wstar(
         M,
@@ -117,12 +115,9 @@ def main() -> None:
     plt.legend()
     plt.xlabel(r"Compute", fontsize=20)
     plt.ylabel(r"Loss", fontsize=20)
-    plt.savefig(
-        output_dir / "compute_scaling_joint_linear_more_NL.png",
-        dpi=200,
-        bbox_inches="tight",
-    )
-    print("Saved compute_scaling_joint_linear_more_NL.png")
+    plt.savefig(out.png("compute_scaling_joint_linear_more_NL"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf("compute_scaling_joint_linear_more_NL"), dpi=200, bbox_inches="tight")
+    print(f"Saved plot to: {out.png('compute_scaling_joint_linear_more_NL')}")
 
     # =====================================================================
     # 2) solve_N_final: loss floor vs N (theory curve)
@@ -149,7 +144,6 @@ def main() -> None:
     print(f"len(spec) = {len(spec)}")
 
     # --- Save data ---
-    npz_path = output_dir / "compute_scaling_joint_data.npz"
     payload: dict[str, np.ndarray] = {
         "Nvals": np.asarray(Nvals, dtype=np.int64),
         "loss_8": np.asarray([loss_8], dtype=np.float64),
@@ -158,8 +152,8 @@ def main() -> None:
     }
     for i, N in enumerate(Nvals):
         payload[f"loss_N_{N}"] = np.asarray(all_loss[i], dtype=np.float64)
-    np.savez(npz_path, **payload)
-    print(f"Saved data to: {npz_path}")
+    np.savez(out.numpy("compute_scaling_joint_data"), **payload)
+    print(f"Saved data to: {out.numpy('compute_scaling_joint_data')}")
 
     if not args.no_show:
         plt.show()

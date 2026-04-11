@@ -8,15 +8,15 @@ import seaborn as sns
 import torch
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
+_PROJ = str(Path(__file__).resolve().parents[1])
+if _PROJ not in sys.path:
+    sys.path.insert(0, _PROJ)
 
 from dynamics import (
     reduced_gamma_structured_fixed_sgd_rmt_isotropic_dynamics,
     ood_loss_fixed_covariance,
 )
-from utils import make_powerlaw_spec_and_wstar, parse_int_list
+from utils import make_powerlaw_spec_and_wstar, parse_int_list, OutputDir
 
 
 def main() -> None:
@@ -56,8 +56,7 @@ def main() -> None:
     beta = args.beta
     T = args.steps
 
-    output_dir = Path(args.output_dir) if args.output_dir else PROJECT_ROOT / "outputs"
-    output_dir.mkdir(parents=True, exist_ok=True)
+    out = OutputDir(__file__, base=args.output_dir)
 
     spec, w_star = make_powerlaw_spec_and_wstar(
         M,
@@ -106,8 +105,9 @@ def main() -> None:
     plt.xlabel(r"$t$", fontsize=20)
     plt.ylabel(r"$\mathcal{L}(t)$", fontsize=20)
     plt.legend()
-    plt.savefig(output_dir / "losses_fixed_covariance.png", dpi=200, bbox_inches="tight")
-    print("Saved losses_fixed_covariance.png")
+    plt.savefig(out.png("losses_fixed_covariance"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf("losses_fixed_covariance"), dpi=200, bbox_inches="tight")
+    print(f"Saved {out.png('losses_fixed_covariance')}")
 
     # --- Plot 2: eigenvalue evolution (last L) ---
     last_eigs = torch.stack(all_eigs[-1])  # (T, d)
@@ -132,8 +132,9 @@ def main() -> None:
     plt.xlabel(r"$t$", fontsize=20)
     plt.ylabel(r"$\gamma_k(t)$", fontsize=20)
     plt.legend()
-    plt.savefig(output_dir / "eig_evolution_fixed_covariance.png", dpi=200, bbox_inches="tight")
-    print("Saved eig_evolution_fixed_covariance.png")
+    plt.savefig(out.png("eig_evolution_fixed_covariance"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf("eig_evolution_fixed_covariance"), dpi=200, bbox_inches="tight")
+    print(f"Saved {out.png('eig_evolution_fixed_covariance')}")
 
     # =====================================================================
     # 2) OOD loss under rotation
@@ -153,11 +154,11 @@ def main() -> None:
     plt.legend()
     plt.xlabel(r"$\theta$", fontsize=20)
     plt.ylabel(r"$\mathcal{L}_{OOD}$", fontsize=20)
-    plt.savefig(output_dir / "ood_loss_fixed_covariance.png", dpi=200, bbox_inches="tight")
-    print("Saved ood_loss_fixed_covariance.png")
+    plt.savefig(out.png("ood_loss_fixed_covariance"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf("ood_loss_fixed_covariance"), dpi=200, bbox_inches="tight")
+    print(f"Saved {out.png('ood_loss_fixed_covariance')}")
 
     # --- Save data ---
-    npz_path = output_dir / "fixed_covariance_data.npz"
     payload: dict[str, np.ndarray] = {
         "lvals": np.asarray(lvals, dtype=np.int64),
         "thetas": thetas_np,
@@ -169,8 +170,8 @@ def main() -> None:
         payload[f"ood_L_{L}"] = np.asarray(ood_losses[i], dtype=np.float64)
         eig_arr = torch.stack(all_eigs[i]).numpy()
         payload[f"eigs_L_{L}"] = eig_arr
-    np.savez(npz_path, **payload)
-    print(f"Saved data to: {npz_path}")
+    np.savez(out.numpy("fixed_covariance_data"), **payload)
+    print(f"Saved data to: {out.numpy('fixed_covariance_data')}")
 
     if not args.no_show:
         plt.show()

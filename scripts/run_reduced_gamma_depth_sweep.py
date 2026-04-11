@@ -8,12 +8,11 @@ import seaborn as sns
 import torch
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
+if str(Path(__file__).resolve().parents[1]) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from dynamics import reduced_gamma_structured_sgd_rmt_isotropic_dynamics
-from utils import make_powerlaw_spec_and_wstar, parse_int_list
+from utils import OutputDir, make_powerlaw_spec_and_wstar, parse_int_list
 
 
 def main() -> None:
@@ -50,8 +49,7 @@ def main() -> None:
     beta = args.beta
     T = args.steps
 
-    output_dir = Path(args.output_dir) if args.output_dir else PROJECT_ROOT / "outputs"
-    output_dir.mkdir(parents=True, exist_ok=True)
+    out = OutputDir(__file__, base=args.output_dir)
 
     spec, w_star = make_powerlaw_spec_and_wstar(
         M,
@@ -94,8 +92,9 @@ def main() -> None:
     plt.xlabel(r"$t$", fontsize=20)
     plt.ylabel(r"$\mathcal{L}(t)$", fontsize=20)
     plt.legend()
-    plt.savefig(output_dir / "losses_gamma_model_vary_L.png", dpi=200, bbox_inches="tight")
-    print("Saved losses_gamma_model_vary_L.png")
+    plt.savefig(out.png("losses_gamma_model_vary_L"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf("losses_gamma_model_vary_L"), dpi=200, bbox_inches="tight")
+    print(f"Saved plot to: {out.png('losses_gamma_model_vary_L')}")
 
     # --- Plot 2: loss vs compute C = L * t ---
     plt.figure()
@@ -116,13 +115,11 @@ def main() -> None:
     plt.xlabel(r"$C$", fontsize=20)
     plt.ylabel(r"$\mathcal{L}(C)$", fontsize=20)
     plt.legend()
-    plt.savefig(
-        output_dir / "losses_gamma_model_compute_vary_L.png", dpi=200, bbox_inches="tight"
-    )
-    print("Saved losses_gamma_model_compute_vary_L.png")
+    plt.savefig(out.png("losses_gamma_model_compute_vary_L"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf("losses_gamma_model_compute_vary_L"), dpi=200, bbox_inches="tight")
+    print(f"Saved plot to: {out.png('losses_gamma_model_compute_vary_L')}")
 
     # --- Save data ---
-    npz_path = output_dir / "reduced_gamma_depth_sweep.npz"
     payload: dict[str, np.ndarray] = {
         "lvals": np.asarray(lvals, dtype=np.int64),
         "spec": spec.cpu().numpy(),
@@ -130,8 +127,8 @@ def main() -> None:
     }
     for i, L in enumerate(lvals):
         payload[f"loss_L_{L}"] = np.asarray(all_loss[i], dtype=np.float64)
-    np.savez(npz_path, **payload)
-    print(f"Saved data to: {npz_path}")
+    np.savez(out.numpy("reduced_gamma_depth_sweep"), **payload)
+    print(f"Saved data to: {out.numpy('reduced_gamma_depth_sweep')}")
 
     if not args.no_show:
         plt.show()

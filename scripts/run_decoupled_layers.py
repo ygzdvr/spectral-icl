@@ -8,12 +8,12 @@ import seaborn as sns
 import torch
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
+_PROJ = str(Path(__file__).resolve().parents[1])
+if _PROJ not in sys.path:
+    sys.path.insert(0, _PROJ)
 
 from dynamics import reduced_gamma_decoupled_depth_structured_sgd_dynamics
-from utils import make_powerlaw_spec_and_wstar, parse_int_list
+from utils import make_powerlaw_spec_and_wstar, parse_int_list, OutputDir
 
 
 def main() -> None:
@@ -50,8 +50,7 @@ def main() -> None:
     beta = args.beta
     T = args.steps
 
-    output_dir = Path(args.output_dir) if args.output_dir else PROJECT_ROOT / "outputs"
-    output_dir.mkdir(parents=True, exist_ok=True)
+    out = OutputDir(__file__, base=args.output_dir)
 
     spec, w_star = make_powerlaw_spec_and_wstar(
         M,
@@ -93,20 +92,16 @@ def main() -> None:
     plt.legend()
     plt.xlabel(r"$t$", fontsize=20)
     plt.ylabel(r"$\mathcal{L}(t)$", fontsize=20)
-    plt.savefig(
-        output_dir / "gamma_decoupled_layers_dynamics.png",
-        dpi=200,
-        bbox_inches="tight",
-    )
-    print("Saved gamma_decoupled_layers_dynamics.png")
+    plt.savefig(out.png("gamma_decoupled_layers_dynamics"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf("gamma_decoupled_layers_dynamics"), dpi=200, bbox_inches="tight")
+    print(f"Saved {out.png('gamma_decoupled_layers_dynamics')}")
 
     # --- Save data ---
-    npz_path = output_dir / "decoupled_layers_data.npz"
     payload: dict[str, np.ndarray] = {"lvals": np.asarray(lvals, dtype=np.int64)}
     for i, L in enumerate(lvals):
         payload[f"loss_L_{L}"] = np.asarray(all_loss[i], dtype=np.float64)
-    np.savez(npz_path, **payload)
-    print(f"Saved data to: {npz_path}")
+    np.savez(out.numpy("decoupled_layers_data"), **payload)
+    print(f"Saved data to: {out.numpy('decoupled_layers_data')}")
 
     if not args.no_show:
         plt.show()

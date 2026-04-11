@@ -14,7 +14,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from configs import IsotropicDepthAlphaSweepConfig
 from dynamics import run_isotropic_depth_vs_alpha_sweep
-from utils import parse_int_list
+from utils import OutputDir, parse_int_list
 
 
 sns.set(font_scale=1.3)
@@ -47,11 +47,7 @@ def main() -> None:
     parser.add_argument("--lvals", type=str, default="1,2,4,8,16")
     parser.add_argument("--theory-t", type=int, default=512)
     parser.add_argument("--theory-iters", type=int, default=100)
-    parser.add_argument("--main-plot-path", type=str, default=None)
-    parser.add_argument("--alpha-plot-path", type=str, default=None)
-    parser.add_argument("--l-plot-path", type=str, default=None)
-    parser.add_argument("--losses-path", type=str, default=None)
-    parser.add_argument("--artifacts-path", type=str, default=None)
+    parser.add_argument("--output-dir", type=str, default=None)
     parser.add_argument("--no-show", action="store_true")
     args = parser.parse_args()
 
@@ -68,6 +64,7 @@ def main() -> None:
 
     p_trs = parse_int_list(args.p_trs)
     lvals = parse_int_list(args.lvals)
+    out = OutputDir(__file__, base=args.output_dir)
 
     cfg = IsotropicDepthAlphaSweepConfig(
         d=args.d,
@@ -113,14 +110,9 @@ def main() -> None:
     plt.ylabel(r"$\mathcal{L}(\alpha)$", fontsize=20)
     plt.legend()
 
-    main_plot_path = (
-        Path(args.main_plot_path)
-        if args.main_plot_path
-        else PROJECT_ROOT / "outputs" / "depth_vs_alpha_isotropic.png"
-    )
-    main_plot_path.parent.mkdir(parents=True, exist_ok=True)
-    plt.savefig(main_plot_path, dpi=200, bbox_inches="tight")
-    print(f"Saved main plot to: {main_plot_path}")
+    plt.savefig(out.png("depth_vs_alpha_isotropic"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf("depth_vs_alpha_isotropic"), dpi=200, bbox_inches="tight")
+    print(f"Saved main plot to: {out.png('depth_vs_alpha_isotropic')}")
 
     plt.figure()
     sns.set_palette("rocket", n_colors=len(p_trs))
@@ -130,14 +122,9 @@ def main() -> None:
     plt.ylabel(r"$\mathcal{L}(t, \alpha)$", fontsize=20)
     plt.legend()
 
-    alpha_plot_path = (
-        Path(args.alpha_plot_path)
-        if args.alpha_plot_path
-        else PROJECT_ROOT / "outputs" / "train_dynamics_vary_alpha.png"
-    )
-    alpha_plot_path.parent.mkdir(parents=True, exist_ok=True)
-    plt.savefig(alpha_plot_path, dpi=200, bbox_inches="tight")
-    print(f"Saved alpha dynamics plot to: {alpha_plot_path}")
+    plt.savefig(out.png("train_dynamics_vary_alpha"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf("train_dynamics_vary_alpha"), dpi=200, bbox_inches="tight")
+    print(f"Saved alpha dynamics plot to: {out.png('train_dynamics_vary_alpha')}")
 
     plt.figure()
     sns.set_palette("rocket", n_colors=len(lvals))
@@ -147,21 +134,10 @@ def main() -> None:
     plt.ylabel(r"$\mathcal{L}(t, L)$", fontsize=20)
     plt.legend()
 
-    l_plot_path = (
-        Path(args.l_plot_path)
-        if args.l_plot_path
-        else PROJECT_ROOT / "outputs" / "train_dynamics_vary_L.png"
-    )
-    l_plot_path.parent.mkdir(parents=True, exist_ok=True)
-    plt.savefig(l_plot_path, dpi=200, bbox_inches="tight")
-    print(f"Saved L dynamics plot to: {l_plot_path}")
+    plt.savefig(out.png("train_dynamics_vary_L"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf("train_dynamics_vary_L"), dpi=200, bbox_inches="tight")
+    print(f"Saved L dynamics plot to: {out.png('train_dynamics_vary_L')}")
 
-    losses_path = (
-        Path(args.losses_path)
-        if args.losses_path
-        else PROJECT_ROOT / "outputs" / "isotropic_depth_vs_alpha_losses.npz"
-    )
-    losses_path.parent.mkdir(parents=True, exist_ok=True)
     payload: dict[str, np.ndarray] = {
         "alpha_vals": alpha_vals,
         "p_trs": np.asarray(p_trs, dtype=np.int64),
@@ -173,15 +149,9 @@ def main() -> None:
     for i, p_tr in enumerate(p_trs):
         for j, L in enumerate(lvals):
             payload[f"loss_P_{p_tr}_L_{L}"] = np.asarray(all_losses[i][j], dtype=np.float64)
-    np.savez(losses_path, **payload)
-    print(f"Saved losses to: {losses_path}")
+    np.savez(out.numpy("isotropic_depth_vs_alpha_losses"), **payload)
+    print(f"Saved losses to: {out.numpy('isotropic_depth_vs_alpha_losses')}")
 
-    artifacts_path = (
-        Path(args.artifacts_path)
-        if args.artifacts_path
-        else PROJECT_ROOT / "outputs" / "isotropic_depth_vs_alpha_artifacts.pt"
-    )
-    artifacts_path.parent.mkdir(parents=True, exist_ok=True)
     torch.save(
         {
             "config": vars(args),
@@ -195,9 +165,9 @@ def main() -> None:
             "p_trs": p_trs,
             "lvals": lvals,
         },
-        artifacts_path,
+        out.torch("isotropic_depth_vs_alpha_artifacts"),
     )
-    print(f"Saved artifacts to: {artifacts_path}")
+    print(f"Saved artifacts to: {out.torch('isotropic_depth_vs_alpha_artifacts')}")
 
     if not args.no_show:
         plt.show()

@@ -8,12 +8,11 @@ import seaborn as sns
 import torch
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
+if str(Path(__file__).resolve().parents[1]) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from dynamics import reduced_gamma_structured_sgd_rmt_isotropic_dynamics
-from utils import compute_loss_inf_depth, make_powerlaw_spec_and_wstar, parse_int_list
+from utils import OutputDir, compute_loss_inf_depth, make_powerlaw_spec_and_wstar, parse_int_list
 
 
 def main() -> None:
@@ -52,8 +51,7 @@ def main() -> None:
     N = args.n
     T = args.steps
 
-    output_dir = Path(args.output_dir) if args.output_dir else PROJECT_ROOT / "outputs"
-    output_dir.mkdir(parents=True, exist_ok=True)
+    out = OutputDir(__file__, base=args.output_dir)
 
     spec, w_star = make_powerlaw_spec_and_wstar(
         M,
@@ -110,12 +108,9 @@ def main() -> None:
     plt.legend()
     plt.xlabel(r"Compute", fontsize=20)
     plt.ylabel(r"Loss", fontsize=20)
-    plt.savefig(
-        output_dir / "compute_scaling_fixed_N_more_depth.png",
-        dpi=200,
-        bbox_inches="tight",
-    )
-    print("Saved compute_scaling_fixed_N_more_depth.png")
+    plt.savefig(out.png("compute_scaling_fixed_N_more_depth"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf("compute_scaling_fixed_N_more_depth"), dpi=200, bbox_inches="tight")
+    print(f"Saved plot to: {out.png('compute_scaling_fixed_N_more_depth')}")
 
     # --- Plot 2: raw loss vs steps ---
     plt.figure()
@@ -125,17 +120,15 @@ def main() -> None:
     plt.legend()
     plt.xlabel(r"$t$", fontsize=20)
     plt.ylabel(r"Loss", fontsize=20)
-    plt.savefig(
-        output_dir / "depth_sweep_raw_loss.png", dpi=200, bbox_inches="tight"
-    )
-    print("Saved depth_sweep_raw_loss.png")
+    plt.savefig(out.png("depth_sweep_raw_loss"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf("depth_sweep_raw_loss"), dpi=200, bbox_inches="tight")
+    print(f"Saved plot to: {out.png('depth_sweep_raw_loss')}")
 
     # Print loss_final for reference
     loss_final = float(torch.sum((1.0 - spec) ** 2 * w_star**2 * spec).cpu())
     print(f"loss_final = {loss_final}")
 
     # --- Save data ---
-    npz_path = output_dir / "compute_scaling_depth_data.npz"
     payload: dict[str, np.ndarray] = {
         "lvals": np.asarray(lvals, dtype=np.int64),
         "loss_inf": np.asarray([loss_inf], dtype=np.float64),
@@ -145,8 +138,8 @@ def main() -> None:
     }
     for i, L in enumerate(lvals):
         payload[f"loss_L_{L}"] = np.asarray(all_loss_lin_scale[i], dtype=np.float64)
-    np.savez(npz_path, **payload)
-    print(f"Saved data to: {npz_path}")
+    np.savez(out.numpy("compute_scaling_depth_data"), **payload)
+    print(f"Saved data to: {out.numpy('compute_scaling_depth_data')}")
 
     if not args.no_show:
         plt.show()

@@ -9,12 +9,12 @@ import seaborn as sns
 import torch
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
+_PROJ = str(Path(__file__).resolve().parents[1])
+if _PROJ not in sys.path:
+    sys.path.insert(0, _PROJ)
 
 from dynamics import train_model_dim_free, sample_data_spec_rotate_bernoulli
-from utils import make_powerlaw_spec_and_wstar, parse_int_list
+from utils import make_powerlaw_spec_and_wstar, parse_int_list, OutputDir
 
 
 def main() -> None:
@@ -56,8 +56,7 @@ def main() -> None:
     beta = args.beta
     sqrt_d = math.sqrt(d)
 
-    output_dir = Path(args.output_dir) if args.output_dir else PROJECT_ROOT / "outputs"
-    output_dir.mkdir(parents=True, exist_ok=True)
+    out = OutputDir(__file__, base=args.output_dir)
 
     spec, w_star = make_powerlaw_spec_and_wstar(
         d,
@@ -117,12 +116,9 @@ def main() -> None:
     plt.xlabel(r"$t$", fontsize=20)
     plt.ylabel(r"$\mathcal{L}(t)$", fontsize=20)
     plt.legend()
-    plt.savefig(
-        output_dir / "dim_free_theory_weight_decoupled_vs_expt.png",
-        dpi=200,
-        bbox_inches="tight",
-    )
-    print("Saved dim_free_theory_weight_decoupled_vs_expt.png")
+    plt.savefig(out.png("dim_free_theory_weight_decoupled_vs_expt"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf("dim_free_theory_weight_decoupled_vs_expt"), dpi=200, bbox_inches="tight")
+    print(f"Saved {out.png('dim_free_theory_weight_decoupled_vs_expt')}")
 
     # --- Plot 2: raw weight norms (last L) ---
     weight_arr = np.array(all_weight_norms[-1])
@@ -131,8 +127,9 @@ def main() -> None:
         plt.plot(weight_arr[:, i])
     plt.xlabel(r"$t$", fontsize=20)
     plt.ylabel(r"$|W_i(t)|$", fontsize=20)
-    plt.savefig(output_dir / "dim_free_weight_norms_raw.png", dpi=200, bbox_inches="tight")
-    print("Saved dim_free_weight_norms_raw.png")
+    plt.savefig(out.png("dim_free_weight_norms_raw"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf("dim_free_weight_norms_raw"), dpi=200, bbox_inches="tight")
+    print(f"Saved {out.png('dim_free_weight_norms_raw')}")
 
     # --- Plot 3: normalized weight norms ---
     plt.figure()
@@ -148,11 +145,11 @@ def main() -> None:
     plt.xlabel(r"$t$", fontsize=20)
     plt.ylabel(r"$|W_i(t)|$", fontsize=20)
     plt.legend()
-    plt.savefig(output_dir / "dim_free_weight_norms_normalized.png", dpi=200, bbox_inches="tight")
-    print("Saved dim_free_weight_norms_normalized.png")
+    plt.savefig(out.png("dim_free_weight_norms_normalized"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf("dim_free_weight_norms_normalized"), dpi=200, bbox_inches="tight")
+    print(f"Saved {out.png('dim_free_weight_norms_normalized')}")
 
     # --- Save data ---
-    npz_path = output_dir / "dim_free_dynamics_data.npz"
     payload: dict[str, np.ndarray] = {
         "lvals": np.asarray(lvals, dtype=np.int64),
         "spec": spec.cpu().numpy(),
@@ -161,8 +158,8 @@ def main() -> None:
     for i, L in enumerate(lvals):
         payload[f"loss_L_{L}"] = np.array(all_losses[i], dtype=np.float64)
         payload[f"weight_norms_L_{L}"] = np.array(all_weight_norms[i], dtype=np.float64)
-    np.savez(npz_path, **payload)
-    print(f"Saved data to: {npz_path}")
+    np.savez(out.numpy("dim_free_dynamics_data"), **payload)
+    print(f"Saved data to: {out.numpy('dim_free_dynamics_data')}")
 
     if not args.no_show:
         plt.show()

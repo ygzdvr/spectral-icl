@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
@@ -16,6 +14,8 @@ from dynamics import (
     simple_sgd_rmt_isotropic_theory,
 )
 
+from .output_dir import OutputDir
+
 
 def run_experiment(
     d: int,
@@ -23,7 +23,7 @@ def run_experiment(
     taus: list[float],
     eta: float,
     t_steps: int,
-    output_dir: Path,
+    out: OutputDir,
     device: str,
     dtype: torch.dtype,
 ) -> None:
@@ -51,17 +51,17 @@ def run_experiment(
     plt.legend()
 
     tag = f"alpha_{alpha:.1f}".replace(".", "p")
-    plot_path = output_dir / f"sgd_isotropic_{tag}.png"
-    plt.savefig(plot_path, dpi=200, bbox_inches="tight")
-    print(f"  Saved plot to: {plot_path}")
+    fig_name = f"sgd_isotropic_{tag}"
+    plt.savefig(out.png(fig_name), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf(fig_name), dpi=200, bbox_inches="tight")
+    print(f"  Saved plot to: {out.png(fig_name)}")
 
-    npz_path = output_dir / f"sgd_isotropic_{tag}.npz"
     payload: dict[str, np.ndarray] = {"taus": np.asarray(taus, dtype=np.float64)}
     for i, tau in enumerate(taus):
         payload[f"emp_tau_{tau:.2f}"] = losses_emp[i]
         payload[f"th_tau_{tau:.2f}"] = losses_th[i]
-    np.savez(npz_path, **payload)
-    print(f"  Saved losses to: {npz_path}")
+    np.savez(out.numpy(fig_name), **payload)
+    print(f"  Saved losses to: {out.numpy(fig_name)}")
 
 
 def run_sweep(
@@ -74,7 +74,7 @@ def run_sweep(
     kappa_fixed: float,
     eta: float,
     t_steps: int,
-    output_dir: Path,
+    out: OutputDir,
     device: str,
     dtype: torch.dtype,
     use_semilogy: bool = False,
@@ -121,14 +121,14 @@ def run_sweep(
     plt.ylabel(r"$\mathcal{L}(t)$", fontsize=20)
 
     safe_name = name.replace(" ", "_").replace("=", "").replace(",", "")
-    plot_path = output_dir / f"sgd_rmt_{safe_name}.png"
-    plt.savefig(plot_path, dpi=200, bbox_inches="tight")
-    print(f"  Saved plot to: {plot_path}")
+    fig_name = f"sgd_rmt_{safe_name}"
+    plt.savefig(out.png(fig_name), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf(fig_name), dpi=200, bbox_inches="tight")
+    print(f"  Saved plot to: {out.png(fig_name)}")
 
-    npz_path = output_dir / f"sgd_rmt_{safe_name}.npz"
     payload: dict[str, np.ndarray] = {"sweep_vals": np.asarray(sweep_vals, dtype=np.float64)}
     for i, val in enumerate(sweep_vals):
         payload[f"emp_{val:.2f}"] = losses_emp[i]
         payload[f"th_{val:.2f}"] = losses_th[i]
-    np.savez(npz_path, **payload)
-    print(f"  Saved losses to: {npz_path}")
+    np.savez(out.numpy(fig_name), **payload)
+    print(f"  Saved losses to: {out.numpy(fig_name)}")

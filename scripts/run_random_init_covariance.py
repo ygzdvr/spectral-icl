@@ -14,6 +14,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from configs import RandomInitCovarianceEvalConfig
 from dynamics import run_random_init_covariance_eval
+from utils import OutputDir
 
 
 sns.set(font_scale=1.3)
@@ -40,8 +41,7 @@ def main() -> None:
     parser.add_argument("--sigma", type=float, default=0.1)
     parser.add_argument("--beta-model", type=float, default=0.5)
     parser.add_argument("--fixed-exp", type=float, default=1.0)
-    parser.add_argument("--plot-path", type=str, default=None)
-    parser.add_argument("--losses-path", type=str, default=None)
+    parser.add_argument("--output-dir", type=str, default=None)
     parser.add_argument("--no-show", action="store_true")
     args = parser.parse_args()
 
@@ -59,7 +59,9 @@ def main() -> None:
         fixed_exp=args.fixed_exp,
     )
 
-    out, train_losses, test_losses, X, y, powers = run_random_init_covariance_eval(
+    odir = OutputDir(__file__, base=args.output_dir)
+
+    result, train_losses, test_losses, X, y, powers = run_random_init_covariance_eval(
         cfg,
         device=device,
         dtype=dtype,
@@ -69,33 +71,22 @@ def main() -> None:
     print(f"X shape: {tuple(X.shape)}")
     print(f"y shape: {tuple(y.shape)}")
     print(f"powers shape: {tuple(powers.shape)}")
-    print(f"out shape: {tuple(out.shape)}")
+    print(f"out shape: {tuple(result.shape)}")
 
     plt.plot(train_losses, label="train")
     plt.plot(np.asarray(test_losses), label="test")
     plt.legend()
 
-    plot_path = (
-        Path(args.plot_path)
-        if args.plot_path
-        else PROJECT_ROOT / "outputs" / "random_init_covariance.png"
-    )
-    plot_path.parent.mkdir(parents=True, exist_ok=True)
-    plt.savefig(plot_path, dpi=200, bbox_inches="tight")
-    print(f"Saved plot to: {plot_path}")
+    plt.savefig(odir.png("covariance"), dpi=200, bbox_inches="tight")
+    plt.savefig(odir.pdf("covariance"), dpi=200, bbox_inches="tight")
+    print(f"Saved plot to: {odir.png('covariance')}")
 
-    losses_path = (
-        Path(args.losses_path)
-        if args.losses_path
-        else PROJECT_ROOT / "outputs" / "random_init_covariance_losses.npz"
-    )
-    losses_path.parent.mkdir(parents=True, exist_ok=True)
     np.savez(
-        losses_path,
+        odir.numpy("losses"),
         train=np.asarray(train_losses, dtype=np.float64),
         test=np.asarray(test_losses, dtype=np.float64),
     )
-    print(f"Saved losses to: {losses_path}")
+    print(f"Saved losses to: {odir.numpy('losses')}")
 
     if not args.no_show:
         plt.show()

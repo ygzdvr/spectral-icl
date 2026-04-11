@@ -19,6 +19,7 @@ from .device import is_cuda_oom, resolve_device
 from .smoothing import moving_average
 from .analysis import compute_loss_inf_depth, loss_landscape
 from .sgd_sweeps import run_experiment, run_sweep
+from .output_dir import OutputDir
 
 __all__ = [
     # Parsing
@@ -37,4 +38,6 @@ __all__ = [
     # Runtime helpers
     "resolve_device",
     "is_cuda_oom",
+    # Output organization
+    "OutputDir",
 ]

@@ -14,7 +14,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from configs import DecoupledTrainModelConfig
 from dynamics import run_ptr_scaling_sweep
-from utils import moving_average, parse_int_list
+from utils import moving_average, parse_int_list, OutputDir
 
 
 sns.set(font_scale=1.3)
@@ -45,10 +45,7 @@ def main() -> None:
     parser.add_argument("--sigma", type=float, default=0.4)
     parser.add_argument("--layers", type=int, default=1)
     parser.add_argument("--p-trs", type=str, default="4,8,16,32,64,128")
-    parser.add_argument("--loss-plot-path", type=str, default=None)
-    parser.add_argument("--final-plot-path", type=str, default=None)
-    parser.add_argument("--losses-path", type=str, default=None)
-    parser.add_argument("--artifacts-path", type=str, default=None)
+    parser.add_argument("--output-dir", type=str, default=None)
     parser.add_argument("--no-show", action="store_true")
     args = parser.parse_args()
 
@@ -84,6 +81,8 @@ def main() -> None:
         online=True,
     )
 
+    out = OutputDir(__file__, base=args.output_dir)
+
     results = run_ptr_scaling_sweep(cfg, p_trs, device=args.device, dtype=dtype)
     all_losses = results["all_losses"]
     final_loss = np.asarray(results["final_loss"], dtype=np.float64)
@@ -103,14 +102,9 @@ def main() -> None:
     plt.ylabel(r"Pretrain Loss", fontsize=20)
     plt.legend()
 
-    loss_plot_path = (
-        Path(args.loss_plot_path)
-        if args.loss_plot_path
-        else PROJECT_ROOT / "outputs" / "ptr_scaling_pretrain_loss.png"
-    )
-    loss_plot_path.parent.mkdir(parents=True, exist_ok=True)
-    plt.savefig(loss_plot_path, dpi=200, bbox_inches="tight")
-    print(f"Saved loss plot to: {loss_plot_path}")
+    plt.savefig(out.png("pretrain_loss"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf("pretrain_loss"), dpi=200, bbox_inches="tight")
+    print(f"Saved loss plot to: {out.png('pretrain_loss')}")
 
     plt.figure()
     alpha_points = np.asarray(p_trs, dtype=np.float64) / float(args.d)
@@ -124,21 +118,10 @@ def main() -> None:
     plt.ylabel("Depth 1 Final Loss", fontsize=20)
     plt.legend()
 
-    final_plot_path = (
-        Path(args.final_plot_path)
-        if args.final_plot_path
-        else PROJECT_ROOT / "outputs" / "ptr_scaling_final_loss.png"
-    )
-    final_plot_path.parent.mkdir(parents=True, exist_ok=True)
-    plt.savefig(final_plot_path, dpi=200, bbox_inches="tight")
-    print(f"Saved final-loss plot to: {final_plot_path}")
+    plt.savefig(out.png("final_loss"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf("final_loss"), dpi=200, bbox_inches="tight")
+    print(f"Saved final-loss plot to: {out.png('final_loss')}")
 
-    losses_path = (
-        Path(args.losses_path)
-        if args.losses_path
-        else PROJECT_ROOT / "outputs" / "ptr_scaling_losses.npz"
-    )
-    losses_path.parent.mkdir(parents=True, exist_ok=True)
     npz_payload: dict[str, np.ndarray] = {
         "p_trs": np.asarray(p_trs, dtype=np.int64),
         "alpha_points": alpha_points,
@@ -151,15 +134,9 @@ def main() -> None:
         npz_payload[f"loss_P_{p_trs[i]}"] = np.asarray(loss, dtype=np.float64)
         npz_payload[f"smooth_P_{p_trs[i]}"] = smoothed_losses[i]
         npz_payload[f"smooth_steps_P_{p_trs[i]}"] = smoothed_steps[i]
-    np.savez(losses_path, **npz_payload)
-    print(f"Saved losses to: {losses_path}")
+    np.savez(out.numpy("losses"), **npz_payload)
+    print(f"Saved losses to: {out.numpy('losses')}")
 
-    artifacts_path = (
-        Path(args.artifacts_path)
-        if args.artifacts_path
-        else PROJECT_ROOT / "outputs" / "ptr_scaling_artifacts.pt"
-    )
-    artifacts_path.parent.mkdir(parents=True, exist_ok=True)
     torch.save(
         {
             "config": vars(args),
@@ -173,9 +150,9 @@ def main() -> None:
             "theory_depth_1": torch.tensor(theory_depth_1, dtype=torch.float64),
             "theory_depth_inf": torch.tensor(theory_depth_inf, dtype=torch.float64),
         },
-        artifacts_path,
+        out.torch("artifacts"),
     )
-    print(f"Saved artifacts to: {artifacts_path}")
+    print(f"Saved artifacts to: {out.torch('artifacts')}")
 
     if not args.no_show:
         plt.show()

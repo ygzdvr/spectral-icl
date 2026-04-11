@@ -14,7 +14,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from configs import PretrainICLPowerLawConfig
 from dynamics import run_pretrain_icl_powerlaw
-from utils import moving_average
+from utils import moving_average, OutputDir
 
 
 sns.set(font_scale=1.3)
@@ -50,10 +50,7 @@ def main() -> None:
         default="spec_rotate",
         choices=["iid", "spec", "spec_rotate", "gauss_rotate"],
     )
-    parser.add_argument("--plot-linear-path", type=str, default=None)
-    parser.add_argument("--plot-loglog-path", type=str, default=None)
-    parser.add_argument("--losses-path", type=str, default=None)
-    parser.add_argument("--artifacts-path", type=str, default=None)
+    parser.add_argument("--output-dir", type=str, default=None)
     parser.add_argument("--no-show", action="store_true")
     args = parser.parse_args()
 
@@ -86,6 +83,8 @@ def main() -> None:
         sample_mode=args.sample_mode,
     )
 
+    out = OutputDir(__file__, base=args.output_dir)
+
     results = run_pretrain_icl_powerlaw(cfg, device=args.device, dtype=dtype)
     pretrain_loss = np.asarray(results["pretrain_loss"], dtype=np.float64)
     steps = np.arange(1, len(pretrain_loss) + 1, dtype=np.float64)
@@ -110,14 +109,9 @@ def main() -> None:
     plt.ylim([0, 1.1])
     plt.xlabel(r"Steps", fontsize=20)
     plt.ylabel(r"Pretrain Loss", fontsize=20)
-    plot_linear_path = (
-        Path(args.plot_linear_path)
-        if args.plot_linear_path
-        else PROJECT_ROOT / "outputs" / "pretrain_icl_powerlaw_linear.png"
-    )
-    plot_linear_path.parent.mkdir(parents=True, exist_ok=True)
-    plt.savefig(plot_linear_path, dpi=200, bbox_inches="tight")
-    print(f"Saved linear plot to: {plot_linear_path}")
+    plt.savefig(out.png("linear"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf("linear"), dpi=200, bbox_inches="tight")
+    print(f"Saved linear plot to: {out.png('linear')}")
 
     plt.figure()
     plt.loglog(smooth_25_steps, smooth_25)
@@ -127,23 +121,12 @@ def main() -> None:
     plt.xlabel(r"Steps", fontsize=20)
     plt.ylabel(r"Pretrain Loss", fontsize=20)
     plt.legend()
-    plot_loglog_path = (
-        Path(args.plot_loglog_path)
-        if args.plot_loglog_path
-        else PROJECT_ROOT / "outputs" / f"pretrain_ICL_powerlaw_L_{cfg.L}_beta_{cfg.beta}.png"
-    )
-    plot_loglog_path.parent.mkdir(parents=True, exist_ok=True)
-    plt.savefig(plot_loglog_path, dpi=200, bbox_inches="tight")
-    print(f"Saved loglog plot to: {plot_loglog_path}")
+    plt.savefig(out.png(f"loglog_L_{cfg.L}_beta_{cfg.beta}"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf(f"loglog_L_{cfg.L}_beta_{cfg.beta}"), dpi=200, bbox_inches="tight")
+    print(f"Saved loglog plot to: {out.png(f'loglog_L_{cfg.L}_beta_{cfg.beta}')}")
 
-    losses_path = (
-        Path(args.losses_path)
-        if args.losses_path
-        else PROJECT_ROOT / "outputs" / "pretrain_icl_powerlaw_losses.npz"
-    )
-    losses_path.parent.mkdir(parents=True, exist_ok=True)
     np.savez(
-        losses_path,
+        out.numpy("losses"),
         pretrain_loss=pretrain_loss,
         steps=steps,
         smooth_10=smooth_10,
@@ -155,14 +138,8 @@ def main() -> None:
         theory_beta=theory_beta,
         theory_exponent=np.asarray([th_exp], dtype=np.float64),
     )
-    print(f"Saved losses to: {losses_path}")
+    print(f"Saved losses to: {out.numpy('losses')}")
 
-    artifacts_path = (
-        Path(args.artifacts_path)
-        if args.artifacts_path
-        else PROJECT_ROOT / "outputs" / "pretrain_icl_powerlaw_artifacts.pt"
-    )
-    artifacts_path.parent.mkdir(parents=True, exist_ok=True)
     torch.save(
         {
             "config": vars(args),
@@ -179,9 +156,9 @@ def main() -> None:
             "theory_fast": torch.tensor(theory_fast, dtype=torch.float64),
             "theory_beta": torch.tensor(theory_beta, dtype=torch.float64),
         },
-        artifacts_path,
+        out.torch("artifacts"),
     )
-    print(f"Saved artifacts to: {artifacts_path}")
+    print(f"Saved artifacts to: {out.torch('artifacts')}")
 
     if not args.no_show:
         plt.show()

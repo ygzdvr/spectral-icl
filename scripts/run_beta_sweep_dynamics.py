@@ -8,12 +8,12 @@ import seaborn as sns
 import torch
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
+_PROJ = str(Path(__file__).resolve().parents[1])
+if _PROJ not in sys.path:
+    sys.path.insert(0, _PROJ)
 
 from dynamics import pretrain_dynamics_two_var
-from utils import make_powerlaw_spec_and_wstar, parse_float_list
+from utils import make_powerlaw_spec_and_wstar, parse_float_list, OutputDir
 
 
 def main() -> None:
@@ -36,7 +36,6 @@ def main() -> None:
     parser.add_argument("--beta-vals", type=str, default="0.5,0.75,1.1,1.25,1.5,2.0")
     parser.add_argument("--multipliers", type=str, default="0.1,0.1,0.2,0.5,0.8,1.0")
     parser.add_argument("--output-dir", type=str, default=None)
-    parser.add_argument("--losses-path", type=str, default=None)
     parser.add_argument("--no-show", action="store_true")
     args = parser.parse_args()
 
@@ -50,8 +49,7 @@ def main() -> None:
     beta_vals = parse_float_list(args.beta_vals)
     multipliers = parse_float_list(args.multipliers)
 
-    output_dir = Path(args.output_dir) if args.output_dir else PROJECT_ROOT / "outputs"
-    output_dir.mkdir(parents=True, exist_ok=True)
+    out = OutputDir(__file__, base=args.output_dir)
 
     # Run two-var dynamics for each beta
     train_loss_and_params: list[tuple[torch.Tensor, list[torch.Tensor]]] = []
@@ -84,8 +82,9 @@ def main() -> None:
         plt.semilogx(wy_wo)
     plt.xlabel(r"$t$", fontsize=20)
     plt.ylabel(r"$w_o(t) w_y(t)$", fontsize=20)
-    plt.savefig(output_dir / "beta_sweep_wy_wo.png", dpi=200, bbox_inches="tight")
-    print("Saved beta_sweep_wy_wo.png")
+    plt.savefig(out.png("beta_sweep_wy_wo"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf("beta_sweep_wy_wo"), dpi=200, bbox_inches="tight")
+    print(f"Saved {out.png('beta_sweep_wy_wo')}")
 
     # --- Plot 2: w_x^2 * w_k * w_q * w_v + per-beta theory lines ---
     plt.figure()
@@ -100,23 +99,20 @@ def main() -> None:
     plt.legend()
     plt.xlabel(r"$t$", fontsize=20)
     plt.ylabel(r"$w_x(t)^2 w_k(t) w_q(t) w_v(t)$", fontsize=20)
-    plt.savefig(output_dir / "beta_sweep_wx2_wk_wq_wv.png", dpi=200, bbox_inches="tight")
-    print("Saved beta_sweep_wx2_wk_wq_wv.png")
+    plt.savefig(out.png("beta_sweep_wx2_wk_wq_wv"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf("beta_sweep_wx2_wk_wq_wv"), dpi=200, bbox_inches="tight")
+    print(f"Saved {out.png('beta_sweep_wx2_wk_wq_wv')}")
 
     # --- Plot 3: loss trajectories ---
     plt.figure()
     sns.set_palette("rocket", n_colors=len(beta_vals))
     for i, beta in enumerate(beta_vals):
         plt.loglog(train_loss_and_params[i][0].cpu().numpy())
-    plt.savefig(output_dir / "beta_sweep_loss.png", dpi=200, bbox_inches="tight")
-    print("Saved beta_sweep_loss.png")
+    plt.savefig(out.png("beta_sweep_loss"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf("beta_sweep_loss"), dpi=200, bbox_inches="tight")
+    print(f"Saved {out.png('beta_sweep_loss')}")
 
     # --- Save losses ---
-    losses_path = (
-        Path(args.losses_path)
-        if args.losses_path
-        else output_dir / "beta_sweep_dynamics_losses.npz"
-    )
     npz_payload: dict[str, np.ndarray] = {
         "beta_vals": np.asarray(beta_vals, dtype=np.float64),
     }
@@ -125,8 +121,8 @@ def main() -> None:
         npz_payload[f"loss_{tag}"] = train_loss_and_params[i][0].cpu().numpy()
         for k, name in enumerate(["wx", "wy", "wk", "wq", "wv", "wo"]):
             npz_payload[f"{name}_{tag}"] = train_loss_and_params[i][1][k].cpu().numpy()
-    np.savez(losses_path, **npz_payload)
-    print(f"Saved losses to: {losses_path}")
+    np.savez(out.numpy("beta_sweep_dynamics_losses"), **npz_payload)
+    print(f"Saved losses to: {out.numpy('beta_sweep_dynamics_losses')}")
 
     if not args.no_show:
         plt.show()

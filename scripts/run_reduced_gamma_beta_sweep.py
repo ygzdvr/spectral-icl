@@ -8,12 +8,11 @@ import seaborn as sns
 import torch
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
+if str(Path(__file__).resolve().parents[1]) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from dynamics import reduced_gamma_structured_sgd_rmt_isotropic_dynamics
-from utils import make_powerlaw_spec_and_wstar, parse_float_list
+from utils import OutputDir, make_powerlaw_spec_and_wstar, parse_float_list
 
 
 def main() -> None:
@@ -50,8 +49,7 @@ def main() -> None:
     T = args.steps
     beta_vals = parse_float_list(args.beta_vals)
 
-    output_dir = Path(args.output_dir) if args.output_dir else PROJECT_ROOT / "outputs"
-    output_dir.mkdir(parents=True, exist_ok=True)
+    out = OutputDir(__file__, base=args.output_dir)
 
     losses_vary_beta: list[list[float]] = []
     for beta in beta_vals:
@@ -94,11 +92,11 @@ def main() -> None:
     plt.xlabel(r"$t$", fontsize=20)
     plt.ylabel(r"$\mathcal{L}(t)$", fontsize=20)
     plt.legend()
-    plt.savefig(output_dir / "losses_vary_beta.png", dpi=200, bbox_inches="tight")
-    print("Saved losses_vary_beta.png")
+    plt.savefig(out.png("losses_vary_beta"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf("losses_vary_beta"), dpi=200, bbox_inches="tight")
+    print(f"Saved plot to: {out.png('losses_vary_beta')}")
 
     # --- Save data ---
-    npz_path = output_dir / "reduced_gamma_beta_sweep.npz"
     payload: dict[str, np.ndarray] = {
         "beta_vals": np.asarray(beta_vals, dtype=np.float64),
     }
@@ -106,8 +104,8 @@ def main() -> None:
         payload[f"loss_beta_{beta:.2f}"] = np.asarray(
             losses_vary_beta[i], dtype=np.float64
         )
-    np.savez(npz_path, **payload)
-    print(f"Saved data to: {npz_path}")
+    np.savez(out.numpy("reduced_gamma_beta_sweep"), **payload)
+    print(f"Saved data to: {out.numpy('reduced_gamma_beta_sweep')}")
 
     if not args.no_show:
         plt.show()

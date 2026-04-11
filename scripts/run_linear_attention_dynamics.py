@@ -9,15 +9,15 @@ import seaborn as sns
 import torch
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
+_PROJ = str(Path(__file__).resolve().parents[1])
+if _PROJ not in sys.path:
+    sys.path.insert(0, _PROJ)
 
 from dynamics import (
     train_model_isotropic,
     reduced_theory_four_var_linear_att_isotropic,
 )
-from utils import parse_int_list
+from utils import parse_int_list, OutputDir
 
 
 def main() -> None:
@@ -57,8 +57,7 @@ def main() -> None:
     lr = args.lr
     sqrt_d = math.sqrt(d)
 
-    output_dir = Path(args.output_dir) if args.output_dir else PROJECT_ROOT / "outputs"
-    output_dir.mkdir(parents=True, exist_ok=True)
+    out = OutputDir(__file__, base=args.output_dir)
 
     lvals = parse_int_list(args.lvals)
 
@@ -129,8 +128,9 @@ def main() -> None:
     plt.xlabel(r"$t$", fontsize=20)
     plt.ylabel(r"$|W_i(t)|$", fontsize=20)
     plt.legend()
-    plt.savefig(output_dir / "weight_norm_dynamics.png", dpi=200, bbox_inches="tight")
-    print("Saved weight_norm_dynamics.png")
+    plt.savefig(out.png("weight_norm_dynamics"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf("weight_norm_dynamics"), dpi=200, bbox_inches="tight")
+    print(f"Saved {out.png('weight_norm_dynamics')}")
 
     # --- Plot 2: normalized loss comparison (theory vs experiment) ---
     t_axis = np.linspace(1, T, T)
@@ -147,15 +147,15 @@ def main() -> None:
     plt.xlabel(r"$t$", fontsize=20)
     plt.ylabel(r"$\mathcal{L}(t)$", fontsize=20)
     plt.legend()
-    plt.savefig(output_dir / "isotropic_theory_vs_expt.png", dpi=200, bbox_inches="tight")
-    print("Saved isotropic_theory_vs_expt.png")
+    plt.savefig(out.png("isotropic_theory_vs_expt"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf("isotropic_theory_vs_expt"), dpi=200, bbox_inches="tight")
+    print(f"Saved {out.png('isotropic_theory_vs_expt')}")
 
     # --- Print final losses ---
     print(f"\nExperiment final losses: {[loss[-1] for loss in all_losses]}")
     print(f"Theory final losses: {[loss[-1] for loss in losses_th]}")
 
     # --- Save data ---
-    npz_path = output_dir / "linear_attention_dynamics_data.npz"
     payload: dict[str, np.ndarray] = {
         "lvals": np.asarray(lvals, dtype=np.int64),
     }
@@ -164,8 +164,8 @@ def main() -> None:
         payload[f"loss_th_L_{L}"] = np.array(losses_th[i], dtype=np.float64)
         payload[f"weight_norms_L_{L}"] = np.array(all_weight_norms[i], dtype=np.float64)
         payload[f"ws_th_L_{L}"] = np.array(all_ws[i], dtype=np.float64)
-    np.savez(npz_path, **payload)
-    print(f"Saved data to: {npz_path}")
+    np.savez(out.numpy("linear_attention_dynamics_data"), **payload)
+    print(f"Saved data to: {out.numpy('linear_attention_dynamics_data')}")
 
     if not args.no_show:
         plt.show()

@@ -15,6 +15,7 @@ if str(PROJECT_ROOT) not in sys.path:
 from configs import LinearICLConfig
 from data import make_train_test_batches
 from models import SimpleTransformer
+from utils import OutputDir
 
 
 sns.set(font_scale=1.3)
@@ -56,8 +57,7 @@ def main() -> None:
         help="Use SDPA (FlashAttention-eligible on CUDA). Default reproduces raw notebook attention.",
     )
     parser.add_argument("--device", type=str, default="cuda")
-    parser.add_argument("--plot-path", type=str, default=None, help="Path to save the plot image.")
-    parser.add_argument("--losses-path", type=str, default=None, help="Path to save losses as .npz.")
+    parser.add_argument("--output-dir", type=str, default=None)
     parser.add_argument("--no-show", action="store_true", help="Disable interactive plot window.")
     args = parser.parse_args()
 
@@ -102,6 +102,8 @@ def main() -> None:
         if step % 100 == 0:
             print(f"Loss step {step}: {train_losses[-1]:.6f}")
 
+    out = OutputDir(__file__, base=args.output_dir)
+
     xs = torch.linspace(10, args.steps, args.steps).cpu().numpy()
     ref = (xs ** 0.5).tolist()
 
@@ -109,24 +111,17 @@ def main() -> None:
     plt.loglog(test_losses, label="test")
     plt.loglog(ref, label="sqrt(t)")
     plt.legend()
-    plot_path = Path(args.plot_path) if args.plot_path else PROJECT_ROOT / "outputs" / "first_cells_torch.png"
-    plot_path.parent.mkdir(parents=True, exist_ok=True)
-    plt.savefig(plot_path, dpi=200, bbox_inches="tight")
-    print(f"Saved plot to: {plot_path}")
+    plt.savefig(out.png("train_test"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf("train_test"), dpi=200, bbox_inches="tight")
+    print(f"Saved plot to: {out.png('train_test')}")
 
-    losses_path = (
-        Path(args.losses_path)
-        if args.losses_path
-        else PROJECT_ROOT / "outputs" / "first_cells_torch_losses.npz"
-    )
-    losses_path.parent.mkdir(parents=True, exist_ok=True)
     np.savez(
-        losses_path,
+        out.numpy("losses"),
         train=np.asarray(train_losses, dtype=np.float64),
         test=np.asarray(test_losses, dtype=np.float64),
         ref=np.asarray(ref, dtype=np.float64),
     )
-    print(f"Saved losses to: {losses_path}")
+    print(f"Saved losses to: {out.numpy('losses')}")
 
     if not args.no_show:
         plt.show()

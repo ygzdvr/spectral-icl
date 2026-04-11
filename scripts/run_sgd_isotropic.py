@@ -3,16 +3,14 @@ import sys
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-import numpy as np
 import seaborn as sns
 import torch
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
+if str(Path(__file__).resolve().parents[1]) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from utils import parse_float_list, run_experiment
+from utils import OutputDir, parse_float_list, run_experiment
 
 
 def main() -> None:
@@ -39,14 +37,13 @@ def main() -> None:
     taus = parse_float_list(args.taus)
     alphas = parse_float_list(args.alphas)
 
-    output_dir = Path(args.output_dir) if args.output_dir else PROJECT_ROOT / "outputs"
-    output_dir.mkdir(parents=True, exist_ok=True)
+    out = OutputDir(__file__, base=args.output_dir)
 
     sns.set(font_scale=1.3)
     sns.set_style("whitegrid")
 
     for alpha in alphas:
-        run_experiment(args.d, alpha, taus, args.eta, args.steps, output_dir, args.device, dtype)
+        run_experiment(args.d, alpha, taus, args.eta, args.steps, out, args.device, dtype)
 
     if not args.no_show:
         plt.show()

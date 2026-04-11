@@ -8,12 +8,12 @@ import seaborn as sns
 import torch
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
+_PROJ = str(Path(__file__).resolve().parents[1])
+if _PROJ not in sys.path:
+    sys.path.insert(0, _PROJ)
 
 from dynamics import pretrain_dynamics, pretrain_dynamics_two_var
-from utils import make_powerlaw_spec_and_wstar, parse_int_list
+from utils import make_powerlaw_spec_and_wstar, parse_int_list, OutputDir
 
 
 def main() -> None:
@@ -38,7 +38,6 @@ def main() -> None:
     parser.add_argument("--w0-two", type=float, default=0.25)
     parser.add_argument("--lvals", type=str, default="1,2,4,8,16,32,64,128")
     parser.add_argument("--output-dir", type=str, default=None)
-    parser.add_argument("--losses-path", type=str, default=None)
     parser.add_argument("--no-show", action="store_true")
     args = parser.parse_args()
 
@@ -61,8 +60,7 @@ def main() -> None:
 
     lvals = parse_int_list(args.lvals)
 
-    output_dir = Path(args.output_dir) if args.output_dir else PROJECT_ROOT / "outputs"
-    output_dir.mkdir(parents=True, exist_ok=True)
+    out = OutputDir(__file__, base=args.output_dir)
 
     # =====================================================================
     # 1) Six-variable dynamics (pretrain_dynamics_two_var)
@@ -90,8 +88,9 @@ def main() -> None:
     plt.loglog(t_axis, t_axis ** (-th_exp_two), "--", color="blue")
     plt.xlabel(r"$t$", fontsize=20)
     plt.ylabel(r"Loss", fontsize=20)
-    plt.savefig(output_dir / "two_var_loss_trajectories.png", dpi=200, bbox_inches="tight")
-    print(f"  Saved two_var_loss_trajectories.png")
+    plt.savefig(out.png("two_var_loss_trajectories"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf("two_var_loss_trajectories"), dpi=200, bbox_inches="tight")
+    print(f"  Saved {out.png('two_var_loss_trajectories')}")
 
     # --- Plot 2: w_y(t) * w_o(t) ---
     plt.figure()
@@ -102,8 +101,9 @@ def main() -> None:
         plt.semilogx(wy_wo)
     plt.xlabel(r"$t$", fontsize=20)
     plt.ylabel(r"$w_o(t) w_y(t)$", fontsize=20)
-    plt.savefig(output_dir / "two_var_wy_wo.png", dpi=200, bbox_inches="tight")
-    print(f"  Saved two_var_wy_wo.png")
+    plt.savefig(out.png("two_var_wy_wo"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf("two_var_wy_wo"), dpi=200, bbox_inches="tight")
+    print(f"  Saved {out.png('two_var_wy_wo')}")
 
     # --- Plot 3: w_x(t)^2 * w_k(t) * w_q(t) * w_v(t) + theory ---
     th_exp_param = 5.0 / (5 * beta + 2)
@@ -124,8 +124,9 @@ def main() -> None:
     plt.legend()
     plt.xlabel(r"$t$", fontsize=20)
     plt.ylabel(r"$w_x(t)^2 w_k(t) w_q(t) w_v(t)$", fontsize=20)
-    plt.savefig(output_dir / "two_var_wx2_wk_wq_wv.png", dpi=200, bbox_inches="tight")
-    print(f"  Saved two_var_wx2_wk_wq_wv.png")
+    plt.savefig(out.png("two_var_wx2_wk_wq_wv"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf("two_var_wx2_wk_wq_wv"), dpi=200, bbox_inches="tight")
+    print(f"  Saved {out.png('two_var_wx2_wk_wq_wv')}")
 
     # =====================================================================
     # 2) Single-variable dynamics (pretrain_dynamics)
@@ -173,12 +174,9 @@ def main() -> None:
     plt.legend()
     plt.ylim([1e-5, 2.0])
     plt.tight_layout()
-    plt.savefig(
-        output_dir / "depth_scaling_pretrain_theory_ICL_powerlaw.png",
-        dpi=200,
-        bbox_inches="tight",
-    )
-    print(f"  Saved depth_scaling_pretrain_theory_ICL_powerlaw.png")
+    plt.savefig(out.png("depth_scaling_pretrain_theory_ICL_powerlaw"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf("depth_scaling_pretrain_theory_ICL_powerlaw"), dpi=200, bbox_inches="tight")
+    print(f"  Saved {out.png('depth_scaling_pretrain_theory_ICL_powerlaw')}")
 
     # --- Plot 5: final loss vs L ---
     final_losses = [float(loss_i[-1].cpu()) for loss_i in train_loss]
@@ -198,21 +196,13 @@ def main() -> None:
     plt.legend()
     plt.xlabel(r"$L$", fontsize=20)
     plt.ylabel(r"$\lim_{t \to \infty} \  \mathcal{L}(t,L)$", fontsize=20)
-    plt.savefig(
-        output_dir / "depth_scaling_final_loss_powerlaw.png",
-        dpi=200,
-        bbox_inches="tight",
-    )
-    print(f"  Saved depth_scaling_final_loss_powerlaw.png")
+    plt.savefig(out.png("depth_scaling_final_loss_powerlaw"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf("depth_scaling_final_loss_powerlaw"), dpi=200, bbox_inches="tight")
+    print(f"  Saved {out.png('depth_scaling_final_loss_powerlaw')}")
 
     # =====================================================================
     # Save losses
     # =====================================================================
-    losses_path = (
-        Path(args.losses_path)
-        if args.losses_path
-        else output_dir / "pretrain_dynamics_losses.npz"
-    )
     npz_payload: dict[str, np.ndarray] = {
         "lvals": np.asarray(lvals, dtype=np.int64),
         "spec": spec.cpu().numpy(),
@@ -223,8 +213,8 @@ def main() -> None:
         npz_payload[f"two_var_loss_L_{L}"] = two_var_results[i][0].cpu().numpy()
         for k, name in enumerate(["wx", "wy", "wk", "wq", "wv", "wo"]):
             npz_payload[f"two_var_{name}_L_{L}"] = two_var_results[i][1][k].cpu().numpy()
-    np.savez(losses_path, **npz_payload)
-    print(f"Saved losses to: {losses_path}")
+    np.savez(out.numpy("pretrain_dynamics_losses"), **npz_payload)
+    print(f"Saved losses to: {out.numpy('pretrain_dynamics_losses')}")
 
     if not args.no_show:
         plt.show()

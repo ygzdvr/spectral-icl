@@ -14,7 +14,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from configs import DecoupledTrainModelConfig
 from dynamics import run_depth_scaling_nonrotate_sweep
-from utils import moving_average, parse_int_list
+from utils import OutputDir, moving_average, parse_int_list
 
 
 sns.set(font_scale=1.3)
@@ -41,9 +41,7 @@ def main() -> None:
     parser.add_argument("--gamma", type=float, default=1.0)
     parser.add_argument("--sigma", type=float, default=0.4)
     parser.add_argument("--lvals", type=str, default="1,2,4,8")
-    parser.add_argument("--plot-path", type=str, default=None)
-    parser.add_argument("--losses-path", type=str, default=None)
-    parser.add_argument("--artifacts-path", type=str, default=None)
+    parser.add_argument("--output-dir", type=str, default=None)
     parser.add_argument("--no-show", action="store_true")
     args = parser.parse_args()
 
@@ -59,6 +57,7 @@ def main() -> None:
         print("CUDA was requested but is not available.")
 
     lvals = parse_int_list(args.lvals)
+    out = OutputDir(__file__, base=args.output_dir)
 
     cfg = DecoupledTrainModelConfig(
         d=args.d,
@@ -98,35 +97,18 @@ def main() -> None:
     plt.ylabel(r"Pretrain Loss", fontsize=20)
     plt.legend()
 
-    plot_path = (
-        Path(args.plot_path)
-        if args.plot_path
-        else PROJECT_ROOT / "outputs" / "depth_scaling_ICL_powerlaw_nonrotate.png"
-    )
-    plot_path.parent.mkdir(parents=True, exist_ok=True)
-    plt.savefig(plot_path, dpi=200, bbox_inches="tight")
-    print(f"Saved plot to: {plot_path}")
+    plt.savefig(out.png("depth_scaling_ICL_powerlaw_nonrotate"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf("depth_scaling_ICL_powerlaw_nonrotate"), dpi=200, bbox_inches="tight")
+    print(f"Saved plot to: {out.png('depth_scaling_ICL_powerlaw_nonrotate')}")
 
-    losses_path = (
-        Path(args.losses_path)
-        if args.losses_path
-        else PROJECT_ROOT / "outputs" / "depth_scaling_ICL_powerlaw_nonrotate_losses.npz"
-    )
-    losses_path.parent.mkdir(parents=True, exist_ok=True)
     npz_payload: dict[str, np.ndarray] = {"lvals": np.asarray(lvals, dtype=np.int64)}
     for i, loss in enumerate(all_losses):
         npz_payload[f"loss_L_{lvals[i]}"] = np.asarray(loss, dtype=np.float64)
         npz_payload[f"smooth_L_{lvals[i]}"] = smoothed_losses[i]
         npz_payload[f"smooth_steps_L_{lvals[i]}"] = smoothed_steps[i]
-    np.savez(losses_path, **npz_payload)
-    print(f"Saved losses to: {losses_path}")
+    np.savez(out.numpy("depth_scaling_ICL_powerlaw_nonrotate_losses"), **npz_payload)
+    print(f"Saved losses to: {out.numpy('depth_scaling_ICL_powerlaw_nonrotate_losses')}")
 
-    artifacts_path = (
-        Path(args.artifacts_path)
-        if args.artifacts_path
-        else PROJECT_ROOT / "outputs" / "depth_scaling_ICL_powerlaw_nonrotate_artifacts.pt"
-    )
-    artifacts_path.parent.mkdir(parents=True, exist_ok=True)
     torch.save(
         {
             "config": vars(args),
@@ -135,9 +117,9 @@ def main() -> None:
             "w_star": results["w_star"].detach().cpu(),
             "all_losses": [torch.tensor(loss, dtype=torch.float64) for loss in all_losses],
         },
-        artifacts_path,
+        out.torch("depth_scaling_ICL_powerlaw_nonrotate_artifacts"),
     )
-    print(f"Saved artifacts to: {artifacts_path}")
+    print(f"Saved artifacts to: {out.torch('depth_scaling_ICL_powerlaw_nonrotate_artifacts')}")
 
     if not args.no_show:
         plt.show()

@@ -14,6 +14,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from configs import OODCovarianceEvalConfig
 from dynamics import run_ood_covariance_eval
+from utils import OutputDir
 
 
 sns.set(font_scale=1.3)
@@ -40,8 +41,7 @@ def main() -> None:
     parser.add_argument("--seed-exp", type=int, default=0)
     parser.add_argument("--seed-x", type=int, default=1)
     parser.add_argument("--seed-beta", type=int, default=2)
-    parser.add_argument("--plot-path", type=str, default=None)
-    parser.add_argument("--losses-path", type=str, default=None)
+    parser.add_argument("--output-dir", type=str, default=None)
     parser.add_argument("--no-show", action="store_true")
     args = parser.parse_args()
 
@@ -61,7 +61,9 @@ def main() -> None:
         beta_model=args.beta_model,
     )
 
-    out, train_losses, test_losses, X, y, powers = run_ood_covariance_eval(
+    odir = OutputDir(__file__, base=args.output_dir)
+
+    result, train_losses, test_losses, X, y, powers = run_ood_covariance_eval(
         cfg,
         device=device,
         dtype=dtype,
@@ -71,7 +73,7 @@ def main() -> None:
     print(f"X shape: {tuple(X.shape)}")
     print(f"y shape: {tuple(y.shape)}")
     print(f"powers shape: {tuple(powers.shape)}")
-    print(f"out shape: {tuple(out.shape)}")
+    print(f"out shape: {tuple(result.shape)}")
 
     ref_curve = (1.0 - cfg.P / cfg.d) * np.ones(len(test_losses), dtype=np.float64)
 
@@ -82,28 +84,17 @@ def main() -> None:
     plt.xlabel(r"$\ell$", fontsize=20)
     plt.ylabel(r"$|h^\ell_{tr,te}|^2$", fontsize=20)
 
-    plot_path = (
-        Path(args.plot_path)
-        if args.plot_path
-        else PROJECT_ROOT / "outputs" / "ood_covariance_generalization.png"
-    )
-    plot_path.parent.mkdir(parents=True, exist_ok=True)
-    plt.savefig(plot_path, dpi=200, bbox_inches="tight")
-    print(f"Saved plot to: {plot_path}")
+    plt.savefig(odir.png("generalization"), dpi=200, bbox_inches="tight")
+    plt.savefig(odir.pdf("generalization"), dpi=200, bbox_inches="tight")
+    print(f"Saved plot to: {odir.png('generalization')}")
 
-    losses_path = (
-        Path(args.losses_path)
-        if args.losses_path
-        else PROJECT_ROOT / "outputs" / "ood_covariance_generalization_losses.npz"
-    )
-    losses_path.parent.mkdir(parents=True, exist_ok=True)
     np.savez(
-        losses_path,
+        odir.numpy("losses"),
         train=np.asarray(train_losses, dtype=np.float64),
         test=np.asarray(test_losses, dtype=np.float64),
         ref=ref_curve,
     )
-    print(f"Saved losses to: {losses_path}")
+    print(f"Saved losses to: {odir.numpy('losses')}")
 
     if not args.no_show:
         plt.show()

@@ -14,7 +14,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from configs import HandCodedEvalConfig
 from dynamics import run_hand_coded_eval
-from utils import is_cuda_oom, resolve_device
+from utils import is_cuda_oom, resolve_device, OutputDir
 
 
 sns.set(font_scale=1.3)
@@ -43,8 +43,7 @@ def main() -> None:
     parser.add_argument("--beta", type=float, default=100.0)
     parser.add_argument("--seed-x", type=int, default=0)
     parser.add_argument("--seed-beta", type=int, default=1)
-    parser.add_argument("--plot-path", type=str, default=None, help="Path to save the plot image.")
-    parser.add_argument("--losses-path", type=str, default=None, help="Path to save losses as .npz.")
+    parser.add_argument("--output-dir", type=str, default=None)
     parser.add_argument("--no-show", action="store_true")
     args = parser.parse_args()
 
@@ -61,8 +60,10 @@ def main() -> None:
     )
     device = resolve_device(args.device)
 
+    odir = OutputDir(__file__, base=args.output_dir)
+
     try:
-        out, train_losses, test_losses, X, y = run_hand_coded_eval(cfg, device=device, dtype=dtype)
+        result, train_losses, test_losses, X, y = run_hand_coded_eval(cfg, device=device, dtype=dtype)
     except (RuntimeError, torch.AcceleratorError) as exc:
         if not device.startswith("cuda") or not is_cuda_oom(exc):
             raise
@@ -73,13 +74,13 @@ def main() -> None:
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
         device = "cpu"
-        out, train_losses, test_losses, X, y = run_hand_coded_eval(cfg, device=device, dtype=dtype)
+        result, train_losses, test_losses, X, y = run_hand_coded_eval(cfg, device=device, dtype=dtype)
 
     print(f"device: {device}")
 
     print(f"X shape: {tuple(X.shape)}")
     print(f"y shape: {tuple(y.shape)}")
-    print(f"out shape: {tuple(out.shape)}")
+    print(f"out shape: {tuple(result.shape)}")
 
     plt.plot(train_losses)
     ts = torch.linspace(0, len(train_losses), len(train_losses))
@@ -88,27 +89,16 @@ def main() -> None:
     plt.xlabel(r"$\ell$", fontsize=20)
     plt.ylabel(r"In Context Loss", fontsize=20)
 
-    plot_path = (
-        Path(args.plot_path)
-        if args.plot_path
-        else PROJECT_ROOT / "outputs" / "hand_coded_model_eval.png"
-    )
-    plot_path.parent.mkdir(parents=True, exist_ok=True)
-    plt.savefig(plot_path, dpi=200, bbox_inches="tight")
-    print(f"Saved plot to: {plot_path}")
+    plt.savefig(odir.png("eval"), dpi=200, bbox_inches="tight")
+    plt.savefig(odir.pdf("eval"), dpi=200, bbox_inches="tight")
+    print(f"Saved plot to: {odir.png('eval')}")
 
-    losses_path = (
-        Path(args.losses_path)
-        if args.losses_path
-        else PROJECT_ROOT / "outputs" / "hand_coded_model_eval_losses.npz"
-    )
-    losses_path.parent.mkdir(parents=True, exist_ok=True)
     np.savez(
-        losses_path,
+        odir.numpy("losses"),
         train=np.asarray(train_losses, dtype=np.float64),
         test=np.asarray(test_losses, dtype=np.float64),
     )
-    print(f"Saved losses to: {losses_path}")
+    print(f"Saved losses to: {odir.numpy('losses')}")
 
     if not args.no_show:
         plt.show()

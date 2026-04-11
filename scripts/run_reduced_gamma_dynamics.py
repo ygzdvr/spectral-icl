@@ -8,15 +8,14 @@ import seaborn as sns
 import torch
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
+if str(Path(__file__).resolve().parents[1]) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from dynamics import (
     reduced_gamma_structured_sgd_rmt_isotropic_dynamics,
     powerlaw_loss_landscape,
 )
-from utils import make_powerlaw_spec_and_wstar, parse_int_list
+from utils import OutputDir, make_powerlaw_spec_and_wstar, parse_int_list
 
 
 def main() -> None:
@@ -63,8 +62,7 @@ def main() -> None:
     alpha = args.alpha
     beta = args.beta
 
-    output_dir = Path(args.output_dir) if args.output_dir else PROJECT_ROOT / "outputs"
-    output_dir.mkdir(parents=True, exist_ok=True)
+    out = OutputDir(__file__, base=args.output_dir)
 
     spec, w_star = make_powerlaw_spec_and_wstar(
         M,
@@ -105,17 +103,17 @@ def main() -> None:
         plt.legend()
         plt.xlabel(r"$t$", fontsize=20)
         plt.ylabel(r"Loss", fontsize=20)
-        plt.savefig(output_dir / "reduced_gamma_sgd_loss.png", dpi=200, bbox_inches="tight")
-        print("Saved reduced_gamma_sgd_loss.png")
+        plt.savefig(out.png("reduced_gamma_sgd_loss"), dpi=200, bbox_inches="tight")
+        plt.savefig(out.pdf("reduced_gamma_sgd_loss"), dpi=200, bbox_inches="tight")
+        print(f"Saved plot to: {out.png('reduced_gamma_sgd_loss')}")
 
-        sgd_npz = output_dir / "reduced_gamma_sgd_data.npz"
         np.savez(
-            sgd_npz,
+            out.numpy("reduced_gamma_sgd_data"),
             losses=np.asarray(sgd_losses, dtype=np.float64),
             mean_eigs=np.asarray(sgd_mean_eigs, dtype=np.float64),
             var_eigs=np.asarray(sgd_var_eigs, dtype=np.float64),
         )
-        print(f"Saved SGD data to: {sgd_npz}")
+        print(f"Saved SGD data to: {out.numpy('reduced_gamma_sgd_data')}")
 
     # =====================================================================
     # 1) Loss landscape: loss(gamma) for varying L
@@ -143,8 +141,9 @@ def main() -> None:
     plt.legend()
     plt.xlabel(r"$\gamma$", fontsize=20)
     plt.ylabel(r"$\mathcal{L}(\gamma)$", fontsize=20)
-    plt.savefig(output_dir / "loss_landscape_powerlaw.png", dpi=200, bbox_inches="tight")
-    print("Saved loss_landscape_powerlaw.png")
+    plt.savefig(out.png("loss_landscape_powerlaw"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf("loss_landscape_powerlaw"), dpi=200, bbox_inches="tight")
+    print(f"Saved plot to: {out.png('loss_landscape_powerlaw')}")
 
     # =====================================================================
     # 2) Min loss vs L (power-law scaling)
@@ -164,13 +163,13 @@ def main() -> None:
     plt.legend()
     plt.xlabel(r"$L$", fontsize=20)
     plt.ylabel(r"$\min_\gamma \mathcal{L}(\gamma)$", fontsize=20)
-    plt.savefig(output_dir / "min_loss_vs_depth_powerlaw.png", dpi=200, bbox_inches="tight")
-    print("Saved min_loss_vs_depth_powerlaw.png")
+    plt.savefig(out.png("min_loss_vs_depth_powerlaw"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf("min_loss_vs_depth_powerlaw"), dpi=200, bbox_inches="tight")
+    print(f"Saved plot to: {out.png('min_loss_vs_depth_powerlaw')}")
 
     # =====================================================================
     # Save data
     # =====================================================================
-    npz_path = output_dir / "reduced_gamma_landscape.npz"
     payload: dict[str, np.ndarray] = {
         "gammas": gammas_np,
         "landscape_lvals": np.asarray(landscape_lvals, dtype=np.int64),
@@ -180,8 +179,8 @@ def main() -> None:
     }
     for i, L in enumerate(landscape_lvals):
         payload[f"landscape_L_{L}"] = landscape_losses[i]
-    np.savez(npz_path, **payload)
-    print(f"Saved data to: {npz_path}")
+    np.savez(out.numpy("reduced_gamma_landscape"), **payload)
+    print(f"Saved data to: {out.numpy('reduced_gamma_landscape')}")
 
     if not args.no_show:
         plt.show()

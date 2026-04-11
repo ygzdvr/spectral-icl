@@ -8,11 +8,12 @@ import seaborn as sns
 import torch
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
+_PROJ = str(Path(__file__).resolve().parents[1])
+if _PROJ not in sys.path:
+    sys.path.insert(0, _PROJ)
 
 from dynamics import visualize_loss_landscape
+from utils import OutputDir
 
 
 def main() -> None:
@@ -34,8 +35,7 @@ def main() -> None:
     args = parser.parse_args()
 
     dtype = torch.float64 if args.dtype == "float64" else torch.float32
-    output_dir = Path(args.output_dir) if args.output_dir else PROJECT_ROOT / "outputs"
-    output_dir.mkdir(parents=True, exist_ok=True)
+    out = OutputDir(__file__, base=args.output_dir)
 
     lamb_grid = torch.linspace(args.lamb_min, args.lamb_max, args.lamb_points, dtype=dtype)
     gamma_vals = torch.linspace(0, 1.0, args.gamma_points, dtype=dtype)
@@ -59,8 +59,9 @@ def main() -> None:
     plt.figure()
     plt.semilogy(gamma_vals_50.numpy(), losses_single)
     plt.ylim([1e-3, 1.2])
-    plt.savefig(output_dir / "loss_landscape_single.png", dpi=200, bbox_inches="tight")
-    print("Saved loss_landscape_single.png")
+    plt.savefig(out.png("loss_landscape_single"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf("loss_landscape_single"), dpi=200, bbox_inches="tight")
+    print(f"Saved {out.png('loss_landscape_single')}")
 
     # =====================================================================
     # Experiment 2: vary L, alpha=0.5, sigma=0.0
@@ -84,12 +85,9 @@ def main() -> None:
     plt.ylim([0, 1.01])
     plt.xlabel(r"$\gamma \ / \  L$", fontsize=20)
     plt.ylabel(r"$\mathcal{L}(\gamma)$", fontsize=20)
-    plt.savefig(
-        output_dir / f"loss_landscape_gamma_alpha_{alpha}.png",
-        dpi=200,
-        bbox_inches="tight",
-    )
-    print(f"Saved loss_landscape_gamma_alpha_{alpha}.png")
+    plt.savefig(out.png(f"loss_landscape_gamma_alpha_{alpha}"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf(f"loss_landscape_gamma_alpha_{alpha}"), dpi=200, bbox_inches="tight")
+    print(f"Saved {out.png(f'loss_landscape_gamma_alpha_{alpha}')}")
 
     # =====================================================================
     # Experiment 3: vary sigma, L=16, alpha=1.125
@@ -118,15 +116,11 @@ def main() -> None:
     plt.ylim([0, 1.01])
     plt.xlabel(r"$\gamma \ / \ L$", fontsize=20)
     plt.ylabel(r"$\mathcal{L}(\gamma)-\sigma^2$", fontsize=20)
-    plt.savefig(
-        output_dir / "loss_landscape_gamma_vary_sigma.png",
-        dpi=200,
-        bbox_inches="tight",
-    )
-    print("Saved loss_landscape_gamma_vary_sigma.png")
+    plt.savefig(out.png("loss_landscape_gamma_vary_sigma"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf("loss_landscape_gamma_vary_sigma"), dpi=200, bbox_inches="tight")
+    print(f"Saved {out.png('loss_landscape_gamma_vary_sigma')}")
 
     # --- Save all data ---
-    npz_path = output_dir / "loss_landscape_data.npz"
     payload: dict[str, np.ndarray] = {
         "gamma_vals": gamma_np,
         "lamb_grid": lamb_grid.numpy(),
@@ -137,8 +131,8 @@ def main() -> None:
         payload[f"vary_sigma_s{sigma:.2f}"] = np.asarray(
             all_losses_sigma[i], dtype=np.float64
         )
-    np.savez(npz_path, **payload)
-    print(f"Saved data to: {npz_path}")
+    np.savez(out.numpy("loss_landscape_data"), **payload)
+    print(f"Saved data to: {out.numpy('loss_landscape_data')}")
 
     if not args.no_show:
         plt.show()

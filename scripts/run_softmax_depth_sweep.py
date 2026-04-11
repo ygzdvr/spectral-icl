@@ -14,7 +14,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from configs import DecoupledTrainModelConfig
 from dynamics import make_normalized_powerlaw_problem, train_model_softmax
-from utils import parse_int_list
+from utils import OutputDir, parse_int_list
 
 
 def main() -> None:
@@ -42,13 +42,13 @@ def main() -> None:
     parser.add_argument("--gamma", type=float, default=1.0)
     parser.add_argument("--sigma", type=float, default=0.45)
     parser.add_argument("--lvals", type=str, default="1,2,4")
-    parser.add_argument("--plot-path", type=str, default=None)
-    parser.add_argument("--losses-path", type=str, default=None)
+    parser.add_argument("--output-dir", type=str, default=None)
     parser.add_argument("--no-show", action="store_true")
     args = parser.parse_args()
 
     dtype = torch.float64 if args.dtype == "float64" else torch.float32
     device = torch.device(args.device)
+    out = OutputDir(__file__, base=args.output_dir)
 
     lvals = parse_int_list(args.lvals)
     spec, w_star = make_normalized_powerlaw_problem(
@@ -93,22 +93,11 @@ def main() -> None:
     plt.xlabel(r"$t$", fontsize=20)
     plt.ylabel(r"Loss", fontsize=20)
 
-    plot_path = (
-        Path(args.plot_path)
-        if args.plot_path
-        else PROJECT_ROOT / "outputs" / "softmax_depth_sweep.png"
-    )
-    plot_path.parent.mkdir(parents=True, exist_ok=True)
-    plt.savefig(plot_path, dpi=200, bbox_inches="tight")
-    print(f"Saved plot to: {plot_path}")
+    plt.savefig(out.png("softmax_depth_sweep"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf("softmax_depth_sweep"), dpi=200, bbox_inches="tight")
+    print(f"Saved plot to: {out.png('softmax_depth_sweep')}")
 
     # --- Save ---
-    losses_path = (
-        Path(args.losses_path)
-        if args.losses_path
-        else PROJECT_ROOT / "outputs" / "softmax_depth_sweep_losses.npz"
-    )
-    losses_path.parent.mkdir(parents=True, exist_ok=True)
     payload: dict[str, np.ndarray] = {"lvals": np.asarray(lvals, dtype=np.int64)}
     for i, L in enumerate(lvals):
         payload[f"loss_L_{L}"] = np.asarray(all_losses[i], dtype=np.float64)
@@ -120,8 +109,8 @@ def main() -> None:
     payload["final_losses"] = final_losses
     print(f"Final losses: {final_losses}")
 
-    np.savez(losses_path, **payload)
-    print(f"Saved losses to: {losses_path}")
+    np.savez(out.numpy("softmax_depth_sweep_losses"), **payload)
+    print(f"Saved losses to: {out.numpy('softmax_depth_sweep_losses')}")
 
     if not args.no_show:
         plt.show()

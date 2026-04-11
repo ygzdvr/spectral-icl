@@ -14,7 +14,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from configs import DecoupledTrainModelConfig
 from dynamics import run_depth_scaling_nonrotate_sweep
-from utils import parse_int_list
+from utils import parse_int_list, OutputDir
 
 
 sns.set(font_scale=1.3)
@@ -47,9 +47,7 @@ def main() -> None:
     parser.add_argument("--gamma", type=float, default=1.0)
     parser.add_argument("--sigma", type=float, default=0.4)
     parser.add_argument("--lvals", type=str, default="1,2,4,8")
-    parser.add_argument("--plot-path", type=str, default=None)
-    parser.add_argument("--losses-path", type=str, default=None)
-    parser.add_argument("--artifacts-path", type=str, default=None)
+    parser.add_argument("--output-dir", type=str, default=None)
     parser.add_argument("--no-show", action="store_true")
     args = parser.parse_args()
 
@@ -90,6 +88,8 @@ def main() -> None:
         online=False,
     )
 
+    out = OutputDir(__file__, base=args.output_dir)
+
     results = run_depth_scaling_nonrotate_sweep(cfg, lvals, device=args.device, dtype=dtype)
     all_test = results["all_losses"]
     all_train = results["all_train_losses"]
@@ -114,36 +114,19 @@ def main() -> None:
     plt.legend()
     plt.tight_layout()
 
-    plot_path = (
-        Path(args.plot_path)
-        if args.plot_path
-        else PROJECT_ROOT / "outputs" / "offline_depth_sweep_test_train.png"
-    )
-    plot_path.parent.mkdir(parents=True, exist_ok=True)
-    plt.savefig(plot_path, dpi=200, bbox_inches="tight")
-    print(f"Saved plot to: {plot_path}")
+    plt.savefig(out.png("test_train"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf("test_train"), dpi=200, bbox_inches="tight")
+    print(f"Saved plot to: {out.png('test_train')}")
 
     # --- save losses ---
-    losses_path = (
-        Path(args.losses_path)
-        if args.losses_path
-        else PROJECT_ROOT / "outputs" / "offline_depth_sweep_losses.npz"
-    )
-    losses_path.parent.mkdir(parents=True, exist_ok=True)
     npz_payload: dict[str, np.ndarray] = {"lvals": np.asarray(lvals, dtype=np.int64)}
     for i, L in enumerate(lvals):
         npz_payload[f"test_L_{L}"] = np.asarray(all_test[i], dtype=np.float64)
         npz_payload[f"train_L_{L}"] = np.asarray(all_train[i], dtype=np.float64)
-    np.savez(losses_path, **npz_payload)
-    print(f"Saved losses to: {losses_path}")
+    np.savez(out.numpy("losses"), **npz_payload)
+    print(f"Saved losses to: {out.numpy('losses')}")
 
     # --- save artifacts ---
-    artifacts_path = (
-        Path(args.artifacts_path)
-        if args.artifacts_path
-        else PROJECT_ROOT / "outputs" / "offline_depth_sweep_artifacts.pt"
-    )
-    artifacts_path.parent.mkdir(parents=True, exist_ok=True)
     torch.save(
         {
             "config": vars(args),
@@ -153,9 +136,9 @@ def main() -> None:
             "all_test": [torch.tensor(t, dtype=torch.float64) for t in all_test],
             "all_train": [torch.tensor(t, dtype=torch.float64) for t in all_train],
         },
-        artifacts_path,
+        out.torch("artifacts"),
     )
-    print(f"Saved artifacts to: {artifacts_path}")
+    print(f"Saved artifacts to: {out.torch('artifacts')}")
 
     if not args.no_show:
         plt.show()

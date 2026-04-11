@@ -8,12 +8,12 @@ import seaborn as sns
 import torch
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
+_PROJ = str(Path(__file__).resolve().parents[1])
+if _PROJ not in sys.path:
+    sys.path.insert(0, _PROJ)
 
 from dynamics import reduced_gamma_structured_sgd_rmt_isotropic_dynamics
-from utils import make_powerlaw_spec_and_wstar, parse_int_list
+from utils import make_powerlaw_spec_and_wstar, parse_int_list, OutputDir
 
 
 def main() -> None:
@@ -51,8 +51,7 @@ def main() -> None:
     T = args.steps
     L = args.l
 
-    output_dir = Path(args.output_dir) if args.output_dir else PROJECT_ROOT / "outputs"
-    output_dir.mkdir(parents=True, exist_ok=True)
+    out = OutputDir(__file__, base=args.output_dir)
 
     spec, w_star = make_powerlaw_spec_and_wstar(
         M,
@@ -105,15 +104,11 @@ def main() -> None:
     plt.legend()
     plt.xlabel(r"Compute", fontsize=20)
     plt.ylabel(r"Loss", fontsize=20)
-    plt.savefig(
-        output_dir / "compute_scaling_fixed_L_more_width.png",
-        dpi=200,
-        bbox_inches="tight",
-    )
-    print("Saved compute_scaling_fixed_L_more_width.png")
+    plt.savefig(out.png("compute_scaling_fixed_L_more_width"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf("compute_scaling_fixed_L_more_width"), dpi=200, bbox_inches="tight")
+    print(f"Saved {out.png('compute_scaling_fixed_L_more_width')}")
 
     # --- Save data ---
-    npz_path = output_dir / "compute_scaling_width_data.npz"
     payload: dict[str, np.ndarray] = {
         "Nvals": np.asarray(Nvals, dtype=np.int64),
         "loss_final": np.asarray([loss_final], dtype=np.float64),
@@ -122,8 +117,8 @@ def main() -> None:
     }
     for i, N in enumerate(Nvals):
         payload[f"loss_N_{N}"] = np.asarray(all_loss_no_scale[i], dtype=np.float64)
-    np.savez(npz_path, **payload)
-    print(f"Saved data to: {npz_path}")
+    np.savez(out.numpy("compute_scaling_width_data"), **payload)
+    print(f"Saved data to: {out.numpy('compute_scaling_width_data')}")
 
     if not args.no_show:
         plt.show()

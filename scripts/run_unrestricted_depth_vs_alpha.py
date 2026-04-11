@@ -14,7 +14,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from configs import IsotropicDepthAlphaSweepConfig
 from dynamics import run_isotropic_depth_vs_alpha_sweep
-from utils import moving_average, parse_int_list
+from utils import OutputDir, moving_average, parse_int_list
 
 
 sns.set(font_scale=1.3)
@@ -50,10 +50,7 @@ def main() -> None:
     parser.add_argument("--theory-lvals", type=str, default="1,2,4,8,16,32")
     parser.add_argument("--theory-t", type=int, default=512)
     parser.add_argument("--theory-iters", type=int, default=100)
-    parser.add_argument("--theory-plot-path", type=str, default=None)
-    parser.add_argument("--combined-plot-path", type=str, default=None)
-    parser.add_argument("--losses-path", type=str, default=None)
-    parser.add_argument("--artifacts-path", type=str, default=None)
+    parser.add_argument("--output-dir", type=str, default=None)
     parser.add_argument("--no-show", action="store_true")
     args = parser.parse_args()
 
@@ -75,6 +72,7 @@ def main() -> None:
     p_trs = parse_int_list(args.p_trs)
     lvals = parse_int_list(args.lvals)
     theory_lvals = parse_int_list(args.theory_lvals)
+    out = OutputDir(__file__, base=args.output_dir)
 
     cfg = IsotropicDepthAlphaSweepConfig(
         d=args.d,
@@ -113,14 +111,9 @@ def main() -> None:
     plt.ylabel("Final Loss", fontsize=20)
     plt.legend()
 
-    theory_plot_path = (
-        Path(args.theory_plot_path)
-        if args.theory_plot_path
-        else PROJECT_ROOT / "outputs" / "unrestricted_depth_vs_alpha_theory.png"
-    )
-    theory_plot_path.parent.mkdir(parents=True, exist_ok=True)
-    plt.savefig(theory_plot_path, dpi=200, bbox_inches="tight")
-    print(f"Saved theory plot to: {theory_plot_path}")
+    plt.savefig(out.png("unrestricted_depth_vs_alpha_theory"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf("unrestricted_depth_vs_alpha_theory"), dpi=200, bbox_inches="tight")
+    print(f"Saved theory plot to: {out.png('unrestricted_depth_vs_alpha_theory')}")
 
     # --- Combined plot (theory + empirical errorbars) ---
     plt.figure()
@@ -140,14 +133,9 @@ def main() -> None:
     plt.ylabel(r"$\mathcal{L}(\alpha)$", fontsize=20)
     plt.legend()
 
-    combined_plot_path = (
-        Path(args.combined_plot_path)
-        if args.combined_plot_path
-        else PROJECT_ROOT / "outputs" / "unrestricted_depth_vs_alpha_combined.png"
-    )
-    combined_plot_path.parent.mkdir(parents=True, exist_ok=True)
-    plt.savefig(combined_plot_path, dpi=200, bbox_inches="tight")
-    print(f"Saved combined plot to: {combined_plot_path}")
+    plt.savefig(out.png("unrestricted_depth_vs_alpha_combined"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf("unrestricted_depth_vs_alpha_combined"), dpi=200, bbox_inches="tight")
+    print(f"Saved combined plot to: {out.png('unrestricted_depth_vs_alpha_combined')}")
 
     # --- Smoothed pretrain loss per depth (one figure per P_tr) ---
     for pi, p_tr in enumerate(p_trs):
@@ -160,20 +148,11 @@ def main() -> None:
         plt.xlabel(r"Steps", fontsize=20)
         plt.ylabel(r"Pretrain Loss", fontsize=20)
         plt.legend()
-        depth_plot_path = (
-            PROJECT_ROOT / "outputs" / f"unrestricted_depth_scaling_P{p_tr}.png"
-        )
-        depth_plot_path.parent.mkdir(parents=True, exist_ok=True)
-        plt.savefig(depth_plot_path, dpi=200, bbox_inches="tight")
-        print(f"Saved depth scaling plot (P={p_tr}) to: {depth_plot_path}")
+        plt.savefig(out.png(f"unrestricted_depth_scaling_P{p_tr}"), dpi=200, bbox_inches="tight")
+        plt.savefig(out.pdf(f"unrestricted_depth_scaling_P{p_tr}"), dpi=200, bbox_inches="tight")
+        print(f"Saved depth scaling plot (P={p_tr}) to: {out.png(f'unrestricted_depth_scaling_P{p_tr}')}")
 
     # --- Save losses ---
-    losses_path = (
-        Path(args.losses_path)
-        if args.losses_path
-        else PROJECT_ROOT / "outputs" / "unrestricted_depth_vs_alpha_losses.npz"
-    )
-    losses_path.parent.mkdir(parents=True, exist_ok=True)
     payload: dict[str, np.ndarray] = {
         "alpha_vals": alpha_vals,
         "p_trs": np.asarray(p_trs, dtype=np.int64),
@@ -186,16 +165,10 @@ def main() -> None:
     for i, p_tr in enumerate(p_trs):
         for j, L in enumerate(lvals):
             payload[f"loss_P_{p_tr}_L_{L}"] = np.asarray(all_losses[i][j], dtype=np.float64)
-    np.savez(losses_path, **payload)
-    print(f"Saved losses to: {losses_path}")
+    np.savez(out.numpy("unrestricted_depth_vs_alpha_losses"), **payload)
+    print(f"Saved losses to: {out.numpy('unrestricted_depth_vs_alpha_losses')}")
 
     # --- Save artifacts ---
-    artifacts_path = (
-        Path(args.artifacts_path)
-        if args.artifacts_path
-        else PROJECT_ROOT / "outputs" / "unrestricted_depth_vs_alpha_artifacts.pt"
-    )
-    artifacts_path.parent.mkdir(parents=True, exist_ok=True)
     torch.save(
         {
             "config": vars(args),
@@ -213,9 +186,9 @@ def main() -> None:
             "lvals": lvals,
             "theory_lvals": theory_lvals,
         },
-        artifacts_path,
+        out.torch("unrestricted_depth_vs_alpha_artifacts"),
     )
-    print(f"Saved artifacts to: {artifacts_path}")
+    print(f"Saved artifacts to: {out.torch('unrestricted_depth_vs_alpha_artifacts')}")
 
     if not args.no_show:
         plt.show()
