@@ -18,7 +18,6 @@ from .powerlaw import make_powerlaw_spec_and_wstar
 from .device import is_cuda_oom, resolve_device
 from .smoothing import moving_average
 from .analysis import compute_loss_inf_depth, loss_landscape
-from .sgd_sweeps import run_experiment, run_sweep
 from .output_dir import OutputDir
 
 __all__ = [
@@ -41,3 +40,12 @@ __all__ = [
     # Output organization
     "OutputDir",
 ]
+
+
+def __getattr__(name: str):
+    """Lazily import sweep runners to avoid package-level circular imports."""
+    if name in {"run_experiment", "run_sweep"}:
+        from .sgd_sweeps import run_experiment, run_sweep
+
+        return {"run_experiment": run_experiment, "run_sweep": run_sweep}[name]
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

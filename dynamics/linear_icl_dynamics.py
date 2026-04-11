@@ -62,7 +62,6 @@ def _as_tensor(x: Tensor, *, device: torch.device, dtype: torch.dtype) -> Tensor
         return x.to(device=device, dtype=dtype)
     return torch.as_tensor(x, device=device, dtype=dtype)
 
-
 def _build_y_mask(batch: int, seq_len: int, p_tr: int, *, device: torch.device, dtype: torch.dtype) -> Tensor:
     """Build a label mask that zeros out test-set labels.
 
@@ -85,7 +84,6 @@ def _build_y_mask(batch: int, seq_len: int, p_tr: int, *, device: torch.device, 
     mask = torch.ones((batch, seq_len), device=device, dtype=dtype)
     mask[:, p_tr:] = 0.0
     return mask
-
 
 def _build_attn_mask(seq_len: int, p_tr: int, *, device: torch.device, dtype: torch.dtype) -> Tensor:
     """Build an attention mask that prevents attending to test positions.
@@ -110,7 +108,6 @@ def _build_attn_mask(seq_len: int, p_tr: int, *, device: torch.device, dtype: to
     mask[:, p_tr:] = 0.0
     return mask
 
-
 def _randn(shape: tuple[int, ...], seed: int, *, device: torch.device, dtype: torch.dtype) -> Tensor:
     """Sample i.i.d. standard normal entries with a deterministic seed.
 
@@ -130,6 +127,59 @@ def _randn(shape: tuple[int, ...], seed: int, *, device: torch.device, dtype: to
     gen.manual_seed(seed)
     return torch.randn(shape, generator=gen, device=device, dtype=dtype)
 
+def _relative_error(a: Tensor, b: Tensor, eps: float) -> Tensor:
+    denom = torch.maximum(torch.linalg.norm(a), torch.linalg.norm(b)).clamp_min(eps)
+    return torch.linalg.norm(a - b) / denom
+
+def linear_attention_token_mixer(
+    W_x: Tensor,
+    Wq: Tensor,
+    Wk: Tensor,
+    X: Tensor,
+    P_test: int,
+) -> dict[str, Tensor]:
+    """
+    Compute the exact token-side mixer used by model_eval_decoupled_frozen_emb.
+
+    Returns:
+        hx:        [B, T, N]
+        q:         [B, T, N]
+        k:         [B, T, N]
+        A:         [B, T, T]   raw attention kernel
+        masked_A:  [B, T, T]   test columns zeroed
+        G:         [d, d]      feature-space bilinear form
+        A_from_G:  [B, T, T]   exact reconstruction X G X^T
+    """
+    device = X.device
+    dtype = X.dtype
+    W_x = _as_tensor(W_x, device=device, dtype=dtype)
+    Wq = _as_tensor(Wq, device=device, dtype=dtype)
+    Wk = _as_tensor(Wk, device=device, dtype=dtype)
+
+    N, d = W_x.shape
+    seq_len = X.shape[1]
+    p_tr = seq_len - P_test
+
+    hx = torch.einsum("btd,nd->btn", X, W_x)
+    q = torch.einsum("btn,kn->btk", hx, Wq) / math.sqrt(N)
+    k = torch.einsum("btn,kn->btk", hx, Wk) / math.sqrt(N)
+
+    A = torch.einsum("btk,bsk->bts", k, q) / float(N)
+    mask = _build_attn_mask(seq_len, p_tr, device=device, dtype=dtype)
+    masked_A = A * mask
+
+    G = (W_x.transpose(0, 1) @ Wk.transpose(0, 1) @ Wq @ W_x) / float(N * N)
+    A_from_G = torch.einsum("btd,df,bsf->bts", X, G, X)
+
+    return {
+        "hx": hx,
+        "q": q,
+        "k": k,
+        "A": A,
+        "masked_A": masked_A,
+        "G": G,
+        "A_from_G": A_from_G,
+    }
 
 def init_hand_coded_params(d: int, *, device: torch.device | str = "cuda", dtype: torch.dtype = torch.float32) -> list[Tensor]:
     """Create the analytically-designed weight matrices for the coupled model.
@@ -187,7 +237,6 @@ def init_hand_coded_params(d: int, *, device: torch.device | str = "cuda", dtype
     w_out[-1] = sqrt_d
     return [W_x, W_y, Wq, Wk, Wv, w_out]
 
-
 def sample_linear_task(
     B: int,
     P: int,
@@ -227,7 +276,6 @@ def sample_linear_task(
     betas = _randn((B, d), seed_beta, device=device, dtype=dtype)
     y = torch.einsum("bpd,bd->bp", X, betas) / math.sqrt(d)
     return X, y
-
 
 def model_eval(
     params: Sequence[Tensor],
@@ -351,7 +399,6 @@ def model_eval(
     out = torch.einsum("bpn,n->bp", h, w_out) / float(N)
     return out, train_losses, test_losses
 
-
 def model_eval_decoupled(
     params: Sequence[Tensor],
     X: Tensor,
@@ -449,7 +496,6 @@ def model_eval_decoupled(
     out = torch.einsum("bpn,n->bp", hy, W_y) / float(N)
     return out, [], []
 
-
 def model_eval_decoupled_frozen_emb(
     params_tr: Sequence[Tensor],
     Wy: Tensor,
@@ -539,6 +585,153 @@ def model_eval_decoupled_frozen_emb(
     out = torch.einsum("bpn,n->bp", hy, Wy) / float(N)
     return out, [], []
 
+def model_eval_decoupled_frozen_emb_trace(
+    params_tr,
+    Wy: Tensor,
+    X: Tensor,
+    y: Tensor,
+    L: int = 100,
+    P_test: int = 1,
+    beta: float = 100.0,
+    store_full_tensors: bool = False,
+) -> tuple[Tensor, dict[str, Any]]:
+    """
+    Trace version of model_eval_decoupled_frozen_emb.
+
+    Returns:
+        out: final network output [B, T]
+        trace: dictionary containing exact theorem-A diagnostics
+    """
+    W_x, Wq, Wk, Wv = params_tr
+    device = X.device
+    dtype = X.dtype
+    eps = torch.finfo(dtype).eps
+
+    W_x = _as_tensor(W_x, device=device, dtype=dtype)
+    Wy = _as_tensor(Wy, device=device, dtype=dtype)
+    Wq = _as_tensor(Wq, device=device, dtype=dtype)
+    Wk = _as_tensor(Wk, device=device, dtype=dtype)
+    Wv = _as_tensor(Wv, device=device, dtype=dtype)
+
+    N, d = W_x.shape
+    seq_len = X.shape[1]
+    p_tr = seq_len - P_test
+    batch = X.shape[0]
+    eta = float(beta) / (float(L) * float(p_tr))
+
+    token = linear_attention_token_mixer(W_x, Wq, Wk, X, P_test)
+    A = token["A"]
+    masked_A = token["masked_A"]
+    G = token["G"]
+    A_from_G = token["A_from_G"]
+
+    mask_y = _build_y_mask(batch, seq_len, p_tr, device=device, dtype=dtype)
+    hy = torch.einsum("bt,n->btn", y * mask_y, Wy)
+
+    wy_norm_sq = torch.dot(Wy, Wy).clamp_min(eps)
+    wvTwy = Wv.transpose(0, 1) @ Wy
+    alpha_v = torch.dot(Wy, wvTwy) / wy_norm_sq
+    chi_v = alpha_v / math.sqrt(N)
+
+    def output_coord(h: Tensor) -> Tensor:
+        return torch.einsum("btn,n->bt", h, Wy) / float(N)
+
+    def decompose(h: Tensor) -> tuple[Tensor, Tensor, Tensor]:
+        coeff = torch.einsum("btn,n->bt", h, Wy) / wy_norm_sq
+        parallel = torch.einsum("bt,n->btn", coeff, Wy)
+        residual = h - parallel
+        return coeff, parallel, residual
+
+    kernel_err = _relative_error(A, A_from_G, eps).detach()
+
+    o_history = [output_coord(hy).detach().clone()]
+    layer_metrics: list[dict[str, float]] = []
+    zeta_history = []
+
+    for ell in range(L):
+        o = output_coord(hy)
+        _, _, residual = decompose(hy)
+
+        zeta = torch.einsum("btn,n->bt", residual, wvTwy) / (float(N) * math.sqrt(N))
+        zeta_history.append(zeta.detach().clone())
+
+        v = torch.einsum("btn,kn->btk", hy, Wv) / math.sqrt(N)
+        update = torch.bmm(masked_A, v)
+        hy_next = hy - eta * update
+        o_next = output_coord(hy_next)
+
+        # Exact decomposition with leakage term retained
+        o_exact = o - eta * torch.bmm(
+            masked_A, (chi_v * o + zeta).unsqueeze(-1)
+        ).squeeze(-1)
+
+        # Leak-free reduced recursion
+        o_local_red = o - eta * torch.bmm(
+            masked_A, (chi_v * o).unsqueeze(-1)
+        ).squeeze(-1)
+
+        exact_err = _relative_error(o_next, o_exact, eps).detach()
+        local_err = _relative_error(o_next, o_local_red, eps).detach()
+        span_err = (
+            torch.linalg.norm(residual) / torch.linalg.norm(hy).clamp_min(eps)
+        ).detach()
+        value_align_err = _relative_error(wvTwy, alpha_v * Wy, eps).detach()
+
+        layer_metrics.append(
+            {
+                "exact_err": float(exact_err.cpu()),
+                "local_err": float(local_err.cpu()),
+                "span_err": float(span_err.cpu()),
+                "value_align_err": float(value_align_err.cpu()),
+                "chi_v": float(chi_v.detach().cpu()),
+                "alpha_v": float(alpha_v.detach().cpu()),
+            }
+        )
+
+        hy = hy_next
+        o_history.append(o_next.detach().clone())
+
+    out = output_coord(hy)
+
+    # Self-consistent leak-free rollout from the same initialization
+    o_red = o_history[0].to(device=device, dtype=dtype)
+    for _ in range(L):
+        o_red = o_red - eta * torch.bmm(
+            masked_A, (chi_v * o_red).unsqueeze(-1)
+        ).squeeze(-1)
+
+    roll_err_all = _relative_error(out, o_red, eps).detach()
+
+    out_tr = out[:, :p_tr]
+    red_tr = o_red[:, :p_tr]
+    out_te = out[:, p_tr:]
+    red_te = o_red[:, p_tr:]
+
+    roll_err_train = _relative_error(out_tr, red_tr, eps).detach()
+    roll_err_test = _relative_error(out_te, red_te, eps).detach()
+
+    trace: dict[str, Any] = {
+        "kernel_err": float(kernel_err.cpu()),
+        "roll_err_all": float(roll_err_all.cpu()),
+        "roll_err_train": float(roll_err_train.cpu()),
+        "roll_err_test": float(roll_err_test.cpu()),
+        "layer_metrics": layer_metrics,
+        "chi_v": float(chi_v.detach().cpu()),
+        "alpha_v": float(alpha_v.detach().cpu()),
+        "G": G.detach().cpu(),
+    }
+
+    if store_full_tensors:
+        trace["A"] = A.detach().cpu()
+        trace["A_from_G"] = A_from_G.detach().cpu()
+        trace["masked_A"] = masked_A.detach().cpu()
+        trace["o_history"] = [t.cpu() for t in o_history]
+        trace["o_red_final"] = o_red.detach().cpu()
+        trace["zeta_history"] = [t.cpu() for t in zeta_history]
+        trace["Wy"] = Wy.detach().cpu()
+        trace["wvTwy"] = wvTwy.detach().cpu()
+
+    return out, trace
 
 def model_eval_decoupled_softmax_frozen_emb(
     params_tr: Sequence[Tensor],
@@ -628,7 +821,6 @@ def model_eval_decoupled_softmax_frozen_emb(
     out = torch.einsum("bpn,n->bp", hy, Wy) / float(N)
     return out, [], []
 
-
 def run_hand_coded_eval(
     cfg: HandCodedEvalConfig,
     *,
@@ -681,7 +873,6 @@ def run_hand_coded_eval(
     )
     return out, train_losses, test_losses, X, y
 
-
 def sample_hard_power_law_batch(
     cfg: HardPowerLawDepthConfig,
     *,
@@ -728,7 +919,6 @@ def sample_hard_power_law_batch(
     betas = _randn((cfg.B, cfg.d), cfg.seed_beta, device=device, dtype=dtype)
     y = torch.einsum("bpd,bd->bp", X, betas) / math.sqrt(cfg.d)
     return X, y, powers
-
 
 def run_hard_power_law_depth_eval(
     cfg: HardPowerLawDepthConfig,

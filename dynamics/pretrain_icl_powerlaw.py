@@ -14,8 +14,10 @@ from .linear_icl_dynamics import (
     model_eval,
     model_eval_decoupled_frozen_emb,
     model_eval_decoupled_softmax_frozen_emb,
+    model_eval_decoupled_frozen_emb_trace,
 )
 
+from utils.theorem_a_utils import summarize_theorem_a_trace
 
 Tensor = torch.Tensor
 
@@ -1274,3 +1276,132 @@ def train_model_softmax(
     if cfg.online:
         return pretrain_loss, None
     return pretrain_loss, train_loss
+
+def sample_batch_from_cfg(
+    cfg: DecoupledTrainModelConfig,
+    *,
+    spec: Tensor | None,
+    w_star: Tensor | None,
+    seed: int,
+    B_override: int | None = None,
+    device: torch.device | str = "cuda",
+    dtype: torch.dtype = torch.float32,
+) -> tuple[Tensor, Tensor]:
+    B = cfg.B if B_override is None else B_override
+
+    if cfg.sample_mode == "iid":
+        return sample_data(cfg.d, B, cfg.P_tr, cfg.P_test, seed=seed, device=device, dtype=dtype)
+
+    if spec is None:
+        raise ValueError("spec is required for non-iid sample modes.")
+    if w_star is None:
+        raise ValueError("w_star is required for non-iid sample modes.")
+
+    if cfg.sample_mode == "spec":
+        return sample_data_spec(spec, w_star, B, cfg.P_tr, cfg.P_test, seed=seed, device=device, dtype=dtype)
+    if cfg.sample_mode == "spec_rotate":
+        return sample_data_spec_rotate(spec, w_star, B, cfg.P_tr, cfg.P_test, seed=seed, device=device, dtype=dtype)
+    if cfg.sample_mode == "gauss_rotate":
+        return sample_data_gauss_rotate(spec, w_star, B, cfg.P_tr, cfg.P_test, seed=seed, device=device, dtype=dtype)
+
+    raise ValueError(f"Unsupported sample_mode: {cfg.sample_mode}")
+
+def train_model_with_checkpoints(
+    cfg: DecoupledTrainModelConfig,
+    *,
+    spec: Tensor | None = None,
+    w_star: Tensor | None = None,
+    checkpoint_steps: tuple[int, ...] = (0,),
+    debug_seed: int = 1234,
+    debug_batch_size: int = 64,
+    device: torch.device | str = "cuda",
+    dtype: torch.dtype = torch.float32,
+) -> dict[str, object]:
+    if cfg.unrestricted:
+        raise ValueError("Theorem-A audit should start with unrestricted=False.")
+
+    device = torch.device(device)
+    params = init_pretrain_params(cfg.d, cfg.N, sigma=cfg.sigma, device=device, dtype=dtype)
+    W_x, Wy, Wq, Wk, Wv, _ = params
+
+    trainable = [
+        torch.nn.Parameter(W_x.clone()),
+        torch.nn.Parameter(Wq.clone()),
+        torch.nn.Parameter(Wk.clone()),
+        torch.nn.Parameter(Wv.clone()),
+    ]
+    optimizer = torch.optim.SGD(trainable, lr=cfg.lr)
+
+    X_dbg, y_dbg = sample_batch_from_cfg(
+        cfg,
+        spec=spec,
+        w_star=w_star,
+        seed=debug_seed,
+        B_override=debug_batch_size,
+        device=device,
+        dtype=dtype,
+    )
+
+    losses: list[float] = []
+    checkpoints: dict[int, dict[str, object]] = {}
+
+    def save_checkpoint(step: int) -> None:
+        with torch.no_grad():
+            _, trace = model_eval_decoupled_frozen_emb_trace(
+                [p.detach() for p in trainable],
+                Wy.detach(),
+                X_dbg,
+                y_dbg,
+                L=cfg.L,
+                P_test=cfg.P_test,
+                beta=cfg.beta_model,
+                store_full_tensors=False,
+            )
+            checkpoints[step] = {
+                "params_tr": [p.detach().cpu().clone() for p in trainable],
+                "Wy": Wy.detach().cpu().clone(),
+                "summary": summarize_theorem_a_trace(trace),
+            }
+
+    if 0 in checkpoint_steps:
+        save_checkpoint(0)
+
+    for t in range(cfg.T):
+        X, y = sample_batch_from_cfg(
+            cfg,
+            spec=spec,
+            w_star=w_star,
+            seed=t if cfg.online else 0,
+            device=device,
+            dtype=dtype,
+        )
+
+        optimizer.zero_grad(set_to_none=True)
+        out, _, _ = model_eval_decoupled_frozen_emb(
+            trainable,
+            Wy,
+            X,
+            y,
+            L=cfg.L,
+            P_test=cfg.P_test,
+            beta=cfg.beta_model,
+            qk_ln=False,
+        )
+
+        loss = torch.mean((out[:, cfg.P_tr:] / cfg.gamma + y[:, cfg.P_tr:]) ** 2)
+        reg_loss = cfg.N * (cfg.gamma ** 2) * loss + cfg.lamb * _sum_squares(trainable)
+        reg_loss.backward()
+        optimizer.step()
+
+        losses.append(float(loss.detach().cpu()))
+
+        step = t + 1
+        if step in checkpoint_steps:
+            save_checkpoint(step)
+
+    return {
+        "losses": losses,
+        "checkpoints": checkpoints,
+        "X_debug": X_dbg.detach().cpu(),
+        "y_debug": y_dbg.detach().cpu(),
+    }
