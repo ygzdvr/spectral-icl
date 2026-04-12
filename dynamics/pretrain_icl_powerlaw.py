@@ -1306,17 +1306,6 @@ def sample_batch_from_cfg(
 
     raise ValueError(f"Unsupported sample_mode: {cfg.sample_mode}")
 
-def train_model_with_checkpoints(
-    cfg: DecoupledTrainModelConfig,
-    *,
-    spec: Tensor | None = None,
-    w_star: Tensor | None = None,
-    checkpoint_steps: tuple[int, ...] = (0,),
-    debug_seed: int = 1234,
-    debug_batch_size: int = 64,
-    device: torch.device | str = "cuda",
-    dtype: torch.dtype = torch.float32,
-) -> dict[str, object]:
     if cfg.unrestricted:
         raise ValueError("Theorem-A audit should start with unrestricted=False.")
 
