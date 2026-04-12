@@ -455,6 +455,16 @@ def _plot_identity(ax: plt.Axes, x: np.ndarray, y: np.ndarray) -> None:
     ax.plot([lo, hi], [lo, hi], "--", color="black", linewidth=1.0)
 
 
+def _save_axis_pair(fig: plt.Figure, ax: plt.Axes, out: OutputDir, stem: str, *, pad: float = 0.08) -> None:
+    fig.canvas.draw()
+    renderer = fig.canvas.get_renderer()
+    bbox = ax.get_tightbbox(renderer).expanded(1.0 + pad, 1.0 + pad)
+    bbox_inches = bbox.transformed(fig.dpi_scale_trans.inverted())
+    fig.savefig(out.png(stem), dpi=200, bbox_inches=bbox_inches)
+    fig.savefig(out.pdf(stem), dpi=200, bbox_inches=bbox_inches)
+    print(f"Saved {out.png(stem)}")
+
+
 # -----------------------------------------------------------------------------
 # Main experiment driver
 # -----------------------------------------------------------------------------
@@ -639,6 +649,10 @@ def main() -> None:
     fig.savefig(out.png("theorem_a_linear_attention_main"), dpi=200, bbox_inches="tight")
     fig.savefig(out.pdf("theorem_a_linear_attention_main"), dpi=200, bbox_inches="tight")
     print(f"Saved {out.png('theorem_a_linear_attention_main')}")
+    _save_axis_pair(fig, axs[0, 0], out, "theorem_a_linear_attention_main_loss")
+    _save_axis_pair(fig, axs[0, 1], out, "theorem_a_linear_attention_main_reduced_gap")
+    _save_axis_pair(fig, axs[1, 0], out, "theorem_a_linear_attention_main_scalarization_gap")
+    _save_axis_pair(fig, axs[1, 1], out, "theorem_a_linear_attention_main_gamma_mismatch")
 
     # ------------------------------------------------------------------
     # Figure 2: deepest-L diagnostics (direct function comparison, gamma
@@ -704,6 +718,10 @@ def main() -> None:
     fig2.savefig(out.png("theorem_a_linear_attention_deepest"), dpi=200, bbox_inches="tight")
     fig2.savefig(out.pdf("theorem_a_linear_attention_deepest"), dpi=200, bbox_inches="tight")
     print(f"Saved {out.png('theorem_a_linear_attention_deepest')}")
+    _save_axis_pair(fig2, axs2[0, 0], out, "theorem_a_linear_attention_deepest_debug_losses")
+    _save_axis_pair(fig2, axs2[0, 1], out, "theorem_a_linear_attention_deepest_gamma_trajectories")
+    _save_axis_pair(fig2, axs2[1, 0], out, "theorem_a_linear_attention_deepest_matrix_diagnostics")
+    _save_axis_pair(fig2, axs2[1, 1], out, "theorem_a_linear_attention_deepest_theory_vs_experiment")
 
     # ------------------------------------------------------------------
     # Figure 3: direct final-prediction scatter for deepest depth.
@@ -736,6 +754,8 @@ def main() -> None:
     fig3.savefig(out.png("theorem_a_linear_attention_final_scatter"), dpi=200, bbox_inches="tight")
     fig3.savefig(out.pdf("theorem_a_linear_attention_final_scatter"), dpi=200, bbox_inches="tight")
     print(f"Saved {out.png('theorem_a_linear_attention_final_scatter')}")
+    _save_axis_pair(fig3, axs3[0], out, "theorem_a_linear_attention_final_scatter_net_vs_gamma")
+    _save_axis_pair(fig3, axs3[1], out, "theorem_a_linear_attention_final_scatter_gamma_vs_scalar")
 
     # ------------------------------------------------------------------
     # Save arrays and artifacts.

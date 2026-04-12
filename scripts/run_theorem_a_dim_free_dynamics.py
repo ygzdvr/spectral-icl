@@ -20,6 +20,8 @@ for path in (PROJECT_ROOT, DYNAMICS_DIR, UTILS_DIR):
     if str(path) not in sys.path:
         sys.path.insert(0, str(path))
 
+from utils import OutputDir
+
 # Prefer direct module imports to avoid circular imports through package __init__.
 try:
     from linear_attention_dynamics import (
@@ -46,36 +48,6 @@ Tensor = torch.Tensor
 
 def parse_int_list(value: str) -> list[int]:
     return [int(part.strip()) for part in value.split(",") if part.strip()]
-
-
-class OutputDir:
-    """Minimal output-directory helper mirroring the original scripts."""
-
-    def __init__(self, script_path: str | Path, base: str | Path | None = None) -> None:
-        script_name = Path(script_path).stem
-        root = Path(base) if base is not None else PROJECT_ROOT / "outputs" / script_name
-        self.root = root
-        self.root.mkdir(parents=True, exist_ok=True)
-
-    def png(self, stem: str) -> Path:
-        path = self.root / f"{stem}.png"
-        path.parent.mkdir(parents=True, exist_ok=True)
-        return path
-
-    def pdf(self, stem: str) -> Path:
-        path = self.root / f"{stem}.pdf"
-        path.parent.mkdir(parents=True, exist_ok=True)
-        return path
-
-    def numpy(self, stem: str) -> Path:
-        path = self.root / f"{stem}.npz"
-        path.parent.mkdir(parents=True, exist_ok=True)
-        return path
-
-    def pt(self, stem: str) -> Path:
-        path = self.root / f"{stem}.pt"
-        path.parent.mkdir(parents=True, exist_ok=True)
-        return path
 
 
 
@@ -518,6 +490,16 @@ def _plot_identity(ax: plt.Axes, x: np.ndarray, y: np.ndarray) -> None:
     ax.plot([lo, hi], [lo, hi], "--", color="black", linewidth=1.0)
 
 
+def _save_axis_pair(fig: plt.Figure, ax: plt.Axes, out: OutputDir, stem: str, *, pad: float = 0.08) -> None:
+    fig.canvas.draw()
+    renderer = fig.canvas.get_renderer()
+    bbox = ax.get_tightbbox(renderer).expanded(1.0 + pad, 1.0 + pad)
+    bbox_inches = bbox.transformed(fig.dpi_scale_trans.inverted())
+    fig.savefig(out.png(stem), dpi=200, bbox_inches=bbox_inches)
+    fig.savefig(out.pdf(stem), dpi=200, bbox_inches=bbox_inches)
+    print(f"Saved {out.png(stem)}")
+
+
 # -----------------------------------------------------------------------------
 # Main experiment driver
 # -----------------------------------------------------------------------------
@@ -708,6 +690,10 @@ def main() -> None:
     fig.savefig(out.png("theorem_a_dim_free_main"), dpi=200, bbox_inches="tight")
     fig.savefig(out.pdf("theorem_a_dim_free_main"), dpi=200, bbox_inches="tight")
     print(f"Saved {out.png('theorem_a_dim_free_main')}")
+    _save_axis_pair(fig, axs[0, 0], out, "theorem_a_dim_free_main_loss")
+    _save_axis_pair(fig, axs[0, 1], out, "theorem_a_dim_free_main_reduced_gap")
+    _save_axis_pair(fig, axs[1, 0], out, "theorem_a_dim_free_main_scalarization_gap")
+    _save_axis_pair(fig, axs[1, 1], out, "theorem_a_dim_free_main_gamma_mismatch")
 
     # ------------------------------------------------------------------
     # Figure 2: deepest-L diagnostics.
@@ -774,6 +760,10 @@ def main() -> None:
     fig2.savefig(out.png("theorem_a_dim_free_deepest"), dpi=200, bbox_inches="tight")
     fig2.savefig(out.pdf("theorem_a_dim_free_deepest"), dpi=200, bbox_inches="tight")
     print(f"Saved {out.png('theorem_a_dim_free_deepest')}")
+    _save_axis_pair(fig2, axs2[0, 0], out, "theorem_a_dim_free_deepest_debug_losses")
+    _save_axis_pair(fig2, axs2[0, 1], out, "theorem_a_dim_free_deepest_gamma_trajectories")
+    _save_axis_pair(fig2, axs2[1, 0], out, "theorem_a_dim_free_deepest_matrix_diagnostics")
+    _save_axis_pair(fig2, axs2[1, 1], out, "theorem_a_dim_free_deepest_theory_vs_experiment")
 
     # ------------------------------------------------------------------
     # Figure 3: direct final-prediction scatter for deepest depth.
@@ -806,6 +796,8 @@ def main() -> None:
     fig3.savefig(out.png("theorem_a_dim_free_final_scatter"), dpi=200, bbox_inches="tight")
     fig3.savefig(out.pdf("theorem_a_dim_free_final_scatter"), dpi=200, bbox_inches="tight")
     print(f"Saved {out.png('theorem_a_dim_free_final_scatter')}")
+    _save_axis_pair(fig3, axs3[0], out, "theorem_a_dim_free_final_scatter_net_vs_gamma")
+    _save_axis_pair(fig3, axs3[1], out, "theorem_a_dim_free_final_scatter_gamma_vs_scalar")
 
     # ------------------------------------------------------------------
     # Save arrays and artifacts.
@@ -863,8 +855,8 @@ def main() -> None:
         "theory_losses": {L: torch.tensor(losses_th[i], dtype=torch.float64) for i, L in enumerate(lvals)},
         "theory_ws": {L: torch.tensor(all_ws_th[i], dtype=torch.float64) for i, L in enumerate(lvals)},
     }
-    torch.save(artifacts, out.pt("theorem_a_dim_free_dynamics_artifacts"))
-    print(f"Saved artifacts to: {out.pt('theorem_a_dim_free_dynamics_artifacts')}")
+    torch.save(artifacts, out.torch("theorem_a_dim_free_dynamics_artifacts"))
+    print(f"Saved artifacts to: {out.torch('theorem_a_dim_free_dynamics_artifacts')}")
 
     if not args.no_show:
         plt.show()

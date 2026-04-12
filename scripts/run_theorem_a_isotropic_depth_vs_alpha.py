@@ -925,6 +925,17 @@ def run_theorem_a_isotropic_depth_vs_alpha_sweep(
 # Plotting
 # -----------------------------------------------------------------------------
 
+def _setup_style() -> None:
+    try:
+        import seaborn as sns  # type: ignore
+
+        sns.set(font_scale=1.2)
+        sns.set_style("whitegrid")
+        sns.set_palette("rocket")
+    except Exception:
+        plt.style.use("default")
+
+
 def _safe_plot_values(arr: np.ndarray, floor: float = 1.0e-18) -> np.ndarray:
     return np.maximum(arr, floor)
 
@@ -938,11 +949,21 @@ def _save_figure(fig: plt.Figure, output_path: Path, *, pdf_path: Path | None = 
     plt.close(fig)
 
 
+def _save_axis_pair(fig: plt.Figure, ax: plt.Axes, out: OutputDir, stem: str, *, pad: float = 0.08) -> None:
+    fig.canvas.draw()
+    renderer = fig.canvas.get_renderer()
+    bbox = ax.get_tightbbox(renderer).expanded(1.0 + pad, 1.0 + pad)
+    bbox_inches = bbox.transformed(fig.dpi_scale_trans.inverted())
+    fig.savefig(out.png(stem), dpi=220, bbox_inches=bbox_inches)
+    fig.savefig(out.pdf(stem), dpi=220, bbox_inches=bbox_inches)
+
+
 def _plot_main_summary(
     results: dict[str, Any],
     *,
     output_path: Path,
     pdf_path: Path | None = None,
+    individual_out: OutputDir | None = None,
     d: int,
     include_theory: bool,
 ) -> None:
@@ -1024,6 +1045,11 @@ def _plot_main_summary(
 
     fig.suptitle(f"Theorem A sweep on isotropic Figure-1 grid (d={d})", fontsize=14)
     fig.tight_layout(rect=[0, 0.02, 1, 0.98])
+    if individual_out is not None:
+        _save_axis_pair(fig, axes[0, 0], individual_out, "theorem_a_isotropic_main_debug_loss")
+        _save_axis_pair(fig, axes[0, 1], individual_out, "theorem_a_isotropic_main_exactness_summary")
+        _save_axis_pair(fig, axes[1, 0], individual_out, "theorem_a_isotropic_main_isotropy_error")
+        _save_axis_pair(fig, axes[1, 1], individual_out, "theorem_a_isotropic_main_scalarization_error")
     _save_figure(fig, output_path, pdf_path=pdf_path)
 
 
@@ -1032,6 +1058,7 @@ def _plot_dynamics_vary_alpha(
     *,
     output_path: Path,
     pdf_path: Path | None = None,
+    individual_out: OutputDir | None = None,
     ref_l_index: int,
 ) -> None:
     alpha_ctx = results["alpha_ctx"]
@@ -1071,6 +1098,10 @@ def _plot_dynamics_vary_alpha(
     ax.set_title(f"Scalarization dynamics, L={L_ref}")
 
     fig.tight_layout()
+    if individual_out is not None:
+        _save_axis_pair(fig, axes[0], individual_out, "theorem_a_dynamics_vary_alpha_debug_loss")
+        _save_axis_pair(fig, axes[1], individual_out, "theorem_a_dynamics_vary_alpha_isotropy")
+        _save_axis_pair(fig, axes[2], individual_out, "theorem_a_dynamics_vary_alpha_scalarization")
     _save_figure(fig, output_path, pdf_path=pdf_path)
 
 
@@ -1079,6 +1110,7 @@ def _plot_dynamics_vary_L(
     *,
     output_path: Path,
     pdf_path: Path | None = None,
+    individual_out: OutputDir | None = None,
     ref_p_index: int,
 ) -> None:
     alpha_ctx = results["alpha_ctx"]
@@ -1117,6 +1149,10 @@ def _plot_dynamics_vary_L(
     ax.set_title(rf"Scalarization dynamics, $\alpha={alpha_ref:.2f}$")
 
     fig.tight_layout()
+    if individual_out is not None:
+        _save_axis_pair(fig, axes[0], individual_out, "theorem_a_dynamics_vary_L_debug_loss")
+        _save_axis_pair(fig, axes[1], individual_out, "theorem_a_dynamics_vary_L_isotropy")
+        _save_axis_pair(fig, axes[2], individual_out, "theorem_a_dynamics_vary_L_scalarization")
     _save_figure(fig, output_path, pdf_path=pdf_path)
 
 
@@ -1209,6 +1245,7 @@ def main() -> None:
         store_final_tensors=True,
     )
 
+    _setup_style()
     ref_l_index = len(lvals) - 1
     ref_p_index = _choose_reference_alpha_index(p_trs, args.d)
     out = OutputDir(__file__, base=args.output_dir)
@@ -1246,6 +1283,7 @@ def main() -> None:
         results,
         output_path=main_plot_path,
         pdf_path=main_plot_pdf_path,
+        individual_out=out,
         d=args.d,
         include_theory=(not args.no_theory),
     )
@@ -1255,6 +1293,7 @@ def main() -> None:
         results,
         output_path=alpha_dynamics_plot_path,
         pdf_path=alpha_dynamics_pdf_path,
+        individual_out=out,
         ref_l_index=ref_l_index,
     )
     print(f"Saved theorem-A alpha dynamics plot to: {alpha_dynamics_plot_path}")
@@ -1263,6 +1302,7 @@ def main() -> None:
         results,
         output_path=l_dynamics_plot_path,
         pdf_path=l_dynamics_pdf_path,
+        individual_out=out,
         ref_p_index=ref_p_index,
     )
     print(f"Saved theorem-A L dynamics plot to: {l_dynamics_plot_path}")
