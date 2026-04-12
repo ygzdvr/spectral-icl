@@ -386,7 +386,6 @@ These experiments use the reduced-gamma (structured SGD with RMT) dynamics frame
 | `run_depth_scaling_nonrotate.py` | `run_depth_scaling_nonrotate.sh` | Yes |
 | `run_dim_free_dynamics.py` | `run_dim_free_dynamics.sh` | Yes |
 | `run_fixed_covariance.py` | `run_fixed_covariance.sh` | Yes |
-| `run_hard_power_law_depth.py` | `run_hard_power_law_depth.sh` | Yes |
 | `run_isotropic_depth_vs_alpha.py` | `run_isotropic_depth_vs_alpha.sh` | Yes |
 | `run_linear_attention_dynamics.py` | `run_linear_attention_dynamics.sh` | Yes |
 | `run_loss_landscape.py` | `run_loss_landscape.sh` | No (CPU) |

@@ -20,6 +20,7 @@ for path in (PROJECT_ROOT, CONFIGS_DIR, DYNAMICS_DIR):
     if str(path) not in sys.path:
         sys.path.insert(0, str(path))
 
+from utils import OutputDir
 from train_configs import DecoupledTrainModelConfig, IsotropicDepthAlphaSweepConfig
 from linear_icl_dynamics import model_eval_decoupled_frozen_emb
 
@@ -928,10 +929,20 @@ def _safe_plot_values(arr: np.ndarray, floor: float = 1.0e-18) -> np.ndarray:
     return np.maximum(arr, floor)
 
 
+def _save_figure(fig: plt.Figure, output_path: Path, *, pdf_path: Path | None = None) -> None:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(output_path, dpi=220, bbox_inches="tight")
+    if pdf_path is not None:
+        pdf_path.parent.mkdir(parents=True, exist_ok=True)
+        fig.savefig(pdf_path, dpi=220, bbox_inches="tight")
+    plt.close(fig)
+
+
 def _plot_main_summary(
     results: dict[str, Any],
     *,
     output_path: Path,
+    pdf_path: Path | None = None,
     d: int,
     include_theory: bool,
 ) -> None:
@@ -1013,15 +1024,14 @@ def _plot_main_summary(
 
     fig.suptitle(f"Theorem A sweep on isotropic Figure-1 grid (d={d})", fontsize=14)
     fig.tight_layout(rect=[0, 0.02, 1, 0.98])
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(output_path, dpi=220, bbox_inches="tight")
-    plt.close(fig)
+    _save_figure(fig, output_path, pdf_path=pdf_path)
 
 
 def _plot_dynamics_vary_alpha(
     results: dict[str, Any],
     *,
     output_path: Path,
+    pdf_path: Path | None = None,
     ref_l_index: int,
 ) -> None:
     alpha_ctx = results["alpha_ctx"]
@@ -1061,15 +1071,14 @@ def _plot_dynamics_vary_alpha(
     ax.set_title(f"Scalarization dynamics, L={L_ref}")
 
     fig.tight_layout()
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(output_path, dpi=220, bbox_inches="tight")
-    plt.close(fig)
+    _save_figure(fig, output_path, pdf_path=pdf_path)
 
 
 def _plot_dynamics_vary_L(
     results: dict[str, Any],
     *,
     output_path: Path,
+    pdf_path: Path | None = None,
     ref_p_index: int,
 ) -> None:
     alpha_ctx = results["alpha_ctx"]
@@ -1108,9 +1117,7 @@ def _plot_dynamics_vary_L(
     ax.set_title(rf"Scalarization dynamics, $\alpha={alpha_ref:.2f}$")
 
     fig.tight_layout()
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(output_path, dpi=220, bbox_inches="tight")
-    plt.close(fig)
+    _save_figure(fig, output_path, pdf_path=pdf_path)
 
 
 # -----------------------------------------------------------------------------
@@ -1147,6 +1154,7 @@ def main() -> None:
     parser.add_argument("--debug-batch-size", type=int, default=64)
     parser.add_argument("--final-window", type=int, default=10)
     parser.add_argument("--no-theory", action="store_true")
+    parser.add_argument("--output-dir", type=str, default=None)
     parser.add_argument("--main-plot-path", type=str, default=None)
     parser.add_argument("--alpha-dynamics-plot-path", type=str, default=None)
     parser.add_argument("--l-dynamics-plot-path", type=str, default=None)
@@ -1203,45 +1211,60 @@ def main() -> None:
 
     ref_l_index = len(lvals) - 1
     ref_p_index = _choose_reference_alpha_index(p_trs, args.d)
+    out = OutputDir(__file__, base=args.output_dir)
 
     main_plot_path = (
         Path(args.main_plot_path)
         if args.main_plot_path
-        else PROJECT_ROOT / "outputs" / "theorem_a_isotropic_main.png"
+        else out.png("theorem_a_isotropic_main")
     )
+    main_plot_pdf_path = None if args.main_plot_path else out.pdf("theorem_a_isotropic_main")
     alpha_dynamics_plot_path = (
         Path(args.alpha_dynamics_plot_path)
         if args.alpha_dynamics_plot_path
-        else PROJECT_ROOT / "outputs" / "theorem_a_dynamics_vary_alpha.png"
+        else out.png("theorem_a_dynamics_vary_alpha")
     )
+    alpha_dynamics_pdf_path = None if args.alpha_dynamics_plot_path else out.pdf("theorem_a_dynamics_vary_alpha")
     l_dynamics_plot_path = (
         Path(args.l_dynamics_plot_path)
         if args.l_dynamics_plot_path
-        else PROJECT_ROOT / "outputs" / "theorem_a_dynamics_vary_L.png"
+        else out.png("theorem_a_dynamics_vary_L")
     )
+    l_dynamics_pdf_path = None if args.l_dynamics_plot_path else out.pdf("theorem_a_dynamics_vary_L")
     metrics_path = (
         Path(args.metrics_path)
         if args.metrics_path
-        else PROJECT_ROOT / "outputs" / "theorem_a_metrics.npz"
+        else out.numpy("theorem_a_metrics")
     )
     artifacts_path = (
         Path(args.artifacts_path)
         if args.artifacts_path
-        else PROJECT_ROOT / "outputs" / "theorem_a_artifacts.pt"
+        else out.torch("theorem_a_artifacts")
     )
 
     _plot_main_summary(
         results,
         output_path=main_plot_path,
+        pdf_path=main_plot_pdf_path,
         d=args.d,
         include_theory=(not args.no_theory),
     )
     print(f"Saved theorem-A main plot to: {main_plot_path}")
 
-    _plot_dynamics_vary_alpha(results, output_path=alpha_dynamics_plot_path, ref_l_index=ref_l_index)
+    _plot_dynamics_vary_alpha(
+        results,
+        output_path=alpha_dynamics_plot_path,
+        pdf_path=alpha_dynamics_pdf_path,
+        ref_l_index=ref_l_index,
+    )
     print(f"Saved theorem-A alpha dynamics plot to: {alpha_dynamics_plot_path}")
 
-    _plot_dynamics_vary_L(results, output_path=l_dynamics_plot_path, ref_p_index=ref_p_index)
+    _plot_dynamics_vary_L(
+        results,
+        output_path=l_dynamics_plot_path,
+        pdf_path=l_dynamics_pdf_path,
+        ref_p_index=ref_p_index,
+    )
     print(f"Saved theorem-A L dynamics plot to: {l_dynamics_plot_path}")
 
     metrics_path.parent.mkdir(parents=True, exist_ok=True)

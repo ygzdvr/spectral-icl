@@ -1,12 +1,12 @@
 #!/bin/bash
-#SBATCH --job-name=reduced-gamma-depth-sweep
+#SBATCH --job-name=theorem-a-dim-free-dynamics
 #SBATCH --output=logs/%j.%x.out
 #SBATCH --error=logs/%j.%x.err
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=256G
-#SBATCH --time=1:30:00
+#SBATCH --time=0:05:00
 #SBATCH --gres=gpu:1
 #SBATCH --partition=ailab
 #SBATCH --mail-type=ALL
@@ -26,5 +26,5 @@ source "$SCRIPT_DIR/starter.sh"
 
 nvidia-smi
 
-echo "Running reduced gamma depth sweep..."
-python -u scripts/run_reduced_gamma_depth_sweep.py --no-show --device cuda
+echo "Running theorem-A dimension-free dynamics experiment..."
+python -u scripts/run_theorem_a_dim_free_dynamics.py --no-show --device cuda

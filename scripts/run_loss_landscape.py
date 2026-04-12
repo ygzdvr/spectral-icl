@@ -90,6 +90,31 @@ def main() -> None:
     print(f"Saved {out.png(f'loss_landscape_gamma_alpha_{alpha}')}")
 
     # =====================================================================
+    # Experiment 2b: vary L, alpha=2.0, sigma=0.0
+    # =====================================================================
+    alpha = 2.0
+
+    all_losses_L2: list[list[float]] = []
+    for L in Lvals:
+        losses_L2 = [
+            float(visualize_loss_landscape(L * g.item(), lamb_grid, alpha, L))
+            for g in gamma_vals
+        ]
+        all_losses_L2.append(losses_L2)
+
+    plt.figure()
+    sns.set_palette("rocket", n_colors=len(Lvals))
+    for i, L in enumerate(Lvals):
+        plt.plot(gamma_np, all_losses_L2[i], label=f"$L = {L}$")
+    plt.legend()
+    plt.ylim([0, 1.01])
+    plt.xlabel(r"$\gamma \ / \  L$", fontsize=20)
+    plt.ylabel(r"$\mathcal{L}(\gamma)$", fontsize=20)
+    plt.savefig(out.png(f"loss_landscape_gamma_alpha_{alpha}"), dpi=200, bbox_inches="tight")
+    plt.savefig(out.pdf(f"loss_landscape_gamma_alpha_{alpha}"), dpi=200, bbox_inches="tight")
+    print(f"Saved {out.png(f'loss_landscape_gamma_alpha_{alpha}')}")
+
+    # =====================================================================
     # Experiment 3: vary sigma, L=16, alpha=1.125
     # =====================================================================
     L = 16
@@ -127,6 +152,8 @@ def main() -> None:
     }
     for i, L in enumerate(Lvals):
         payload[f"vary_L_L{L}"] = np.asarray(all_losses_L[i], dtype=np.float64)
+    for i, L in enumerate(Lvals):
+        payload[f"vary_L_alpha2_L{L}"] = np.asarray(all_losses_L2[i], dtype=np.float64)
     for i, sigma in enumerate(sigmas):
         payload[f"vary_sigma_s{sigma:.2f}"] = np.asarray(
             all_losses_sigma[i], dtype=np.float64

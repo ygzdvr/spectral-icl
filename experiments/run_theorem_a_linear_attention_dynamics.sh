@@ -1,12 +1,12 @@
 #!/bin/bash
-#SBATCH --job-name=hard-power-law-depth
+#SBATCH --job-name=theorem-a-linear-attention-dynamics
 #SBATCH --output=logs/%j.%x.out
 #SBATCH --error=logs/%j.%x.err
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=256G
-#SBATCH --time=0:30:00
+#SBATCH --time=0:05:00
 #SBATCH --gres=gpu:1
 #SBATCH --partition=ailab
 #SBATCH --mail-type=ALL
@@ -26,5 +26,5 @@ source "$SCRIPT_DIR/starter.sh"
 
 nvidia-smi
 
-echo "Running hard power-law depth experiment..."
-python -u scripts/run_hard_power_law_depth.py --no-show --device cuda
+echo "Running theorem-A  linear attention dynamics..."
+python -u scripts/run_theorem_a_linear_attention_dynamics.py --no-show --device cuda
