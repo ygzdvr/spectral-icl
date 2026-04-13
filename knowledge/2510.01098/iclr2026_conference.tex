@@ -1,0 +1,1128 @@
+
+\documentclass{article} % For LaTeX2e
+\usepackage{iclr2026_conference,times}
+
+% Optional math commands from https://github.com/goodfeli/dlbook_notation.
+\input{math_commands.tex}
+
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{bm}
+\usepackage{subfigure}
+\usepackage{tcolorbox}
+\usepackage{xcolor}
+\usepackage{wrapfig}
+\definecolor{myblue}{rgb}{0.2,0.2,0.7} % tweak numbers
+\hypersetup{colorlinks=true,allcolors=myblue}
+
+\newtheorem{lemma}{Lemma}
+\newtheorem{theorem}{Result}
+
+
+\def\x{\bm x}
+\def\W{\bm W}
+\def\w{\bm w}
+\def\h{\bm h}
+\def\v{\bm v}
+
+\title{Theory of Scaling Laws for In-Context Regression: Depth, Width, Context and Time}
+
+% Authors must not appear in the submitted version. They should be hidden
+% as long as the \iclrfinalcopy macro remains commented out below.
+% Non-anonymous submissions will be rejected without review.
+
+\author{Blake Bordelon$^\spadesuit$, Mary Letey$^{\diamondsuit \heartsuit}$, Cengiz Pehlevan$^{\diamondsuit \heartsuit}$
+\\
+Center for Mathematical Sciences and Applications$^\spadesuit$
+\\
+John A. Paulson School of Engineering and Applied Sciences$^\diamondsuit$
+\\
+Kempner Institute for the Study of Natural and Artificial Intelligence $^{\heartsuit}$,
+\\
+Harvard University
+}
+
+
+% The \author macro works with any number of authors. There are two commands
+% used to separate the names and addresses of multiple authors: \And and \AND.
+%
+% Using \And between authors leaves it to \LaTeX{} to determine where to break
+% the lines. Using \AND forces a linebreak at that point. So, if \LaTeX{}
+% puts 3 of 4 authors names on the first line, and the last on the second
+% line, try using \AND instead of \And before the third author name.
+
+\newcommand{\fix}{\marginpar{FIX}}
+\newcommand{\new}{\marginpar{NEW}}
+
+\iclrfinalcopy % Uncomment for camera-ready version, but NOT for submission.
+\begin{document}
+
+
+\maketitle
+\vspace{-5pt}
+\begin{abstract}
+We study in-context learning (ICL) of linear regression in a deep linear self-attention model, characterizing how performance depends on various computational and statistical resources (width, depth, number of training steps, batch size and data per context). In a joint limit where data dimension, context length, and residual stream width scale proportionally, we analyze the limiting asymptotics for three ICL settings: (1) isotropic covariates and tasks (ISO), (2) fixed and structured covariance (FS), and (3) where covariances are randomly rotated and structured (RRS). For ISO and FS settings, we find that depth only aids ICL performance if context length is limited. Alternatively, in the RRS setting where covariances change across contexts, increasing the depth leads to significant improvements in ICL, even at infinite context length. This provides a new solvable toy model of neural scaling laws which depends on both width and depth of a transformer and predicts an optimal transformer shape as a function of compute. This toy model enables computation of exact asymptotics for the risk as well as derivation of powerlaws under source/capacity conditions for the ICL tasks. 
+%We analyze the limiting asymptotics for ICL in a joint scaling limit for data dimension, context length, and residual stream width, for any depth. We study three ICL settings (1) isotropic covariates and tasks, (2) fixed but arbitrary covariance, and (3) structured data with covariances varying randomly across contexts. In the first two settings (1)-(2), we find that depth only aids ICL performance if context length is limited. Alternatively, in setting (3) where covariances are random across contexts, we show that increasing the depth leads to significant improvements in ICL, even at infinite context length. This provides a new solvable toy model of neural scaling laws which depends on both width and depth of a transformer and predicts optimal transformer shapes as a function of compute. 
+\end{abstract}
+
+\vspace{-25pt}
+\section{Introduction}
+\vspace{-12pt}
+
+In recent years, transformer models have become the backbone architecture for modern machine learning systems \citep{vaswani2017attention, dosovitskiy2020image}. The transformer architecture consists of alternating self attention and multi-layer perceptron blocks in a deep residual network. For a variety of tasks, increasing the size of transformers by increasing width and depth of the model leads to empirically predictable improvements in model performance \citep{hestness2017deep, kaplan2020scaling, hoffmann2022training, achiam2023gpt}. Various protocols for scaling up the width and depth of transformers have been developed that provide stable training limits \citep{yang2021tuning, bordelon2023depthwise,bordelon2024infinite, chizat2024feature}. One common strategy is to scale width $N$ and depth $L$ linearly with fixed aspect ratio $L/N$ \citep{noci2023shaped,dey2025don}, however existing theory cannot justify such a practice as compute optimal or distinguish relative performance gain from width and depth from total parameter count. This leads us to our first open question:
+\vspace{-5pt}
+\begin{tcolorbox}[colframe=myblue, opacityback=0.95, title=Q1: What sets optimal Transformer shapes and scaling laws?]
+How should width and depth scale under a compute budget in a transformer? Do transformer scaling laws only depend on total parameters or have different width and depth dependence?
+\end{tcolorbox}
+\vspace{-5pt}
+
+In this work, we explore this question for in-context learning (ICL) problems, specifically in-context linear regression problems. In-context learning refers to the ability of models to condition their outputs on the past sequence of inputs provided by the user \textit{without updating model parameters} \citep{brown2020language}. This contrasts with in-weight learning (IWL) where information about the dataset is encoded in the model parameters during pre-training. Whereas many prior theoretical works on neural scaling laws essentially analyze the role of width, pretraining data, or pretraining time \citep{bahri2021explaining, maloney2022solvable, simon2023more, bordelon2024dynamical, paquette20244+, lin2024scaling,bordelon2025feature}, our work explores how depth, width, context length, and pretraining time influence the quality of ICL in self-attention models. In our investigations, we find that the architectural requirements to perform ICL regression depend significantly on the statistics of the pretraining ICL tasks. To address the first question, we are forced to investigate:
+\begin{tcolorbox}[colframe=myblue,opacityback=0.95,  title=Q2: What task properties influence ICL solution]
+How does the statistical structure of ICL tasks provided during pretraining influence the nature of the learned solution? Do these influence the optimal width/depth ratios?
+\end{tcolorbox}
+
+To address these questions, we develop a solvable model of deep linear attention for three distinct ICL data covariance structures. Our concrete novel contributions and findings are as follows:
+\vspace{-12pt}
+\subsection{Contributions}
+\begin{enumerate}
+    \item We identify a new asymptotic scaling for in-context regression with linear attention where context length $P$, number of masked points per context $K$, and contexts per step $B$ all scale \textit{linearly} with dimension $D$. This reduces the amount of compute and total data (by a factor of $D$) to converge than prior works \citep{lu2025asymptotictheoryincontextlearning} and speeds up simulations. 
+    \item We introduce three distinct ICL data models of increasing generality. We study \textbf{isotropic} input data and task vectors (\textbf{ISO}). We then proceed to analyze fixed and structured (\textbf{FS}) covariances for data and task vectors. Lastly, we examine an ICL distribution where data covariances are randomly rotated and structured (\textbf{RRS}) across contexts. 
+    \item We show with our asymptotic theory, that depth $L$ benefits the first two data settings (\textbf{ISO} + \textbf{FS}) only if $\alpha\equiv \text{context length}/\text{data dimension} $ is finite. In the limit of $\alpha \to \infty$, there is no benefit from depth for these ICL tasks. Further, the FS setting is brittle with respect to variations in changes to the data covariance at test time. However, for the \textbf{RRS} setting, increasing depth is beneficial for any distribution and a non-trivial width \& depth scaling.
+    \item We introduce a model width $N$ bottleneck to our ICL model and study the pretraining scaling law for a model trained for $t$ steps on a width $N$ and depth $L$ linear attention model in the \textbf{RRS} setting. For powerlaw data, the scaling law takes the form of a Chinchilla scaling law but with width and depth contributing separate terms
+    \begin{align}
+        \mathcal L(t,N,L,P) = c_t \  t^{-\beta_t} + c_N \  N^{-\beta_N} + c_L \  L^{-\beta_L} +c_P \  P^{-\beta_P} .
+    \end{align}
+    \item From this scaling law, we consider compute optimal joint scaling of width and depth. Depending on the structure of the ICL covariates, we obtain different scalings of $L \sim N^{ \nu }$ where $\nu$ depends on properties of the data. 
+\end{enumerate}
+
+\vspace{-10pt}
+\subsection{Related Works}
+
+\vspace{-7pt}
+
+\paragraph{Infinite Neural Network Width and Depth Limits and Commonly Used Joint Scalings.} The empirical fact that larger networks tend to perform better on natural data \citep{hestness2017deep,kaplan2020scaling,hoffmann2022training} has led to development of scaling procedures to stably increase the size of a model to allow optimization. The mean-field or $\mu$P scaling theory \citep{geiger2020disentangling, mei2018mean, chizat2018global, yang2021tensor, bordelon2022self} allows one to scale up the width of a model in a way that admits a feature learning infinite limit. Further, this scaling protocol provides consistent optimal hyperparameters, while delivering monotonic improvements in performance \citep{yang2021tuning}. The same program has been carried out for deep residual models, such as transformers \citep{bordelon2023depthwise, yang2023tensor, bordelon2024infinite, dey2025don}. However, while these infinite width and infinite depth scaling limits have been established to exist and perform better than finite models, no theory currently captures the \textit{relative gains in performance from scaling up width or depth at fixed compute.}  Understanding compute optimal shapes could help guide architectural choices when training large transformer models.
+
+
+\vspace{-8pt}
+\paragraph{Theories of Compute Optimal Neural Scaling Laws.} Following the empirical scaling law results of \cite{kaplan2020scaling} and \cite{hoffmann2022training}, many theoretical works have examined the generalization theory for fully trained kernel methods under power law features  \citep{bordelon2020spectrum, spigler2020asymptotic, cui2021generalization, bahri2021explaining, maloney2022solvable, atanasov2023onset, atanasov2022neural,defilippis2024dimension}. More recently, several efforts have begun to incorporate SGD dynamics into these models to gain a notion of compute (and compute optimal tradeoffs between parameters and training time) \citep{bordelon2022learning, bordelon2024dynamical, paquette20244+, lin2024scaling, kunstner2025scaling, bordelon2025feature}. In these works, the model is essentially one or two layers and the notion of finite model size is introduced with a random projection of the features to an $N$ dimensional space. In this way, existing theories more closely resemble scaling laws for width rather than a comparison where depth and width serve different functions. Recent empirical works have pointed out the utility of increasing depth (or virtual depth through looping) for tasks requiring reasoning such as solving Sudoku puzzles \citep{wang2025hierarchical} and solving math problems \citep{zhu20254th,geiping2025scaling}. \cite{merrill2025little} study regular language recognition where a clear computational advantage to scaling depth instead of width is established and experimentally verified. 
+
+\vspace{-10pt}
+\paragraph{Empirical Studies of ICL.} \cite{brown2020language} demonstrated that large pretrained language models such as GPT-3 exhibit remarkable in-context learning capabilities for natural language tasks. Following this finding, \cite{garg2022can} empirically investigated the ability of transformers to learn simple function classes such as linear regression, sparse regression, and two-layer neural networks. Various works have studied emergence of ICL beyond language tasks, focusing on what data structures (from dynamical systems to classification problems) can be learned in-context \citep{liu2024llms,chan2022datadistributionalpropertiesdrive,iclmodular_learningtogrok,mccracken2025uncoveringuniversalabstractalgorithm, park2024iclr, chen2024training}. Several works have offered experimental evidence that ICL implements Bayesian inference \citep{xie2021explanation, wurgaft2025context, liu2024betterunderstandingincontextlearning,panwar2024incontextlearningbayesianprism, zhang2023and}. Further investigations questioned whether attention is even strictly necessary for ICL by studying the performance of MLPs on these tasks \citep{tong2025mlpslearnincontextregression, kratsios2025incontextuniversalityenoughmlps}.
+\vspace{-10pt}
+\paragraph{Theoretical Studies of ICL.} Inspired by empirical studies of ICL, many works have theoretically investigated how ICL algorithms such as in-context gradient descent can be implemented in transformers \citep{zhang2023trainedtransformerslearnlinear, ahn2023transformerslearnimplementpreconditioned, von2023transformers, li2023transformersalgorithmsgeneralizationstability, kim2024transformersminimaxoptimalnonparametric, akyurek2022learning, pathak2023transformersoptimallylearnregression, mahankali2023stepgradientdescentprovably}. Some works have demonstrated flexibility of the transformer to adapt to changing statistics \citep{vladymyrov2024lineartransformersversatileincontext} or performing model selection \citep{bai2023transformers}. Studies have pointed out the need for sufficient pretraining task diversity for ICL generalization \citep{raventós2023pretrainingtaskdiversityemergence, wu2024pretrainingtasksneededincontext} which was theoretically analyzed in an asymptotic scaling limit for a shallow linear attention model by  \cite{lu2025asymptotictheoryincontextlearning}. Extensions to structured covariances and distribution shifts revealed the importance of train-test task alignment \citet{letey2025pretraintesttaskalignmentgoverns}.  \citet{gatmiry2024roledepthloopingincontext} investigate the need for a sufficient number of residual stream steps (either by increasing true depth or loops of attention layers) to solve ICL distributions with multiple condition numbers with larger condition numbers requiring more depth. While many of these works study a final construction of weights, recent theory has described the training dynamics of one layer linear multi-head attention \citep{zhang2025trainingdynamicsincontextlearning}. 
+
+
+% \cite{vladymyrov2024lineartransformersversatileincontext} Linear Transformers are Versatile In-Context Learners: Changing statistics between contexts, but only label noise 
+
+% \cite{raventós2023pretrainingtaskdiversityemergence} Pretraining task diversity and the emergence of non-Bayesian in-context learning for regression
+
+% \cite{zhang2023trainedtransformerslearnlinear} transformers learn linear models in-context
+
+% \cite{mahankali2023stepgradientdescentprovably} One Step of Gradient Descent is Provably the Optimal ICL with One Layer of Linear Self-Attention
+
+% \cite{ahn2023transformerslearnimplementpreconditioned} Transformers Learn to Implement Preconditioned Gradient Descent for ICL
+
+% \cite{li2025provableincontextlearningnonlinear} Provable In-Context Learning of Nonlinear Regression with Transformers
+
+% \cite{wu2024pretrainingtasksneededincontext} How Many Pretraining Tasks Are Needed for ICL of Linear Regression
+
+% \cite{kim2024transformersminimaxoptimalnonparametric} Transformers are Minimax-Optimal Nonparametric In-Context Learners
+
+% \cite{li2023transformersalgorithmsgeneralizationstability} Transformers as Algorithms: Generalization and Stability in ICL
+
+% \cite{akyürek2023learningalgorithmincontextlearning}
+% What Learning Algorithm is ICL? Investigations with Linear Models
+
+% \cite{lu2025asymptotictheoryincontextlearning} asymptotic theory of linear regression in-context by linear attention
+
+% \cite{gatmiry2024roledepthloopingincontext} \textcolor{red}{this one could be good but i haven't investigated properly:} On the Role of Depth and Looping for ICL with Task Diversity
+
+% \cite{zhang2025trainingdynamicsincontextlearning} \textcolor{red}{TRAINING DYANMICS!} of In-Context Learning in Linear Attention
+
+% \cite{pathak2023transformersoptimallylearnregression} 
+% Transformers can Optimally Learn Regression Mixture Models
+
+% \cite{yang2025provable} \cite{park2025iclrincontextlearningrepresentations} in-context learning of representations
+
+\vspace{-10pt}
+\section{Data, Architecture and Reduced Model}
+\vspace{-10pt}
+
+\subsection{Deep Linear Attention Architecture}
+\vspace{-5pt}
+The most general model we study is a depth $L$, residual linear attention model $f$ that maps inputs contexts to output predictions. The data are formed as $P$ input-output pairs $\{ (\bm x_\mu, y_\mu) \}_{\mu=1}^P$ and $K$ evaluation points $\{ (\bm x^\star_\mu, *) \}_{\mu=P+1}^{P+K}$ (which do not carry target outputs) into a data matrix $\bm D$
+\begin{align}
+    \bm D = \begin{bmatrix}
+        \x_1 & ... & \x_P & \x_{P+1} & ... & \x_{P+K}
+        \\
+        y_1 & ... & y_P &  * & ... & *
+    \end{bmatrix}
+\end{align}
+where $*$ indicates masked target values on the $K$ evaluation points which are provided as $0$ entries. The evaluation tokens $\mu \in \{ P+1,... ,P+K\}$ prevented from updating the model with a positional masking matrix $M_{\mu\nu}$ (Appendix \ref{app:reduced_Gamma_derivation}). The model $f_\mu$ is computed from
+\begin{align}
+    &\h^1_\mu = \bm W_x \x_\mu + \w_y y_\mu, \quad  \quad  \h^{\ell+1}_{\mu} = \h^{\ell}_\mu + \frac{1}{L P} \sum_{\nu=1}^P \left( \bm k^\ell_\nu \cdot \bm q^\ell_\mu \right) \v^\ell_\nu  \ , \ \ell \in [L] \ , \  \mu \in [P+K] \nonumber
+    \\
+    &\bm q^\ell_\mu = \bm W_q^\ell \h^{\ell}_\mu \ , \ \bm k^\ell_\mu = \bm W_k^\ell \h^{\ell}_\mu \ , \ \bm v^\ell_\mu = \bm W_v^\ell \h^\ell_\mu,  \quad \quad f_\mu = \bm w_{o} \cdot \h^L_\mu
+\end{align}
+The loss function for context $\bm D$ is $\mathcal L({\bm D}) = \frac{1}{K} \sum_{\mu=P+1}^{P+K} ( f_{\mu} - y_\mu  )^2$ and the full population loss is $\mathcal L = \mathbb{E}_{\bm D} \mathcal L(\bm D)$ where $\bm D$ is the distribution of context matrices. We stress that the operation $\bm q_\mu \cdot \bm k_\mu$ corresponds to \textit{linear attention} rather than commonly used in soft-max attention. For the regression tasks we consider, this model is sufficient to solve the ICL task \citep{ahn2023transformerslearnimplementpreconditioned,von2023transformers} and aids theoretical tractability \citep{lu2025asymptotictheoryincontextlearning, zhang2025trainingdynamicsincontextlearning}. 
+
+\vspace{-10pt}
+\subsection{Recurrent Reduced-$\Gamma$ Model}
+\vspace{-8pt}
+
+Following prior works on ICL in linear regression  \citep{zhang2023trainedtransformerslearnlinear,lu2025asymptotictheoryincontextlearning,wu2024pretrainingtasksneededincontext,zhang2025trainingdynamicsincontextlearning}, we examine the minimal (simplest) reparameterization of the above model which can solve this task where the residual stream encodes $\x$ information in a subspace orthogonal to $\w_y = \w_o$ so that $\bm W_x^\top \bm w_y = 0$ and $\bm W_v \propto \bm w_y \bm w_y^\top$. Further, instead of optimizing separate hidden weight matrices, we consider \textit{looped / universal transformers} where each attention block is the identical $\bm W^\ell_i = \bm W^{\ell'}_{i}$ for $i \in \{k, q, v\}$ \citep{dehghani2018universal, gatmiry2024roledepthloopingincontext}, though we relax this assumption in Section \ref{sec:untied_gammas} and Appendix \ref{app:diff_layers}. The reduced model then defines the predictor $f(\bm x_\star)$ for test point $\bm \x_\star$ in terms of a single matrix $\bm\Gamma \in \mathbb{R}^{D\times D}$
+\begin{align}
+    \bm \Gamma &\equiv \left( \w_o^\top \bm W_v \bm w_y \right) \bm W_x^\top \bm W_k^\top \bm W_q \bm W_x  \ , \ f(\bm x_\star) = \frac{1}{L P} \bm x_\star^\top  \bm\Gamma \sum_{\ell=0}^{L-1} \left( \bm I - L^{-1} \hat{\bm\Sigma} \bm\Gamma \right)^\ell \bm X^\top \bm y
+\end{align}
+% 
+where $\hat{\bm\Sigma} = \frac{1}{P}\bm X \bm X^\top$ is the empirical covariance. Due to the simplicity of this model and loss landscape structure, we will first focus on the gradient dynamics when we directly perform gradient descent on the matrix $\bm\Gamma$. Then in Section \ref{sec:full_linear_att_dynamics}, we consider learning dynamics on the decoupled collection of parameters $\{ \bm W_{i} \}_{i\in\{ k,q,v \}}$. 
+
+\vspace{-12pt}
+\section{Learning Curves in Reduced Linear Attention Model}
+
+\vspace{-10pt}
+
+\subsection{Isotropic Covariates and Tasks (\textbf{ISO})}
+
+\vspace{-5pt}
+To start our investigation, we begin by considering $D$ dimensional isotropic data and isotropic task distribution. For each context $\bm D_c$ and each data point $\mu \in [P]$, the distribution of $\x$ and $y$ are 
+\begin{align}
+    \x_{\mu, c} \sim \mathcal N\left(0, \mI \right)  \quad \quad \bm\beta_c \sim \mathcal{N}(0,\mI) \ , \ y_{\mu c} = \frac{1}{\sqrt D} \bm\beta_c \cdot \x^\mu_c + \sigma \epsilon^\mu_c \ , \ \epsilon^\mu_c \sim \mathcal{N}(0,1) . 
+\end{align}
+In Appendix \ref{app:shallow_sgd}, we analyze SGD with batch of $B$ contexts sampled at each step in the proportional asymptotics $P,K,B,D \to \infty \ , \ P/D = \alpha \ , \ K/D = \kappa \ , \ B/D = \tau$, establishing that successful pretraining requires a total of $B t = \Theta(D)$ contexts, each of size $P = \Theta(D)$. 
+
+\begin{figure}[h]
+    \centering
+    \subfigure[$L = 16$, Linear Transformer]{\includegraphics[width=0.32\linewidth]{figures/train_dynamics_vary_alpha.pdf}}
+    \subfigure[$\alpha= 1$, Linear Transformer]{\includegraphics[width=0.32\linewidth]{figures/train_dynamics_vary_L.pdf}}
+    \subfigure[Final Loss of The Transformer]{\includegraphics[width=0.32\linewidth]{figures/depth_vs_alpha_isotropic.pdf}}
+    \caption{Deep linear self attention models trained with SGD on the ICL task with \textit{isotropic covariates} with $D = 32$.  (a) Training dynamics for varying $\alpha$. (b) Increasing depth $L$ can improve ICL predictions, especially for $\alpha \approx 1$. (c) The final loss is well predicted by the theory of $L$ steps of gradient descent with optimal learning rate for each $(\alpha,L)$ pair. }
+    \label{fig:isotropic_dynamics_landscape}
+\end{figure}
+
+
+
+% \begin{tcolorbox}[colframe=blue, opacityback=0.95, title=Result 1: Online SGD Dynamics for Shallow ICL with Isotropic Covariates] 
+
+% Consider the reduced $\Gamma$ model with a single layer $L=1$ and proportional asymptotics, then the ICL loss $\mathcal L(t) = \frac{1}{d} ||\bm\Gamma(t) - \bm I||^2$ has a closed form expression involving only $\{ t,\alpha,\kappa,\tau \}$. 
+% \end{tcolorbox}
+% The complete formula is provided in Appendix \textcolor{red}{WHERE?}. 
+
+
+% \begin{theorem}
+%     Consider the reduced $\Gamma$ model with a single layer $L=1$ and proportional asymptotics
+%     \begin{align}
+%         P,K,B,D \to \infty \ , \ P/D = \alpha \ , \ K/D = \kappa \ , \ B/D = \tau
+%     \end{align}
+%     Then the ICL test loss $\mathcal L(t) = \frac{1}{d} ||\bm\Gamma(t) - \bm I||^2$ after $t$ iterations of SGD can be expressed in terms of 
+%     \begin{align}
+%         &\mathcal L(t) = C(t) +  \frac{2 \alpha^{-1}(1+\sigma^2)}{(1+\alpha^{-1}(1+\sigma^2))^2} \left[1-\eta(1+\alpha^{-1}(1+\sigma^2)) \right]^t + \frac{(1+\sigma^2)^2}{(\alpha + 1+\sigma^2)^2}
+%         \\
+%         &C(t) = a(\eta, \alpha, \tau, \kappa)^t  + \frac{1-a(\eta, \alpha, \tau, \kappa)^t}{1-a(\eta, \alpha, \tau, \kappa)}  b(\eta, \alpha, \tau, \kappa)
+%     \end{align}
+%     where the functions $a(\eta,\alpha, \kappa,\tau) = \left[1 - \eta \left(1 +\alpha^{-1}(1+\sigma^2) \right) \right]^2  + \frac{\eta^2}{\tau} (1+\kappa^{-1}) (1+\alpha^{-1}(1+\sigma^2))^2$ and $b(\eta,\alpha,\kappa,\tau) = \frac{\eta^2}{\tau} (1+\kappa^{-1}) \alpha^{-1}(1+\sigma^2)$ capture the dependence on batchsize through $\tau$. 
+% \end{theorem}
+
+%We thus see that deviations from gradient flow in the $L=1$ model come in at a scale of $\eta / \tau$. This is a generic fact for deeper models as well (\textcolor{red}{simulations in Appendix (WHERE)}), however, we do not attempt to fully characterize the SGD fluctuations for online learning in deeper model. The purpose of this result is to stress that only $\mathcal O(D^2)$ total tokens are required (unlike prior works which required $\mathcal{O}(D^3)$ data points) for an ICL learner in this regime \footnote{The gap is caused by suboptimal scaling of the number of evaluation points $K$ per context (usually $K=1$ in prior works). Note realistic LLMs get multiple error signals per context (one per token).}. We verify these theoretical learning curves in Figure \ref{fig:sgd_isotropic_theory}. 
+
+% We also indicate the following facts about SGD effects
+% \begin{itemize}
+%     \item The number of evaluation points per batch $\kappa \equiv K/D$ only alters the SGD noise terms (the terms involving $1/\tau$) and its effect vanishes in the gradient flow limit $\eta / \tau \to 0$.
+%     \item Unlike offline training, in this online SGD setting the model regularizes the final value of $\gamma(t) = $ based on label noise $\sigma^2$ to reduce overfitting.  
+%     \item SGD fluctuations can impact the final loss through $\lim_{t\to\infty} C(t) = \frac{b(\eta,\alpha,\tau,\kappa)}{1-a(\eta,\alpha,\tau,\kappa)}$. 
+% \end{itemize}
+
+% \vspace{-10pt}
+
+% \paragraph{Moving to Deeper Models} These SGD effects, while potentially interesting, are not the primary focus of the paper. Moving forward, we will instead focus on gradient flow in deeper models. For isotropic covariates, we have the following result. 
+
+
+\begin{tcolorbox}[colframe=myblue, opacityback=0.95, title=Result 1: Gradient Flow for Isotropic Covariates (ISO)] 
+In the gradient flow limit, when training from initial condition $\bm\Gamma =0$, ICL pretraining on isotropic data at any depth $L \geq 1$ reduces to tracking a scaled identity matrix 
+    \begin{align}
+       \bm\Gamma(t) = \gamma(t) \bm I  .
+    \end{align} 
+    Consequently, the gradient flow can be expressed as an evolution of the scalar $\gamma(t)$
+    \begin{align}
+        \frac{d}{dt} \gamma(t) &= \text{tr} \left< \bm{\hat\Sigma} \left( \bm I - L^{-1} \gamma(t) \bm{\hat\Sigma} \right)^{2L-1}  \right>  =  \int d\lambda \rho(\lambda) \lambda \left[ 1 - L^{-1} \gamma(t) \lambda \right]^{2L-1}
+    \end{align}
+    where the average is over the empirical covariance $\bm{\hat\Sigma} = \frac{1}{P}\bm X \bm X^\top$ with Marchenko-Pastur eigenvalue distribution $\rho(\lambda)$. The final loss can be interpreted as the MSE loss for $L$ steps of GD with optimal step size 
+    \begin{align}
+        \mathcal L_\star(\alpha) &= \min_{\gamma} \ \text{tr} \left< \left( \bm I - L^{-1}\gamma \hat{\bm\Sigma} \right)^{2L} \right> =  \min_{\gamma} \int \rho(\lambda)   \left( 1 - L^{-1} \gamma \lambda \right)^{2L} .
+    \end{align}
+\end{tcolorbox}
+
+For $L=1$, the loss saturates to $\mathcal L_\star = (1 + \alpha)^{-2}$ while for $L\to\infty$, the $\mathcal L_\star = [1 - \alpha]_+$, which illustrates the gap in performance between a shallow model and a large depth model. We illustrate loss curves of varying depth $L$ compared to pretrained linear transformers (dots) in Figure \ref{fig:isotropic_dynamics_landscape} (c). We extend to the case with label noise $\sigma^2>0$ in Appendix \ref{app:grad_flow_iso_deep}. In this case optimal $\gamma$ is smaller since early stopping acts as an effective regularization \citep{advani2020high, sonthalia2024regularization}. 
+
+
+\begin{figure}[h]
+    \centering
+     \subfigure[Loss Landscape $\alpha = 0.5$]{\includegraphics[width=0.32\linewidth]{figures/loss_landscape_gamma_alpha_0.5.pdf}}
+    %\subfigure[Loss Landscape $\alpha = 1.0$]{\includegraphics[width=0.32\linewidth]{figures/loss_landscape_gamma_alpha_1.0.pdf}}
+    \subfigure[Loss Landscape $\alpha = 2.0$]{\includegraphics[width=0.32\linewidth]{figures/loss_landscape_gamma_alpha_2.0.pdf}}
+    \subfigure[Effect of Noise $L=16$]{\includegraphics[width=0.32\linewidth]{figures/loss_landscape_gamma_vary_sigma.pdf}}
+    \caption{The loss landscape for the reduced $\Gamma$ model with $\bm\Gamma=\gamma \bm I$ corresponding to the gradient flow limit. This limit is equivalent to \textbf{optimal step size} selection for in-context GD. (a)-(b) The effect of depth $L$ and context length $\alpha$ on the loss. (c) Larger noise $\sigma$ decreases the optimal $\gamma$. }
+    \label{fig:placeholder}
+\end{figure}
+
+
+\begin{tcolorbox}[colframe=myblue, opacityback=0.95, title=Result 2: Depth is Unnecessary for Long Contexts on Isotropic Covariates]  
+    If $\alpha = P/D \to \infty$ then $L=1$ achieves the minimal ICL loss (among any depth $L$ models). Any larger depth $L \geq 2$ achieves the same (zero if $\sigma^2 = 0$) loss in the $\alpha \to \infty$ limit. 
+\end{tcolorbox}
+\vspace{-10pt}
+\subsection{Fixed Structured Covariance (\textbf{FS}) $\to$ Preconditioned Gradient Descent}
+\vspace{-5pt}
+Next, we let the population covariance be arbitrary $\left< \bm x \bm x^\top \right> = \bm \Sigma$ across all contexts and task correlations be given by the matrix $\left< \bm\beta \bm\beta^\top \right> = \bm\Omega$. The ICL population loss takes the form
+\begin{align}
+    \mathcal L =  \text{tr} \ \bm\Omega \left< \left[\left( \bm I - L^{-1} \bm\Gamma \hat{\bm\Sigma} \right)^L \right]^\top \bm\Sigma \left( \bm I - L^{-1} \bm\Gamma \hat{\bm\Sigma} \right)^L \right>
+\end{align}
+
+\vspace{-10pt}
+
+\begin{tcolorbox}[colframe=myblue, opacityback=0.95, title=Result 3: Depth Unnecessary for Long Contexts with Fixed Covariance $\bm\Sigma$]  
+    When the ICL distribution involves fixed covariance across contexts, there is no benefit to increasing depth $L$ beyond $L=1$ in the large context $\alpha \to \infty$ limit. For any $L \geq 1$, zero ICL loss can be achieved in the $\alpha \to \infty$ limit by setting $\bm\Gamma = L \bm\Sigma^{-1}$.
+\end{tcolorbox}
+
+
+We support this finding in Figure \ref{fig:fixed_covariance} (b) where we show that small depth models are not outperformed by deeper models even after very long training horizons. When the ICL pretraining distribution for $\bm\Sigma$ is fixed, the model will memorize statistical information about the covariance of the inputs from the pretraining distribution. By preconditioning with the inverse of the data covariance $\bm\Sigma^{-1}$, the model is capable of achieving zero loss after even a single step of in-context GD. The gradient flow dynamics of the $\bm\Gamma$ matrix can be decomposed further in the case where $\bm\Omega$ and $\bm\Sigma$ commute.
+
+
+\begin{figure}
+    \centering
+    \subfigure[Eigenvalue Evolution]{\includegraphics[width=0.32\linewidth]{figures/eig_evolution_fixed_covariance.pdf}}
+    \subfigure[Depth unnecessary]{\includegraphics[width=0.32\linewidth]{figures/losses_fixed_covariance.pdf}}
+    \subfigure[Brittleness to Distribution Shift]{\includegraphics[width=0.32\linewidth]{figures/ood_loss_fixed_covariance.pdf}}
+    \caption{Pretraining on \textbf{FS} ICL covariates leads to a solution that does not require depth but is brittle to distribution shift. (a) Evolution of the eigenvalues $\gamma_k(t)$ of the $\bm\Gamma(t)$ matrix for depth $L = 4$ as a function of pretraining time $t$ compared with infinite depth $L \to \infty$ theory (dashed black). (b) For powerlaw covariates, all depth models converge as a power law in $t$. There is no asymptotic benefit to increasing depth beyond $L=1$. (c) The ICL solution obtained when training from fixed covariance is \textbf{brittle} to changes in the covariance $\bm\Sigma \to \exp( - \theta \bm S) \bm\Sigma \exp( \theta \bm S)$. }
+    \label{fig:fixed_covariance}
+\end{figure}
+
+
+
+\begin{tcolorbox}[colframe=myblue, opacityback=0.95, title=Result 4: Decoupled Eigenvalue Dynamics During Pretraining on Fixed Covariances]  
+    Suppose that $\bm\Omega$ and $\bm\Sigma$ are codiagonalizable with respective eigenvalues $\{ \omega_k \}$ and $\{ \lambda_k \}$. Then, when training from zero initialization, $\bm\Gamma$ is diagonal in the same basis with eigenvalues $\gamma_k(t)$ that obey the following dynamics (see Appendix \ref{app:FS_setting})
+    \begin{align}
+        \frac{d}{dt} \gamma_k(t) = \omega_k \lambda_k^2 \left( 1- L^{-1} \lambda_k \gamma_k(t) \right)^{2L-1} .
+    \end{align}
+    In the large depth limit $L \to \infty$ these dynamics have solution $\gamma_k(t) = \frac{1}{2 \lambda_k} \ln(1+ 4 \omega_k \lambda_k^3 t )$ generating the loss dynamics $ \lim_{L \to\infty} \mathcal L(t, L) = \sum_k \frac{\omega_k \lambda_k}{ 1 + 4 \omega_k \lambda_k^3 \ t  }$. 
+Under powerlaw source/capacity conditions where $\lambda_k \sim k^{-\nu}$ and $\sum_{\ell > k} \lambda_\ell \omega_\ell \sim k^{- \nu \beta}$, the ICL loss scales as a powerlaw in pretraining time $\mathcal L(t) \sim t^{- \frac{\beta}{\nu + \nu \beta + 1}}$. 
+\end{tcolorbox}
+
+While pretraining the linear transformer in this setting can achieve zero loss for long contexts $P \to \infty$ even in shallow networks, the solution the model finds from gradient descent is \textit{brittle} to properties of the pretraining data. Rather than learning a generic algorithm that solves ICL regression for any covariance $\bm\Sigma$, its solution is specialized to the pretraining covariance.  
+
+\begin{tcolorbox}[colframe=myblue, opacityback=0.95, title=Result 5: Brittleness of Fully Trained Model to Distribution Shift (OOD Loss)]  
+    A depth $L$ model is pretrained on ICL tasks with fixed covariances $\bm\Sigma$ and $\bm\Omega$ for inputs and task vectors, but evaluated on new covariances $\bm\Sigma', \bm\Omega'$. The out-of-distribution loss is
+    \begin{align}
+        \mathcal L_{\text{OOD}} = \text{tr} \ \bm\Omega'  \left[\left( \bm I - \bm\Sigma^{-1} \bm\Sigma' \right)^{L}\right]^\top \bm\Sigma' \left( \bm I - \bm\Sigma^{-1} \bm\Sigma' \right)^{L}
+    \end{align}
+\end{tcolorbox}
+We illustrate this brittleness in Figure \ref{fig:fixed_covariance} (c) where we define a family of new covariance matrices $\bm\Sigma' = \exp( \theta \bm S ) \bm \Sigma \exp( - \theta \bm S)$ where $\bm S$ is a random skew-symmetric matrix. As $\theta$ increases and $\bm\Sigma'$ becomes more dissimilar to $\bm\Sigma$, the OOD loss increases for all depths $L$.
+
+\vspace{-10pt}
+\subsection{Random Rotated and Structured Covariances $\implies$ In-Context GD} 
+\vspace{-10pt}
+
+Next, we attempt to enhance the \textit{covariance diversity} across contexts. To do so, we now allow that each context $c$ has a random data and task covariances which are randomly rotated
+\begin{align}
+    \x^\mu_c \sim \mathcal{N}\left( 0 , \bm\Sigma_c \right) \ , \  \bm\Sigma_c = \bm O_c \bm\Lambda \bm O_c^\top  \ , \ \bm\Omega_c = \bm O_c \bm \Omega \bm O_c^\top  , 
+\end{align}
+where $\bm O_c$ is a random $d\times d$ orthogonal matrix sampled from the Haar measure. The idea to pretrain with a diverse set of covariances $\bm\Sigma_c$ across contexts $c$ is to encourage the model to learn a \textit{generic} in-context learning algorithm that is not specifically tailored to a particular data covariance $\bm\Sigma$. %\footnote{In random matrix theory, the model parameters $\bm\Gamma$ and the random covariance $\bm \Sigma_c$ are statistically \textit{free}.}.
+By introducing the random rotation across contexts, the model cannot encode a whitening transform of the data in the matrix $\bm\Gamma$ which prevents a zero loss solution in a shallow model with depth $L=1$. Therefore, even the $P/D \to \infty$ limit has the potential to exhibit a nontrivial scaling law in $L$. 
+
+
+%A key consequence of the rotational symmetry of this ensemble, the minimizer of the loss among the set of symmetric matrices will be isotropic $\bm \Gamma_\star = \gamma_\star \bm I$ as we prove in Appendix (\textcolor{red}{where?}). Further, this holds not only for the minimizer, but also for the trajectory of gradient flow as we describe below
+
+
+\begin{tcolorbox}[colframe=myblue, opacityback=0.95, title=Result 6: Gradient Flow Generates Isotropic $\bm\Gamma$]  
+    Gradient flow on the $\bm\Gamma$-reduced model maintains the isotropy condition $\bm\Gamma(t) = \gamma(t) \bm I$ with
+    \begin{align}
+        \frac{d}{dt} \gamma(t) = \text{tr} \bm\Lambda^2 \bm\Omega \left( 1 - L^{-1} \gamma(t) \bm\Lambda \right)^{2L-1} .
+    \end{align}
+\end{tcolorbox}
+This indicates that, provided the covariance is randomly rotated across contexts, the behavior of the learned solution is unconditioned in-context GD (see Appendix \ref{app:rrs_setting}). In the next section, we explore the consequences of this finding for optimal shapes.
+
+\vspace{-10pt}
+
+\section{Model of Compute Optimal Neural Scaling Laws}
+\vspace{-10pt}
+
+
+We consider the third setting with power law features and also introduce a notion of width through a projection matrix $\bm A \in \mathbb{R}^{N \times D}$. Rather than training on $D$ dimensional inputs $\bm x$, the model has access to $N$ dimensional features $\tilde{\x} = \bm A \x$, which leads to the following condition of $\bm\Gamma(t)$
+\begin{align}
+    \tilde{\x}  = \bm A \x \quad  {\implies} \quad   \bm\Gamma(t) = \gamma(t) \left( \bm A \bm A^\top \right) \in \mathbb{R}^{N \times N}
+\end{align}
+As before, the loss can again be viewed as a function of the scale parameter $\gamma(t)$. We provide a recipe to compute it below by computing the average over the random orthgonal matrix, resulting in a two-point deterministic equivalent for free products\footnote{\textit{Two-point} refers to the correlation function of two resolvents evaluated at different arguments, rather than the one point function which is a single resolvent and determines only the spectrum of the random matrix.}, in the same spirit of the results of \citep{bordelon2024dynamical, atanasov2025two}, using a saddle point method (Appendix \ref{app:two_point_det_equiv}). 
+
+\begin{tcolorbox}[colframe=myblue, opacityback=0.95, title=Result 7: Two-Point Deterministic Equivalent (DMFT Correlation) for the Loss Landscape]  
+     The loss function $\mathcal L = \left< |\bm\Lambda^{1/2}[\bm I - \gamma(t) L^{-1} \bm O \left( \bm A^\top \bm A \right)^2 \bm O^\top \hat{\bm\Sigma} ]^L \bar{\bm\beta}|^2 \right>$ can be explicitly averaged over the random orthogonal matrix $\bm O$ and expressed as a deterministic function
+    \begin{align}
+        \mathcal L(t,N,L,P) &= \int \frac{d\omega d\omega'}{(2\pi)^2} \left(1 + L^{-1} \gamma(t) i\omega  \right)^L \left(1 + L^{-1} \gamma(t) i\omega'  \right)^L \mathcal C(\omega,\omega') \nonumber
+        \\
+        \mathcal C(\omega,\omega') &= \text{tr} \ \bm\Lambda \left[ i \omega + \Psi_{v\chi}(\omega) \bm\Lambda \right]^{-1} \left[ \bm\Omega - \Psi_{\chi\chi}(\omega,\omega')  \right] \left[ i \omega' + \Psi_{v\chi}(\omega') \bm\Lambda \right]^{-1} 
+    \end{align}
+    where $\Psi_{v\chi}(\omega)$ and $\Psi_{\chi\chi}(\omega,\omega')$ are deterministic functions that depend on the spectra of $\hat{\bm\Sigma}$ and $\bm A^\top \bm A$ (Appendix  \ref{app:two_point_det_equiv}). For example to obtain $\Psi_{v\chi}(\omega)$ we first solve
+    \begin{align}
+        i\omega_{(\bm A^\top \bm A)^2}(\tau) i \omega_{\hat{\bm\Sigma}}(\tau) = \frac{\tau-1}{\tau} i \omega  \implies \Psi_{v\chi}(\omega) =  \frac{i\omega}{i\omega_{(\bm A^\top \bm A)^2}(\tau)}
+    \end{align}
+    where $\tau$ and $\omega_M$ for matrix $M$ is defined as $\tau = \text{tr} \bm M \left(\bm M + i\omega_M \right)^{-1}$. 
+\end{tcolorbox}
+
+
+\begin{figure}[h]
+    \centering
+    \subfigure[Pretraining time $t$ scaling]{\includegraphics[width=0.32\linewidth]{figures/losses_vary_beta.pdf}}
+    \subfigure[Loss landscape vs Depth]{\includegraphics[width=0.32\linewidth]{figures/loss_landscape_powerlaw.pdf}}
+    \subfigure[Learning Curves Varying $L$]{\includegraphics[width=0.32\linewidth]{figures/losses_gamma_model_vary_L.pdf}}
+    %\subfigure[$t,L$ Tradeoff at $N\to\infty$]{\includegraphics[width=0.32\linewidth]{figures/losses_gamma_model_compute_vary_L.pdf}}
+    \caption{Loss dynamics for powerlaw data. (a) Varying the source exponent $\beta$, we see that the scaling with pretraining time has exponent $\frac{\beta}{2+\beta}$. (b) The loss landscape across depths $L$ for the scalar $\gamma$ parameter exhibits minima at $\gamma \approx L$. (c) The training dynamics of the reduced-$\Gamma$ model exhibit $t^{-\beta/(2+\beta)}$ decay before hitting an asymptote which scales as $L^{-\beta}$.   }
+    \label{fig:powerlaws}
+\end{figure}
+
+In Appendix \ref{app:orthogonal_proj_structured_Wishart} we provide formulas for $\Psi_{v\chi}(\omega)$ and $\Psi_{vv}(\omega,\omega')$ in the case that $\bm A^\top \bm A$ is a rank $N$ projection (has $N$ eigenvalues equal to $1$) and $\hat{\bm\Sigma} = \frac{1}{P} \bm X \bm X^\top$ is a structured Wishart matrix. This formula provides the full asymptotics. We can further extract Chinchilla scaling laws for powerlaw data. We demonstrate the need for both width and depth in Figures \ref{fig:powerlaws} and \ref{fig:width_depth_scaling_law}.
+
+
+\begin{tcolorbox}[colframe=myblue, opacityback=0.95, title=Result 8: Scaling Law for Power Law Features and Optimal Shapes]  
+        Assume source and capacity conditions for the eigenvalues and target coefficients $\omega_k \equiv \Omega_{kk}$
+    \begin{align}
+        \sum_{\ell > k} \lambda_\ell \ \omega_{k} \sim k^{-\nu \beta} \ , \ \lambda_k \sim k^{- \nu}, 
+    \end{align}
+    where source and capacity $(\beta, \nu)$ control the complexity of each in-context linear regression problem. Let the matrix $\bm A$ be rank $N$ and frozen. Then the loss follows a Chinchilla neural scaling law in the resources of time $t$, width $N$, depth $L$, and context length $P$
+    \begin{align}
+        \mathcal L(t,N,L,P) \approx c_t \ t^{-\frac{\beta}{2+\beta}} + c_N \ N^{-\nu\beta} + c_L \ L^{-\beta} + c_P \ P^{-\nu \beta} ,
+    \end{align}
+    in the sense that taking any three of the resources to infinity leaving the last fixed results in a powerlaw in the remaining resource, e.g. $\lim_{N,L,P\to\infty}\mathcal L(t,N,L,P) = \Theta \left(t^{- \frac{\beta}{2+\beta} } \right)$.  As a consequence, at fixed compute $C = t P^2 N^2 L$ the optimal width and depth scale as $L \propto N^{\nu}$. 
+\end{tcolorbox}
+
+
+
+
+
+\begin{figure}[h]
+    \centering
+    \subfigure[Fixed Depth $L=1$]{\includegraphics[width=0.32\linewidth]{figures/compute_scaling_fixed_L_more_width.pdf}}
+    \subfigure[Fixed Width $N=8$]{\includegraphics[width=0.32\linewidth]{figures/compute_scaling_fixed_N_more_depth.pdf}}
+    \subfigure[Optimal Joint Scaling $L \propto N^\nu$]{\includegraphics[width=0.32\linewidth]{figures/compute_scaling_joint_linear_more_NL.pdf}}
+    \caption{Increasing width and depth alone is insufficient to obtain monotonic improvements on powerlaw data with random covariance across contexts. (a) Scaling only width leads to a depth bottleneck (dashed red line). (b) Scaling only depth leads to a width bottleneck (dashed red line). (c) Increasing $N$ and $L$ simultaneously achieves monotonic improvement with compute. }
+    \label{fig:width_depth_scaling_law}
+\end{figure}
+
+\section{More Realistic Self Attention Models}
+\vspace{-5pt}
+In this section, we discuss more realistic models which exhibit similar training dynamics and depth dependence. First, we describe the dynamics when the $\bm\Gamma^\ell$ matrices are not tied. Second, we provide a theory of training when each of the weight matrices is optimized separately. Lastly, we provide experiments with softmax attention models trained with Adam.
+\vspace{-5pt}
+\subsection{Gradient Flow with Untied $\Gamma$ Matrices}\label{sec:untied_gammas}
+
+In this section, we consider the effect of untied $\bm\Gamma^\ell$ matrices across layers $\ell \in [L]$. When each of the weights are optimized separately with a learning rate that is upscaled by depth $\eta = \eta_0 L$, the dynamics are actually equivalent to the recurrent model that we presented previously under the \textbf{RRS} noise-free setting. In this setting, the matrices remain isotropic $\bm\Gamma^\ell = \gamma^\ell \bm I$ under gradient flow and leading to \textit{permutation symmetric} loss function
+\begin{align}
+    \mathcal L(\{ \gamma^\ell \}) = \left< \left|\bm\Lambda^{1/2} \prod_{\ell=1}^L \left[ \bm I - L^{-1} \gamma^\ell \bm O \left( \bm A^\top \bm A \right)^2 \bm O^\top \hat{\bm\Sigma}  \right] \bar{\bm\beta} \right|^2 \right>
+\end{align}
+where the average is over $\bm O$ and $\bar{\bm\beta}$. The evolution of $\gamma^\ell(t)$ under gradient flow will maintain balance $\gamma^\ell(t) = \gamma^k(t)$ if they start in a balanced initial condition such as $\gamma^\ell(0)=0$ for all $\ell$. As a consequence, the loss dynamics will be \textit{identical to the recurrent model that we analyzed in previous sections}. We provide additional details in Appendix \ref{app:diff_layers} and Figure \ref{fig:decoupled_layers_fig}. 
+
+\vspace{-5pt}
+\subsection{Gradient Flow for Full Linear Attention}\label{sec:full_linear_att_dynamics}
+
+
+In this section we consider gradient flow on all of the attention weights $\{\bm W_k,\bm W_q, \bm W_v \}$ separately rather than gradient flow on the $\bm\Gamma$ matrix. This corresponds to the dynamical system
+\begin{align}
+    \frac{d}{dt} \bm W_{i} = - \frac{\partial}{\partial \bm W_{i}} \mathcal L  \ , \ i \in \{ x, y, k, q, v, o \} 
+\end{align}
+The dynamics of this model from small initialization are theoretically tractable as a set of low dimensional ODEs (see Appendix \ref{app:decoupling_layers}), but suffers some defects due to transient blowup and recovery in the scale of $\bm w_y$ and $\bm w_o$. However, if we fix these weights to unit norm, the dynamics of the above model reduces to a \textit{one-dimensional ODE} much like the reduced-$\bm \Gamma$ model. 
+
+\begin{tcolorbox}[colframe=myblue, opacityback=0.95, title=Result 9: Gradient Flow on Full Linear Attention Module]\label{result:grad_flow_full_att}  
+    Consider pretraining a linear transformer on randomly rotated covariance ICL data distribution. Fix read-in weights $\bm w_y$ and readout weights $\bm w_o$ with $\bm w_y = \bm w_o$ and $|\bm w_y| = 1$. Initialize the other weights to be small $\frac{1}{2} |\bm W_x|^2 = |\bm W_k|^2 = |\bm W_q|^2 = |\bm W_k|^2 = \sigma^2$ where $\sigma \ll 1$. The gradient dynamics will maintain a balanced condition where $|\bm W_i(t)| = |\bm W_{j}(t)| = w(t)$ for $i,j\in\{ x, k, q, v \}$ where the scalar $w(t)$ evolves as
+    \begin{align}
+        \frac{d}{dt} w(t) = w(t)^4  \ \text{tr} \bm\Lambda^2 \bm\Omega \left( \bm I - w(t)^5 \bm\Lambda \right)^{2L-1} 
+    \end{align}
+    This can be interpreted as gradient flow on the loss function for the reduced $\bm \Gamma$ model under the reparameterization $\gamma(t) \to w(t)^5$. For powerlaw covariates with source exponent $\beta$, this gives a powerlaw scaling with pretraining time $t$ and depth $L$
+    \begin{align}
+        \mathcal{L}(t,L) \sim  c_t \ t^{ - \frac{5\beta}{5\beta + 2} } + c_L \ L^{-\beta} .
+    \end{align}
+\end{tcolorbox}
+
+We show the learning curves for this full attention module for isotropic covariates and powerlaw covariates in Figure \ref{fig:full_att_dynamics}. The theoretical dynamics and predicted powerlaw exponent for this new dynamical system closely match the predictions. 
+
+\vspace{-10pt}
+\subsection{Nonlinear (Softmax) Attention} 
+\vspace{-5pt}
+We also provide experiments showing that similar scaling behavior holds in softmax attention models trained with Adam. In this setting, the attention block has the form $\bm h^{\ell+1}_\mu = \bm h^{\ell}_\mu + L^{-1} \sum_{\nu=1}^P A_{\mu\nu} \bm W_v \bm h^\ell_{\nu}$ where $A_{\mu\nu}^\ell = \frac{1}{Z_\mu} \exp( \bm h_\nu^\top \bm W_k  \bm W_q \bm h^\ell_\mu)$ with $Z_\mu = \sum_{\nu} \exp( \bm h_\nu^\top \bm W_k  \bm W_q \bm h^\ell_\mu)$ as the normalization factor. We train with Adam and show depth is still beneficial to ICL performance in Figure \ref{fig:full_att_dynamics} (c) and \ref{fig:softmaxandmlpappendix}, consistent with the phenomenology of our linear attention model. 
+
+
+\begin{figure}
+    \centering
+    \subfigure[Loss Isotropic Features $\alpha = 1$]{\includegraphics[width=0.32\linewidth]{figures/isotropic_theory_vs_expt.pdf}}
+    %\subfigure[Weight Balancing on Isotropic]{\includegraphics[width=0.32\linewidth]{figures/weight_norm_dynamics.pdf}}
+    \subfigure[Powerlaw $\beta=1.25$]{\includegraphics[width=0.32\linewidth]{figures/dim_free_theory_weight_decoupled_vs_expt.pdf}}
+    \subfigure[Softmax Attention Model]{\includegraphics[width=0.32\linewidth]{figures/SOFTMAX_T20000_NO_UPSCALING_loss_vs_t.pdf}}
+    \caption{(a)-(b) Dynamics of the full linear attention module with separate $\{\bm W_x, \bm W_q, \bm W_k, \bm W_v \}$ as a function of depth $L$ agree with a theory generated through reparameterization $\gamma \to w^5$ as described in Result 9. (c) Softmax attention dynamics.}
+    \label{fig:full_att_dynamics}
+\end{figure}
+\vspace{-10pt}
+\section{Discussion}
+\vspace{-8pt}
+
+\paragraph{Conclusion} In this work we analyzed a solvable model of in-context learning with deep linear attention. We showed that the pretraining statistics strongly determine the type of solution the model converges to and under what conditions scaling depth is necessary at large context lengths. When training on fixed covariance structures, large depth is not necessary (at infinite context length) as the model learns a preconditioner that whitens the data. However, this learned solution is brittle to changes in the data covariance. When training on tasks where the data covariance is randomly rotated across contexts, the model learns a general purpose in-context gradient descent algorithm and exhibits a separable Chinchilla neural scaling law where limited width and depth can both bottleneck performance. Lastly, we show these results are robust to reparameterization of the attention blocks.  
+
+\vspace{-10pt}
+
+\paragraph{Limitations and Future Directions} While our work presents an advance in the solvable models of neural scaling laws and the structure of ICL in linear attention, there are many current limitations. The primary limitation is that we focus on linear regression tasks solved with linear attention. Characterization of more general ICL problems such as nonlinear function approximation and nonlinear attention could provide more insights into realistic in-context function approximation. Further, our analysis is focused on online learning in the present work. Future work could investigate overfitting effects caused by repeating tasks or context matrices during training, perhaps with dynamical mean field theory techniques \citep{mignacco2020dynamical, bordelon2024dynamical, montanari2025dynamical}. Future work could also examine the role of large learning rate effects during pretraining dynamics. Another direction that could be interesting to explore in future works is scaling up the number of loops dynamically as the network trains to significantly reduce the total compute required.
+
+\section*{Acknowledgements}
+The authors would like to thank Jacob Zavatone-Veth, Alex Atanasov, Alexandru Meterez, Clarissa Lauditi, William Tong, Jamie Simon, Boris Hanin, Zhouran Yang, and Jascha Sohl-Dickstein for insightful discussions. B.B. acknowledges support from the Center of Mathematical Sciences and Applications
+(CMSA) of Harvard University. C.P. is supported by an NSF CAREER Award (IIS-2239780), DARPA grants DIAL-FP-038 and AIQ-HR00112520041, the Simons Collaboration on the Physics of Learning and Neural Computation, and the William F. Milton Fund from Harvard University. This work has been made possible in part by a gift from the Chan Zuckerberg Initiative Foundation to establish the Kempner Institute for the Study of Natural and Artificial Intelligence.
+
+\bibliography{iclr2026_conference}
+\bibliographystyle{iclr2026_conference}
+
+\pagebreak
+\appendix
+\section*{Appendix}
+
+
+\section{Two Point Deterministic Equivalent for General Free Product From Dynamical Mean Field Theory}\label{app:two_point_det_equiv}
+
+In this section, we describe a method to handle two-point correlation properties of free products of random matrices. Similar results were provided in a simple random feature model of \citep{bordelon2024dynamical, atanasov2025two}. This computation provides the necessary technical results to establish the behavior of ICL in the randomly rotated context setting. Note throughout that we will use $\text{tr} \bm M$ for normalized trace of the matrix $\bm M$ so that for $N \times N$ matrix $\text{tr} \bm M = \frac{1}{N} \sum_{k=1}^N M_{kk}$. 
+
+ 
+\paragraph{Tracking Linear Dynamics Generated by Free Product} Taking a dynamical approach, we consider the following dynamical system which depends on a random matrix  $\bm M \in \mathbb{R}^{N \times N}$ 
+\begin{align}
+    \partial_{t} \v(t ) = - \bm M \v(t ) + \delta(t ) \v_0 \ , \ \bm M = \bm O \bm B \bm O^\top \bm A 
+\end{align}
+where $\bm O$ is a random $N \times N$ orthogonal matrix drawn from the Haar measure for the orthogonal group. Our starting point is to express the above dynamical system with an integral representation of Dirac-Delta functions $1 = \int dz \delta(z) = \int  \frac{dz d\chi}{2\pi i } e^{- \chi z}$ where the integration variable $\chi \in (-i\infty, i\infty)$ runs along the imaginary axis. Performing this for each time $t$ of the dynamics yields
+\begin{align}
+    Z = \int \mathcal D\bm v \mathcal D \bm\chi  \left< \exp\left(  -  \int dt \bm\chi(t) \left[  \partial_t \v(t ) + \bm M \v(t ) - \v_0 \delta(t ) \right] \right) \right> = 1
+\end{align}
+where $\mathcal D\v \mathcal D\bm\chi = \lim_{\delta t \to 0} \prod_{n=-\infty}^\infty \frac{d\v( n \cdot \delta t) d\bm\chi(n\cdot \delta t)}{2 \pi i }$ is the flat measure over $\v(t),\bm\chi(t)$ in the continuous time limit $\delta t \to 0$. The average $\left< \cdot \right>$ is computed over the random orthogonal matrix $\bm O$. 
+
+
+To simplify the calculation, we transform our dynamics into Fourier space 
+\begin{align}
+    \v(t) \equiv \int \frac{d\omega}{2\pi} \exp\left( i \omega t \right) \v(\omega) \ , \ \bm\chi(t) \equiv \int \frac{d\omega}{2\pi}\exp\left( i \omega t \right) \bm\chi(\omega) , 
+\end{align}
+which transforms the original integral over $t$ into an integral over $\omega$ as $\int d\omega \bm\chi(\omega) \cdot [ (i\omega) \v(\omega) + \bm M \v(\omega) - \v_0 ]$.
+
+\paragraph{Disorder Average} Averaging the resulting expression over the orthogonal matrix $\bm O$, we obtain the following representation of $Z$ as an integral over order parameters $\{ \bm\Sigma, \bm\Psi \}$
+\begin{align}
+    Z = \int \mathcal D\bm\Sigma \mathcal D \bm\Psi \exp\left( - N \mathcal S[\bm\Sigma,\bm\Psi] \right).
+\end{align}
+In the above expression, the action $\mathcal S$ has the form 
+\begin{align}
+    \mathcal S[\bm\Sigma,\bm\Psi] = -  \text{Tr}   \bm\Sigma \bm\Psi  - \frac{1}{N} \ln \mathcal Z_A(\bm\Psi) - \text{Tr} \bm\Sigma  \hat{\bm\Sigma}_\star  - \frac{1}{N}\ln\det\left( \hat{\bm\Sigma}_\star \otimes \bm I + \bm V \otimes \bm B \right) + \ln\det \bm\Sigma
+\end{align}
+where $\hat{\bm\Sigma}_\star$ solves the implicit equation $\frac{\partial \mathcal S}{\partial \hat{\bm\Sigma}_\star} = -\bm\Sigma + \text{tr}\left(  \bm{\hat\Sigma}_\star \otimes \bm I + \bm V \otimes \bm B \right)^{-1} = 0$ and the single site measure $\mathcal Z_A$ has the form
+\begin{align}
+    \mathcal Z_A(\bm\Psi)& = \int \mathcal D\v\mathcal D\bm\chi
+    \exp\left(  - \int d\omega \bm\chi(\omega) \cdot \left[ (i\omega) \v(z) - \v_0 - \int d\omega' \Psi_{v \chi}(\omega,\omega') \bm A \v(\omega') \right] \right) \nonumber
+    \\
+    &\exp\left( - \frac{1}{2} \int d \omega d\omega' \left[\Psi_{vv}( \omega,\omega' ) \v(\omega)^\top \bm A^2 \v(\omega') + \Psi_{\chi\chi}(\omega,\omega') \bm\chi(\omega) \cdot \bm\chi(\omega')   \right]    \right)
+\end{align}
+
+\paragraph{Taking the Large System Size Limit} To study the limit of $N \to \infty$, the saddle point equations over $\bm\Sigma$ and $\bm\Psi$ give
+\begin{align}
+    &\frac{\partial \mathcal S}{\partial \bm\Psi(\omega,\omega') } = 
+     - \begin{bmatrix}
+        \Sigma_{vv}(\omega, \omega') & \Sigma_{v\chi}(\omega,\omega') 
+        \\
+        \Sigma_{\chi v}(\omega,\omega') & \Sigma_{\chi\chi}(\omega,\omega')
+    \end{bmatrix} + 
+    \begin{bmatrix}
+        \frac{1}{N} \left< \v(\omega)^\top \bm A^2 \v(\omega') \right> & \frac{1}{N} \left< \v(\omega)^\top \bm A \bm\chi(\omega') \right>
+        \\
+        \frac{1}{N} \left< \bm\chi(\omega)^\top \bm A \v(\omega') \right> & \frac{1}{N} \left< \bm\chi(\omega) \cdot \bm\chi(\omega') \right>
+    \end{bmatrix} \nonumber
+    \\
+    &\frac{\partial \mathcal S}{\partial \bm\Sigma(\omega,\omega')} = - \bm\Psi(\omega,\omega')  - \bm{\hat\Sigma}_\star(\omega,\omega') + [\bm\Sigma^{-1}](\omega,\omega') = 0
+\end{align}
+The average over $\left< \cdot \right>$ represents an average over the Gaussian measure defined by $\mathcal Z_A$. The solution to these equations has the following block structure
+\begin{align}
+    &\bm\Sigma(\omega,\omega') = 
+    \begin{bmatrix}
+        \Sigma_{vv}(\omega,\omega') &  \Sigma_{v\chi}(\omega,\omega')
+        \\
+         \Sigma_{v\chi}(\omega,\omega') &  0 
+    \end{bmatrix}  
+    \\  
+    &\hat{\bm\Sigma}(\omega,\omega') = 
+    \begin{bmatrix}
+        0 & \hat{\Sigma}_{v\chi}(\omega,\omega')
+        \\
+        \hat{\Sigma}_{v\chi}(\omega,\omega') &  \hat{\Sigma}_{\chi\chi}(\omega,\omega') 
+    \end{bmatrix} 
+    \\ 
+    &\bm\Psi(\omega,\omega') = \begin{bmatrix}
+        0 & \Psi_{v\chi}(\omega,\omega')
+        \\
+        \Psi_{v\chi}(\omega,\omega') &  \Psi_{\chi\chi}(\omega,\omega') 
+    \end{bmatrix} 
+\end{align}
+
+\paragraph{Off Diagonal Blocks} The off diagonal blocks decouple over different frequencies $\Sigma_{v\chi}(\omega,\omega') = \delta(\omega-\omega') \Sigma_{v\chi}(\omega)$ and satisfy the following equations
+\begin{align}
+    &\Sigma_{v\chi}(\omega) = \text{tr} \bm A \left( i \omega + \Psi_{v\chi}(\omega) \bm A \right)^{-1} = \text{tr}\left( \hat{\Sigma}_{v\chi}(\omega) + \bm B \right)^{-1} ,
+    \\
+    &\Psi_{v\chi}(\omega) \Sigma_{v\chi}(\omega) = 1 - \hat\Sigma_{v\chi}(\omega) \Sigma_{v\chi}(\omega)
+\end{align}
+Introduce the $\tau$-transform $\tau_{M}$ of a matrix $\bm M$ as
+\begin{align}
+    \tau_M(i\omega) \equiv \text{tr} \bm M( i\omega + \bm M)^{-1} 
+\end{align}
+as well as its inverse function $i\omega_M(\tau)$ \footnote{Up to a change in signs and $i\omega \to -z$ this is equivalent to the $t$-transform of a random matrix \citep{potters2020first}.}.  Then our saddle point equations give us
+\begin{align}
+    \tau = \Sigma_{v\chi}(\omega) \Psi_{v\chi}(\omega) = \tau_A( i\omega_A) = \tau_B(i \omega_B) 
+\end{align}
+where $i\omega_A = \frac{i\omega}{\Psi_{v\chi}(\omega)}$ and $i \omega_B = ( \tau^{-1} - 1 )\Psi_{v\chi}(\omega)$. Putting these equations together, we find
+\begin{align}
+    (i\omega_A(\tau)) (i\omega_B(\tau)) = \frac{1-\tau}{\tau}  ( i \omega ) 
+\end{align}
+This equation is to be solved for $\tau(\omega)$. Once this function is determined we can use it to compute the diagonal blocks of $\bm\Sigma,\bm\Psi$ as we describe in the next section. 
+
+\paragraph{Diagonal Blocks} Now, we can determine the diagonal blocks, which determine the covariance structure of the $\v(\omega)$ variables
+
+\begin{align}
+    \Sigma_{vv}(\omega,\omega') &= \frac{1}{N} \v_0^\top \left( i \omega + \Psi_{v\chi}(\omega) \bm A \right)^{-1} \bm A^2  \left(  i \omega' + \Psi_{v\chi}(\omega') \bm A \right)^{-1} \v_0 \nonumber
+    \\
+    &- \Psi_{\chi\chi}(\omega,\omega') \  \underbrace{\text{tr} \bm A^2 \left( i \omega + \Psi_{v\chi}(\omega) \bm A \right)^{-1} \left(  i \omega' + \Psi_{v\chi}(\omega') \bm A \right)^{-1}}_{\mathcal A(\omega,\omega')} \nonumber 
+    \\
+    \Sigma_{vv}(\omega,\omega') &= - \hat\Sigma_{\chi\chi}(\omega,\omega') \  \underbrace{\text{tr} \left( \hat{\Sigma}_{v\chi}(\omega) + \bm B  \right)^{-1}\left( \hat{\Sigma}_{v\chi}(\omega') + \bm B  \right)^{-1}}_{\mathcal B(\omega,\omega')}\nonumber 
+    \\
+    \Psi_{\chi\chi}(\omega,\omega') &= - \hat\Sigma_{\chi\chi}(\omega,\omega') - \Sigma_{vv}(\omega,\omega') \Sigma_{v\chi}(\omega)^{-1}\Sigma_{v\chi}(\omega' )^{-1}
+\end{align}
+where we introduced functions $\mathcal A$ and $\mathcal B$ which can be determined from the (already obtained) off-diagonal blocks. Combining these equations
+\begin{align}
+    \Sigma_{vv}(\omega,\omega') & = \frac{\frac{1}{N} \v_0^\top \left( i \omega + \Psi_{v\chi}(\omega) \bm A \right)^{-1} \bm A^2  \left(  i \omega' + \Psi_{v\chi}(\omega') \bm A \right)^{-1} \v_0}{1 -  \left[ \Sigma_{v\chi}(\omega)^{-1} \Sigma_{v\chi}(\omega')^{-1} - \mathcal B(\omega,\omega')^{-1} \right] \mathcal A(\omega,\omega')}
+\end{align}
+From this expression, both $\hat\Sigma_{\chi\chi}(\omega,\omega') = - \mathcal{B}(\omega,\omega') \Sigma_{vv}(\omega,\omega')$ and $\Psi_{\chi\chi}(\omega,\omega') = - \hat\Sigma_{\chi\chi}(\omega,\omega') - \Sigma_{vv}(\omega,\omega') \Sigma_{v\chi}(\omega)^{-1}\Sigma_{v\chi}(\omega' )^{-1}$ are determined.
+
+\paragraph{Deterministic Equivalent} From the functions $\Psi_{v\chi}(\omega)$ and $\Psi_{\chi\chi}(\omega,\omega')$ we obtain the following determinstic equivalent for the outer product of $\bm v$ variables 
+\begin{align}
+    \v(\omega) \v(\omega')^\top \simeq  &\left( i\omega + \Psi_{v\chi}(\omega)\bm A \right)^{-1} \left[ \v_0 \v_0 - \Psi_{\chi\chi}(\omega,\omega') \bm I \right] \left( i\omega' + \Psi_{v\chi}(\omega')\bm A \right)^{-1} 
+\end{align}
+where the $\simeq$ expression holds under trace against a test matrix (i.e. $\bm M_1 \simeq \bm M_2 \implies \text{tr}\bm C \bm M_1 = \text{tr} \bm C \bm M_2$) \citep{potters2020first}. This function will be used in subsequent expressions to give an exact result for the loss landscape of our randomly rotated ICL loss function. Approximations of this will give rise to our scaling law results as we discuss in Appendix \ref{app:orthogonal_proj_structured_Wishart}. 
+
+\section{Model Definition, Masking Mechanics, Reduced-$\Gamma$ Model}\label{app:reduced_Gamma_derivation}
+
+\subsection{Linear Attention and Positional Masking For our Task}
+
+In this section, we provide more detail on the structure of the masking used in our task. First, we note that the target values $y_\mu$ are only provided for the $P$ labeled examples within each context matrix. Second, we note that the residual attention operations are masked differently for the $P$ labeled examples and the $K$ evaluation points. To define our masking operation precisely, we introduce the notation $\bm 1_k \in \mathbb{R}^k$ as a vector consisting of all $k$ entries equal to one. We introduce the masking matrix $\bm M \in \mathbb{R}^{(P+K)\times (P+K)}$ for the residual stream which has the following block structure
+\begin{align}
+    \bm M = 
+    \begin{bmatrix}
+        - \bm 1_P \ \bm 1_P^\top & \bm 0
+        \\
+        \bm 1_K \  \bm 1_P^\top & \bm 0 
+    \end{bmatrix} . 
+\end{align}
+Now that this positional masking matrix is introduced, we can conveniently express our update rule for the residual stream
+\begin{align}
+    \h^{\ell+1}_\mu &= \h^\ell_\mu +  \frac{1}{P L} \sum_{\nu=1}^{P+K} M_{\mu\nu}  \left( \bm k^\ell_\nu \cdot \bm q^\ell_\mu \right)  \bm v_{\nu}^\ell \nonumber
+    \\
+    &=  \h^\ell_\mu +  \frac{1}{P L} \sum_{\nu=1}^{P} M_{\mu\nu}  \left( \bm k^\ell_\nu \cdot \bm q^\ell_\mu \right)  \bm v_{\nu}^\ell \ , \ \mu \in [P+K]
+\end{align}
+where $\bm k^\ell_\mu = \bm W_k \cdot \h^\ell_\mu, \bm q^\ell_\mu = \bm W_q \h^\ell_\mu, \bm v^\ell_\mu = \bm W^\ell_v \h^\ell_\mu$ and we dropped the sum over evaluation points $\{ P+1,...,P+K \}$ due to the structure of the positional mask $\bm M$. We thus see that the masked update rule has two properties
+\begin{enumerate}
+    \item It prevents the test points $\x_\mu$ for $\mu \in \{P+1,...,P+K\}$ from being used in the residual stream updates. Only the first $P$ training points are utilized. 
+    \item It provides an opposite sign for the updates on training points and on testing points. We will see that this will enable the model to implement an in-context gradient descent rule. In such a rule, a subspace of the residual variables will encode residual errors $y_\mu - f_\mu^\ell$ for the training predictions and $+ f_\mu^\ell$ for the test points $\mu \in \{P+1,..,P+K\}$. Instead, one could use the same signs for training points and test points in $\bm M$ and simply negate the output of the model at the end $f \to -f$.  
+\end{enumerate}
+
+
+\subsection{Derivation of Reduced Gamma Model}
+
+In this section, we describe the conditions under which a linear attention transformer model can be reparameterized as the recurrent reduced-$\Gamma$ model we discuss in the main text. 
+
+\paragraph{Alignment Assumptions} Following \citet{von2023transformers, zhang2025trainingdynamicsincontextlearning, lu2025asymptotictheoryincontextlearning}, we study configurations of weights that encode information about inputs $\bm x$ and targets $y$ in orthogonal subspaces of the residual stream. Concretely, the following assumptions are made on the input weights, which implement in-context preconditioned gradient descent 
+\begin{align}
+    \bm W_x^\top \bm w_y = 0 \ , \ \bm W_x^\top \bm w_o = 0 \ , \  \bm w_y \cdot \bm w_y = |\bm w_y| |\bm w_y| .
+\end{align}
+Collectively these assumptions imply that read-in weights for the targets $\w_y$ and readout weights $\w_o$ perfectly align and that the read-in weights for $\x$ $\bm W_x$ project input data to an orthgonal subspace. Next we study the following set of alignment conditions for the key, query and value matrices 
+\begin{align}
+    &\bm W_x^\top \left(\bm W_k^\ell \right)^\top \bm W_q^\ell \bm W_x \propto \bm \Gamma^\ell  \in \mathbb{R}^{D \times D}
+    \\ 
+    &\bm W_v \bm W_x = 0 \ , \ \bm W_v \w_y \propto \w_y 
+\end{align}
+Under these assumptions, we can define a collection of $D \times D$ matrices $\bm\Gamma^\ell$
+\begin{align}
+    \bm\Gamma^\ell \equiv  \left( \bm w_o^\top \bm W_v^\ell \bm w_y \right)  \bm W_x^\top ( \bm W_k^\ell )^\top ( \bm W_q^\ell )  \bm W_x  \in \mathbb{R}^{D \times D } ,
+\end{align}
+which gives rise to the following residual stream dynamics for $\Delta_\mu^\ell \equiv \w_o \cdot \h^\ell$
+\begin{align}
+    \Delta^{\ell+1}_\mu = \Delta^\ell_\mu + \frac{1}{LP}\sum_{\nu=1}^P M_{\mu\nu} \x_\nu^\top \bm\Gamma^\ell \x_\mu \Delta_\nu^\ell .
+\end{align}
+We note that this can be separated into two distinct dynamical systems, one for the first $P$ training points 
+\begin{align}
+    \Delta^{\ell+1}_\mu = \Delta^\ell_\mu -\frac{1}{LP}\sum_{\nu=1}^P  \x_\nu^\top \bm\Gamma^\ell \x_\mu \Delta_\nu^\ell  \ , \ \mu \in \{1,...,P\}
+\end{align}
+which form a closed dynamical system on the $P$ labeled training points. From these $P$ variables $\{ \Delta_\mu^\ell \}_{\mu \in [P]}$, we can describe how the remaining $K$ points evolve
+\begin{align}
+    \Delta^{\ell+1}_\mu = \Delta^\ell_\mu + \frac{1}{LP}\sum_{\nu=1}^P  \x_\nu^\top \bm\Gamma^\ell \x_\mu \Delta_\nu^\ell = \frac{1}{LP} \sum_{\ell=1}^L \sum_{\nu=1}^P  \x_\nu^\top \bm\Gamma^\ell \x_\mu \Delta_\nu^\ell  \ , \ \mu \in \{P + 1,...,P+K\} .
+\end{align}
+
+\paragraph{Recurrence} Instead of defining separate $\bm\Gamma^\ell$ matrices for each layer $\ell$, we instead can examine a recurrent model where the weights are tied $\bm\Gamma^\ell = \bm\Gamma$ for all $\ell \in [L]$. We relax this assumption in Appendix \ref{app:diff_layers} and in many of the settings we analyze recurrence has no impact compared to decoupling layers. Under this constraint, the residual stream of the model has the following dynamics
+\begin{align}
+    \Delta_\mu^{\ell+1} &= \Delta^\ell_{\mu} - \frac{1}{L P} \sum_{\nu=1}^P \bm x_\mu^\top \bm \Gamma \bm x_\nu  \ \Delta^\ell_\nu \ , \ \mu \in \{1,...,P\} \nonumber
+    \\
+    \Delta_\mu^{\ell+1} &= \Delta_\mu^\ell + \frac{1}{L P} \sum_{\nu =1}^P \bm x_\mu^\top \bm \Gamma \bm x_\nu  \ \Delta^\ell_\nu \ , \ \mu \in \{P+1,...,P+K\}
+\end{align}
+Let $\bm \Delta^\ell \in \mathbb{R}^P$ represent the residual stream variables restricted to the $P$ unmasked training points in the context. This vector has the residual stream dynamics
+\begin{align}
+    \bm \Delta^{\ell} = \left( \bm I -   \frac{1}{L P} \bm X^\top \bm \Gamma \bm X \right)^\ell \bm y  .
+\end{align}
+However, the recursion is different for the test set since these points only receive attention signals from the $P$ unmasked training tokens. For one of the test points $\x_\star$, the prediction of the model $f_\star$ satisfies
+\begin{align}
+     f_\star = \frac{1}{L P}  \bm x_\star^\top \bm\Gamma \bm X  \sum_{\ell=0}^{L-1} \bm h^\ell = \frac{1}{L P}  \bm x_\star^\top \bm\Gamma \bm X  \sum_{\ell=0}^{L-1} \left( \bm I -   \frac{1}{L
+     P} \bm X^\top \bm \Gamma \bm X \right)^\ell \bm y
+\end{align}
+\paragraph{Equivalence to Preconditioned In-Context Gradient Descent} This update rule is equivalent to implementing preconditioned in-context gradient descent steps for a linear regression model $f = \frac{1}{\sqrt D} \bm\beta \cdot \bm x$. To see this, define an in-context training loss $\hat{\mathcal L}(\bm\beta, \bm D)$ on the $P$ labeled training points for context $\bm D$
+\begin{align}
+    \hat{\mathcal L}(\bm D) = \frac{1}{2 P} || D^{-1/2} \bm X^\top \bm\beta  - \bm y ||^2 
+\end{align}
+Preconditioned gradient descent with learning rate $D/L$ and a preconditioner matrix $\bm \Gamma$ generates the following dynamics on the learned ICL weights $\bm \beta$
+\begin{align}
+    \bm\beta^{\ell+1} = \bm\beta^\ell - L^{-1} \bm\Gamma  \ \nabla  \mathcal L(\bm \beta^\ell,\bm D) =  \bm\beta^\ell -  \frac{\sqrt D}{L P} \bm \Gamma \bm X \left( D^{-1/2} \bm X^\top \bm \beta^\ell - \bm y \right)
+\end{align}
+Defining a variable $\bm h^\ell \equiv \bm y - D^{-1/2} \bm X^\top \bm\beta^\ell$, we note that this variable satisfies the same recursion as the residual stream variables $\bm h^\ell$ on the training points described above which gives the identical solution $\h^\ell = \left( \bm I -   \frac{1}{LP} \bm X^\top \bm \Gamma \bm X \right)^\ell \bm y$. The function $f_\star$ on a test point $\x_\star$ takes the form
+\begin{align}
+    f_\star = \frac{1}{\sqrt D} \bm \beta^L \cdot \bm x_\star =  \frac{1}{L P } \bm x_\star^\top \bm\Gamma \bm X \sum_{\ell=0}^{L-1}  \bm h^\ell = \frac{1}{L P} \bm x_\star^\top \bm\Gamma \bm X \sum_{\ell=0}^{L-1}  \left( \bm I -   \frac{1}{L P} \bm X^\top \bm \Gamma \bm X \right)^\ell \bm y
+\end{align}
+We will next express the test loss 
+\paragraph{Test Error Formula for Linear Models} We now desire to compute the expected test loss (averaged over the dataset $\bm X$ and noise $\bm\epsilon$) for (noisy) linear target function $y(\x)$
+\begin{align}
+    y(\bm x) = \frac{1}{\sqrt D} \bm\beta_\star \cdot \bm x + \sigma \epsilon  \ , \  \left< \bm x \bm x^\top \right> = \bm\Sigma  \ , \  \left< \epsilon^2 \right> = 1
+\end{align}
+where $\bm\Sigma$ is the (population) covariance of the inputs. The expected loss under this assumption is 
+\begin{align}
+    \mathcal L= \frac{1}{D} \left< \left (  \bm\beta^L - \bm\beta_\star \right)^\top \bm\Sigma \left(  \bm\beta^L - \bm\beta_\star \right)   \right>_{\bm X, \bm\epsilon} + \sigma^2
+\end{align}
+Letting $\bm\epsilon \in \mathbb{R}^P$ represent the noise on the $P$ labeled training points, the target weights have the form
+\begin{align}
+    \bm\beta^L &= \frac{\sqrt D}{L P} \bm\Gamma \bm X \sum_{\ell=0}^L \left( \bm I - \frac{1}{LP} \bm X^\top \bm \Gamma \bm X \right)^\ell \left[ \frac{1}{\sqrt D} \bm X^\top \bm\beta_\star  + \sigma \bm\epsilon \right] \nonumber
+    \\
+    &= L^{-1} \bm\Gamma \hat{\bm\Sigma} \sum_{\ell=0}^{L-1} \left( \bm I - L^{-1} \bm\Gamma \hat{\bm\Sigma} \right)^\ell \bm\beta_\star +  \frac{\sigma \sqrt{D}}{L P} \ \bm\Gamma \sum_{\ell=0}^{L-1} \left( \bm I - L^{-1} \hat{\bm\Sigma} \bm \Gamma \right)^{\ell} \bm X \bm\epsilon  \nonumber
+    \\
+    &= \bm\beta_\star - \left( \bm I - L^{-1} \bm\Gamma \hat{\bm\Sigma} \right)^L \bm\beta_\star +  \frac{\sigma \sqrt D}{L P} \bm\Gamma \sum_{\ell=0}^{L-1} \left( \bm I - L^{-1} \hat{\bm\Sigma} \bm \Gamma \right)^{\ell} \bm X \bm\epsilon 
+\end{align}
+where we defined $\hat{\bm\Sigma} = \frac{1}{P} \bm X \bm X^\top \in \mathbb{R}^{D \times D}$. Then we note that for $\alpha \equiv P / D$ that the reducible loss $\mathcal L - \sigma^2$ has the form 
+\begin{align}
+    \mathcal L - \sigma^2 &= \frac{1}{D} \left< \left( \bm\beta_\star - \bm\beta^L \right)^\top \bm\Sigma \left( \bm\beta_\star - \bm\beta^L \right)  \right> \nonumber
+    \\
+    &=  \frac{1}{D} \bm\beta_\star^\top \left< \left( \bm I - L^{-1} \bm\Gamma \hat{\bm\Sigma} \right)^{L \top} \bm\Sigma  \left( \bm I - L^{-1} \bm\Gamma \hat{\bm\Sigma} \right)^L  \right> \bm\beta_\star  \nonumber
+    \\
+    &+ \frac{\sigma^2}{\alpha L^2 } \text{Tr} \ \bm\Gamma^\top \bm\Gamma   \sum_{\ell,\ell' =0}^{L-1} \left< \left( \bm I - L^{-1} \bm\Gamma \hat{\bm\Sigma} \right)^{\ell} \hat{\bm\Sigma} \left[\left( \bm I - L^{-1} \bm\Gamma \hat{\bm\Sigma} \right)^{\ell'} \right]^\top  \right>
+\end{align}
+In the next sections, we will compute this quantity for various distributions for $\bm{\hat\Sigma}$ and $\bm\beta_\star$. 
+
+\section{Isotropic (\textbf{ISO}) Setting Theory}
+
+In this section, we consider isotropic covariates and tasks so that the data covariance $\bm\Sigma$ and the task vector covariance $\bm\Omega$ are both identity
+\begin{align}
+    \bm \Sigma= \left< \bm x \bm x^\top \right> = \bm I  \ , \ \bm\Omega = \left< \bm\beta_\star \bm\beta_\star^\top \right> = \bm I .
+\end{align}
+where the average for target vectors $\bm\beta_\star$ is over different contexts. We further operate in the \textit{high dimensional} asymptotic limit where both context length $P$ and input dimension $D$ diverge with fixed ratio 
+\begin{align}
+    P,D \to \infty \ , \ P / D = \alpha .
+\end{align}
+In this setting, the spectrum of the empirical covariance matrix $\hat{\bm\Sigma} = \frac{1}{P} \bm X \bm X^\top$ follows the well-known Marchenko-Pastur law, where the eigenvalue density $\rho(\lambda)$ depends explicitly on the aspect ratio $\alpha$ \citep{potters2020first, advani2020high}. We will first describe an asymptotic limit of SGD for the shallow $L=1$ case where the dynamics on the matrix $\bm\Gamma$ are linear. We will then pursue a description of gradient flow dynamics in an arbitrary depth $L$ model. 
+
+
+\subsection{Shallow SGD Theory}\label{app:shallow_sgd}
+
+In this section, we consider the SGD dynamics of the shallow architecture $L=1$. This excercise will establish at what rate our dynamics will converge to gradient flow and how finite batchsize $B$, context length $P$ and number of masked evaluation points $K$ impact the SGD dynamics. In this case, the updates have the form 
+
+\begin{align}
+    &\bm\Gamma(t+1) = \bm\Gamma(t) + \eta \ \bm G(t) \nonumber
+    \\    
+    &\bm G(t) = \frac{1}{B} \sum_{n} \hat{\bm\Sigma}_{\star , n} \left[ (\bm I - \bm\Gamma \bm\Sigma_n ) \bm\beta_n - \sigma P^{-1} \sqrt{D}\bm\Gamma \bm X_n \bm\epsilon_n \right]  \left[ \bm\Sigma_n \bm\beta_n + \sigma P^{-1} \sqrt{D} \bm X_n \bm\epsilon_n \right]^\top \nonumber
+    \\ 
+    &\hat{\bm\Sigma}_n = \frac{1}{P} \bm X_n^\top \bm X_n \ , \ \hat{\bm\Sigma}_{\star,n} = \frac{1}{K} \bm X_{\star,n}^\top \bm X_{\star,n} 
+\end{align}
+where $\bm X \in \mathbb{R}^{P \times D}$ is the set of training points and $\bm X_{\star} \in \mathbb{R}^{K \times D}$ represents the set of $K$ evaluation points and $\bm\epsilon \in \mathbb{R}^P$ represents the label noise on the provided targets $\bm y$. We remind the reader that we will operate in the joint scaling limit
+\begin{align}
+    P,B,K, D \to \infty \ , \ P / D = \alpha \ , \ K/D = \kappa \ , \ B / D = \tau
+\end{align}
+The population ICL loss has the form
+\begin{align}
+    \mathcal L(t) = \frac{1}{D} \left< |\bm\Gamma(t) - \bm I|^2 \right> ,
+\end{align}
+where the average is performed over all possible draws of data and tasks. This function admits the recursion
+\begin{align}
+    \mathcal L(t+1) = \mathcal L(t) - 2 \eta \text{tr}[\bm \Gamma(t) - \bm I]^\top  \left< \bm G(t) \right> + \eta^2 \text{tr} \left< \bm G(t)^\top \bm G(t) \right>
+\end{align}
+We have the following mean for the gradient
+\begin{align}
+    \left< \bm G(t) \right> = (\bm I - (1+\alpha^{-1} + \sigma^2 \alpha^{-1}) \bm\Gamma ) 
+\end{align}
+Thus if we only updated using mean gradients the model would relax to a fixed point $\bm\Gamma_\star = \left( 1 + \alpha^{-1} + \sigma^2 \alpha^{-1} \right)^{-1} \bm I$. However, we will see momentarily that SGD noise in the gradients impact the $\bm \Gamma$ that SGD converges to
+\begin{align}
+ \text{tr} \ \left<  \bm G(t)^\top \bm G(t) \right >  =  \frac{1}{B^2} \sum_{nm} \text{tr} \  \left< \bm u_n \bm v_n^\top \bm v_m \bm u_m^\top \right> 
+\end{align}
+where $\bm u_n = \bm{\hat\Sigma}_{\star,n} \left[ (\bm I - \bm\Gamma \bm\Sigma_n ) \bm\beta_n - \sigma p^{-1} \sqrt{d}\bm\Gamma \bm X_n \bm\epsilon_n \right]$ and $\bm v_n = \bm\Sigma_n \bm\beta_n + \sigma p^{-1} \sqrt{d} \bm X_n \bm\epsilon_n$. Doing the averages
+\begin{align}
+    &\frac{1}{D} \left< \bm u_n \cdot \bm u_m \right> = \delta_{mn} \text{tr} \left[ \bm I - 2 \bm\Gamma + (1+\alpha^{-1}) \bm\Gamma^2 + \sigma^2 \alpha^{-1} \bm\Gamma^2  \right] (1 + \kappa^{-1})
+    \\
+    &=  \delta_{mn} (1 + \alpha^{-1}(1+\sigma^2)) (1+\kappa^{-1}) \text{tr} \left[ (\bm\Gamma - \bm\Gamma_\star)^2 +  \frac{\alpha^{-1}(1+\sigma^2)}{(1+\alpha^{-1}(1+\sigma^2))^2} \bm I  \right]
+    \\
+    &\frac{1}{D} \left< \bm v_n \cdot \bm v_m \right> = \delta_{mn}  (1+\alpha^{-1} (1+\sigma^2) ) 
+\end{align}
+From the above results, we get the following second moment structure
+\begin{align}
+    \text{tr} \left<  \bm G(t)^\top \bm G(t) \right> &=  \text{tr} \left<\bm G(t) \right>^\top \left<\bm G(t) \right> \nonumber
+    \\
+    &+ \frac{1}{\tau} (1+\kappa^{-1}) (1+\alpha^{-1}(1+\sigma^2))^2 \left[ (\bm\Gamma - \bm\Gamma_\star)^2 +  \frac{\alpha^{-1}(1+\sigma^2)}{(1+\alpha^{-1}(1+\sigma^2))^2} \bm I  \right] .
+\end{align}
+
+Thus we get a recursion
+\begin{align}
+    \bm\Gamma(t+1) = \bm\Gamma(t) + \eta (1+\alpha^{-1}(1+\sigma^2)) \left[ \bm\Gamma_\star - \bm\Gamma(t)  \right] + \eta \  \bm \Xi(t)
+\end{align}
+where $\bm\Xi \in \mathbb{R}^{D \times D}$ is the noise process with variance given above. We define a quantity $C(t)$ which measures the relaxation of $\bm\Gamma$ to $\bm\Gamma_\star$
+\begin{align}
+    C(t) = \frac{1}{D} \left|\bm\Gamma(t) -\bm\Gamma_\star \right|^2 \ , \ \bm\Gamma_\star = \left[  1 + \alpha^{-1} (1+\sigma^2)  \right]^{-1} \bm I
+\end{align}
+This function exhibits the following linear dynamics
+\begin{align}
+    C(t+1) &= \left[1 - \eta \left(1 +\alpha^{-1}(1+\sigma^2) \right) \right]^2 C(t) \nonumber
+    \\
+    &+ \frac{\eta^2}{\tau} (1+\kappa^{-1}) (1+\alpha^{-1}(1+\sigma^2))^2   \left[ C(t) + \frac{\alpha^{-1}(1+\sigma^2)}{(1+\alpha^{-1}(1+\sigma^2))^2} \right]
+\end{align}
+
+This recursion again takes the form
+\begin{align}
+    &C(t+1) = a(\eta,\alpha, \kappa,\tau) C(t) + b(\eta,\alpha, \kappa,\tau) \nonumber
+    \\
+    &a(\eta,\alpha, \kappa,\tau) = \left[1 - \eta \left(1 +\alpha^{-1}(1+\sigma^2) \right) \right]^2  + \frac{\eta^2}{\tau} (1+\kappa^{-1}) (1+\alpha^{-1}(1+\sigma^2))^2 \nonumber
+    \\
+    &b(\eta,\alpha,\kappa,\tau) = \frac{\eta^2}{\tau} (1+\kappa^{-1}) \alpha^{-1}(1+\sigma^2)
+\end{align}
+
+Now we need to compute the ICL loss
+\begin{align}
+    \mathcal L(t) &= \text{tr}[\bm\Gamma(t) - \bm\Gamma_\star + \bm\Gamma_\star - \bm I]^2 = C(t) + 2 \text{tr}(\bm\Gamma_\star-\bm\Gamma(t))(\bm I - \bm\Gamma_\star) + \text{tr} (\bm\Gamma_\star-\bm I)^2 \nonumber
+    \\
+    &= C(t) +  \frac{2 \alpha^{-1}(1+\sigma^2)}{(1+\alpha^{-1}(1+\sigma^2))^2} \left[1-\eta(1+\alpha^{-1}(1+\sigma^2)) \right]^t + \frac{(1+\sigma^2)^2}{(\alpha + 1+\sigma^2)^2}
+\end{align}
+
+
+
+
+\begin{figure}[h]
+    \centering
+    \subfigure[Vary Batchsize $\tau$]{\includegraphics[width=0.33\linewidth]{figures/loss_vary_tau_depth_1_alpha_1.0.pdf}}
+    \subfigure[Vary Context Length $\alpha$]{\includegraphics[width=0.32\linewidth]{figures/loss_vary_alpha_depth_1_tau_1.0.pdf}}
+    \subfigure[Varying Evaluation Size $\kappa$]{\includegraphics[width=0.33\linewidth]{figures/loss_vary_kappa_depth_1_alpha_1.0.pdf}}
+    \caption{Pretraining SGD loss dynamics in the shallow $L=1$ reduced $\bm \Gamma$ model for (a) $\alpha,\kappa = 1$ and varying $\tau$ (b) varying $\alpha$ with $\tau=\kappa=1$ (c) varying $\kappa$ with $\alpha,\tau = 1$. The loss monotonically improves with all three quantities $\tau,\alpha,\kappa$ and is well predicted by the asymptotic theory. }
+\label{fig:sgd_isotropic_theory}
+\end{figure}
+
+Putting this all together, we summarize our findings below.
+\begin{tcolorbox}[colframe=blue, opacityback=0.95, title=Result 10: Online SGD Dynamics for Shallow ICL with Isotropic Covariates] 
+Consider the reduced $\Gamma$ model with a single layer $L=1$ and proportional asymptotics
+    \begin{align}
+        P,K,B,D \to \infty \ , \ P/D = \alpha \ , \ K/D = \kappa \ , \ B/D = \tau
+    \end{align}
+    Then the ICL test loss $\mathcal L(t) = \frac{1}{d} ||\bm\Gamma(t) - \bm I||^2$ after $t$ SGD iterations is
+    \begin{align}
+        &\mathcal L(t) = C(t) +  \frac{2 \alpha^{-1}(1+\sigma^2)}{(1+\alpha^{-1}(1+\sigma^2))^2} \left[1-\eta(1+\alpha^{-1}(1+\sigma^2)) \right]^t + \frac{(1+\sigma^2)^2}{(\alpha + 1+\sigma^2)^2}
+        \\
+        &C(t) = a(\eta, \alpha, \tau, \kappa)^t  + \frac{1-a(\eta, \alpha, \tau, \kappa)^t}{1-a(\eta, \alpha, \tau, \kappa)}  b(\eta, \alpha, \tau, \kappa)
+    \end{align}
+    where $a(\eta,\alpha, \kappa,\tau) = \left[1 - \eta \left(1 +\alpha^{-1}(1+\sigma^2) \right) \right]^2  + \frac{\eta^2}{\tau} (1+\kappa^{-1}) (1+\alpha^{-1}(1+\sigma^2))^2$ and $b(\eta,\alpha,\kappa,\tau) = \frac{\eta^2}{\tau} (1+\kappa^{-1}) \alpha^{-1}(1+\sigma^2)$ capture the dependence on batchsize through $\tau$. 
+\end{tcolorbox}
+We verify the validity of these learning curves for shallow pretraining dynamics in Figure \ref{fig:sgd_isotropic_theory}. 
+
+
+We thus see that deviations from gradient flow in the $L=1$ model come in at a scale of $\eta / \tau$. The purpose of this result is to stress that only $\mathcal O(D^2)$ total tokens are required (unlike the prior work of \cite{lu2025asymptotictheoryincontextlearning} which required $\mathcal{O}(D^3)$ tokens) for an ICL learner in this regime \footnote{The gap is caused by suboptimal scaling of the number of evaluation points $K$ per context (usually $K=1$ in prior works). Note realistic LLMs get multiple error signals per context (one per token).}. We verify these theoretical learning curves in Figure \ref{fig:sgd_isotropic_theory}. 
+
+We also indicate the following facts about SGD effects
+\begin{itemize}
+    \item The number of masked evaluation points per batch $\kappa \equiv K/D$ only alters the SGD noise terms (the terms involving $1/\tau$) and its effect vanishes in the gradient flow limit $\eta / \tau \to 0$.
+    \item Unlike offline training, in this online SGD setting the model regularizes the final value of $\gamma(t) = $ based on label noise $\sigma^2$ to reduce overfitting.  
+    \item SGD fluctuations can impact the final loss through $\lim_{t\to\infty} C(t) = \frac{b(\eta,\alpha,\tau,\kappa)}{1-a(\eta,\alpha,\tau,\kappa)}$. 
+\end{itemize}
+One nice consequence of this result is that the gradient flow limit can be accessed simply by controlling the scale of $\eta/\tau$ in a limit where batch size is \textit{linear} in the dimension $B = \tau D$. 
+
+\subsection{Gradient Flow in Deep Models}\label{app:grad_flow_iso_deep}
+
+From the previous section, we saw that in the absence of SGD noise, gradient dynamics generated an isotropic $\bm\Gamma$ matrix. This fact is true for larger depth $L\geq 1$ as well. The gradient flow dynamics generate is $\bm\Gamma(t) = \gamma(t) \bm I$. To see this, we note that the gradient has the form
+\begin{align}
+    \frac{\partial}{\partial \bm\Gamma} \mathcal L &=  - \left< 
+     \frac{2}{L} \sum_{\ell=1}^L \left[\left( \bm I - L^{-1} \bm\Gamma \hat{\bm\Sigma} \right)^{\ell}\right]^\top \hat{\bm\Sigma} \left[ \left(\bm I - L^{-1} \bm\Gamma \hat{\bm\Sigma} \right)^{L-1-\ell} \right]^\top  \left( \bm I - L^{-1} \bm\Gamma \hat{\bm\Sigma}  \right)^{L}   \right>\nonumber
+     \\
+     &+ \frac{2 \sigma^2}{\alpha L^2 }  \bm\Gamma  \sum_{\ell,\ell'} \left< \left( \bm I - L^{-1} \bm\Gamma \hat{\bm\Sigma} \right)^{\ell} \hat{\bm\Sigma} \left[\left( \bm I - L^{-1} \bm\Gamma \hat{\bm\Sigma} \right)^{\ell'} \right]^\top  \right> \nonumber
+     \\
+     &+ \frac{2 \sigma^2}{\alpha L^3 }  \bm\Gamma^\top \bm \Gamma  \sum_{\ell,\ell',k} \left< \left( \bm I - L^{-1} \bm\Gamma \hat{\bm\Sigma} \right)^{k} \hat{\bm\Sigma} \left( \bm I - \bm\Gamma \hat{\bm\Sigma} \right)^{\ell-1-k} \hat{\bm\Sigma} \left[\left( \bm I - L^{-1} \bm\Gamma \hat{\bm\Sigma} \right)^{\ell'} \right]^\top  \right>
+\end{align}
+Now, evaluating this at $\bm\Gamma = \gamma \bm I$ we find
+\begin{align}
+    \frac{\partial}{\partial \bm\Gamma} \mathcal L|_{\bm\Gamma=\gamma \bm I} &= -2 \left< \hat{\bm\Sigma} \left( \bm I - L^{-1} \gamma \hat{\bm\Sigma} \right)^{2L-1}  \right> + \frac{2\sigma^2 \gamma}{\alpha L^2}   \left< \hat{\bm\Sigma} \sum_{\ell\ell'} (1 - L^{-1} \gamma \hat{\bm\Sigma})^{\ell+\ell'} \right> \nonumber
+    \\
+    &+ \frac{2\sigma^2 \gamma^2 }{\alpha L^2} \sum_{\ell,\ell'} \left< \hat{\bm\Sigma} \left( \bm I - L^{-1} \gamma \hat{\bm\Sigma} \right)^{\ell+\ell'-1} \right> \propto \bm I
+\end{align}
+where we recognize through rotational invariance, that the above averages are proportional to the identity. Thus if $\bm\Gamma$ is currently in an isotropic configuration, it will remain in one throughout gradient flow. Further, we can compute the scalar $\gamma(t) = \text{tr} \bm\Gamma(t)$ under gradient flow $\partial_t \bm\Gamma(t) = - \frac{1}{2} \partial_{\bm\Gamma} \mathcal L(\bm\Gamma)$.
+\begin{align}
+    \frac{d}{dt} \gamma(t) = - \frac{\partial}{\partial \gamma} \text{tr} \left[  \left( \bm I -  L^{-1} \gamma \hat{\bm\Sigma}  \right)^{2L} + \frac{\sigma^2}{\alpha} \hat{\bm\Sigma}^{-1} \left[ \bm I -  \left( \bm I - L^{-1} \gamma \hat{\bm\Sigma}  \right)^L \right]^2  \right] 
+\end{align}
+Now, we note that this expression can be rewritten in terms of the Marchenko-Pastur eigenvalue density $\rho(\lambda) = \frac{1}{D} \sum_{k=1}^D \left< \delta(\lambda - \lambda_k) \right>$ as
+\begin{align}
+    \frac{d}{dt} \gamma(t) =  -\frac{\partial}{\partial \gamma }  \int d\lambda \rho(\lambda) \left[ \left( 1 -  L^{-1} \gamma  \lambda \right)^{2L} + \frac{\sigma^2}{\alpha \lambda}  \left[ 1 -  \left( 1 - L^{-1} \gamma \lambda \right)^L \right]^2  \right]
+\end{align}
+which shows that we can view the dynamics as a gradient flow on a one dimensional loss landscape. 
+
+\section{Fixed and Structured Covariance (\textbf{FS}) Setting}\label{app:FS_setting}
+
+In this section we discuss the case where the data covariance is structured but potentially structured. We consider the noise free setting and $P/D \to \infty$ for simplicity where the loss has the form
+\begin{align}
+    \mathcal L =  \text{tr} \ \bm\Omega \left< \left[\left( \bm I - L^{-1} \bm\Gamma {\bm\Sigma} \right)^L \right]^\top \bm\Sigma \left( \bm I - L^{-1} \bm\Gamma {\bm\Sigma} \right)^L \right>
+\end{align}
+In this case, gradient flow will generate dynamics that cause $\bm\Gamma$ to pick up anisotropy from the structure of $\bm\Omega$ and $\bm\Sigma$. We analyze the case where $\bm\Omega$ and $\bm\Sigma$ are simultaneously diagonalizable with eigenvalues $\omega_k$ and $\lambda_k$. In this case, $\bm\Gamma$ will share the same eigenbasis. Let the eigenvalues be $\gamma_k$
+\begin{align}
+    \frac{\partial}{\partial t} \gamma_k(t) = 2  \omega_k \lambda_k^2 \left( 1 - L^{-1} \lambda_k \gamma_k(t) \right)^{2L-1} .
+\end{align}
+The fixed point of the above dynamics is $\gamma_k = L \lambda_k^{-1}$. In the large depth limit $L \to \infty$, we can solve the dynamics exactly
+\begin{align}
+    \frac{d}{dt} \gamma_k(t) &=   2 \omega_k \lambda_k^2 e^{-2 \lambda_k \gamma_k(t) } \implies e^{2  \lambda_k \gamma_k} d\gamma_k = \omega_k \lambda_k^2 dt  \nonumber
+    \\
+    \implies 2  \lambda_k \gamma_k(t)  &=  \ln( 1 + 4 \omega_k \lambda_k^3 t )
+\end{align}
+Plugging this solution into the loss function we find
+\begin{align}
+    \mathcal L(t) = \frac{1}{D} \sum_k \omega_k \lambda_k e^{-2 \gamma_k \lambda_k} =  \frac{1}{D} \sum_k \omega_k \lambda_k [ 1 + \omega_k \lambda_k^3 t ]^{-1}
+\end{align}
+
+Under powerlaw (source/capacity) assumptions on the structure of the data
+\begin{align}
+    \lambda_k \sim k^{-\nu} \ , \ \omega_k \lambda_k \sim k^{-\nu \beta - 1},
+\end{align}
+the loss scales in a powerlaw as 
+\begin{align}
+    \mathcal L(t) =   \sum_{k} k^{-\nu \beta- 1} [ 1 + k^{-2\nu - \nu \beta } t ]^{-1} \sim t^{- \frac{\beta}{\nu + \nu \beta + 1}}
+\end{align}
+This powerlaw provides a decent approximation to large but finite depth models $L$ as we show in Figure \ref{fig:fixed_covariance}. 
+
+\section{Randomly Rotated and Structured Covariance (\textbf{RRS}) Setting}\label{app:rrs_setting}
+
+\subsection{Exploiting Symmetry in the Gradient Updates}
+
+Utilizing the definition of the RRS setting, we can massage the placement of the orthogonal matrices so that the loss function can be expressed as 
+\begin{align}
+    \mathcal L = \left< |\bm\Lambda^{1/2} \left( \bm I - L^{-1} \bm O^\top \bm \Gamma \bm O \hat{\bm\Sigma}  \right)^L  \bm\beta_\star |^2 \right> .
+\end{align}
+From this expression, it is immediately clear that this function is rotationally invariant with respect to $\bm\Gamma$ since the transformation $\bm\Gamma \to \bm V \bm \Gamma \bm V^\top$ for orthogonal $\bm V$ leaves the Haar average unchanged. The form of the loss gradients also reveals a symmetry 
+\begin{align}
+    \frac{\partial}{\partial \bm\Gamma} \mathcal L =  - 2 L^{-1}  \sum_{\ell} \left<  \bm O  \hat{\bm\Sigma} \bm M^{\ell} \bm\beta_\star \bm\beta_\star^\top \left(\bm M^L \right)^\top \bm\Lambda \left( \bm M^{L-1-\ell} \right)^\top \bm O^\top \right>  \ , \ \bm M = \bm I - \bm O^\top \bm \Gamma \bm O \hat{\bm\Sigma}
+\end{align}
+Note that starting from zero initialization, we have $\bm M = 0$ which implies isotropic gradients $\frac{\partial}{\partial \bm\Gamma} \mathcal L|_{\bm\Gamma=0} \propto \bm I$. To see this note that $\left<  \bm O \bm C \bm O^\top \right> \propto \bm I$ for any matrix $\bm C$ that is independent of $\bm O$. Further, suppose that we evaluated the loss gradient at any isotropic $\bm\Gamma = \gamma \bm I$, then $\bm M = \bm I - \gamma \hat{\bm\Sigma}$ and the gradients remain isotropic
+\begin{align}
+    \frac{\partial \mathcal L}{\partial \bm\Gamma} &=  - 2 L^{-1}  \sum_{\ell} \left<  \bm O  \hat{\bm\Sigma} \bm M^{\ell} \bm\beta_\star \bm\beta_\star^\top \left(\bm M^L \right)^\top \bm\Lambda \left( \bm M^{L-1-\ell} \right)^\top \bm O^\top \right> 
+    \\
+    &=  - 2 L^{-1}  \sum_{\ell} \text{tr} \left<    \hat{\bm\Sigma} \bm M^{\ell} \bm\beta_\star \bm\beta_\star^\top \left(\bm M^L \right)^\top \bm\Lambda \left( \bm M^{L-1-\ell} \right)^\top \right>  \times \bm I
+\end{align}
+where we explicitly performed the average over the only remaining factors of $\bm O$ since $\bm M = \bm I - \gamma \hat{\bm\Sigma}$ is independent of $\bm O$. Further, we can express the dynamics of $\gamma(t)$ as a gradient flow on the reduced one-dimensional loss landscape
+\begin{align}
+    \mathcal L(\gamma) = \text{tr} \ \bm\Omega \left( \bm I - \gamma L^{-1} \hat{\bm\Sigma} \right)^L \bm\Lambda \left( \bm I - \gamma L^{-1} \hat{\bm\Sigma} \right)^L 
+\end{align}
+
+\section{Scaling Law Theory}
+
+In this section, we consider the scaling law theory with a finite projection matrix $\bm A$, following \cite{bordelon2024dynamical}. In this case, our \textbf{RRS} setting requires utilizing the free product result in Appendix \ref{app:two_point_det_equiv}.  
+
+
+\subsection{Dynamics at Infinite $N,L,P$} 
+
+The gradient flow in the limit of $N , L , P \to \infty$ has the form 
+\begin{align}
+    \frac{d}{dt} \gamma(t) = - \frac{\partial}{\partial \gamma} \sum_k  \lambda_k \omega_k  e^{- 2 \gamma(t) \lambda_k  } \approx  - \frac{\partial}{\partial \gamma}  \gamma(t)^{- \beta } = \beta \gamma(t)^{- \beta - 1 }
+\end{align}
+This is a separable ODE with solution (under the assumption that $\gamma(0) = 0$) up to constants
+\begin{align}
+    \gamma(t) \sim t^{ \frac{1}{\beta + 2} }  .
+\end{align}
+This implies a powerlaw loss scaling with exponent set by the rate of growth of $\gamma(t)$
+\begin{align}
+    \mathcal L(t) \sim    \gamma(t)^{-\beta } \sim t^{- \frac{\beta}{2+\beta }} .
+\end{align}
+We expect these dynamics to hold in the limit of $N ,L , P \to \infty$. At finite $N,L,P$ the model will saturate at some finite maximal value of $\gamma$. 
+
+\subsection{Depth Scaling Law at Infinite Time, Width, and Context Length}
+
+We now explore the scaling law in depth $L$. In this case, we can consider taking all other resources to infinity $t,N,P \to \infty$. The value of $\gamma$ will stabilize, resulting in a final loss
+\begin{align}
+    \mathcal L(\gamma) = \sum_k \lambda_k \omega_k \left( 1 - \gamma L^{-1} \lambda_k  \right)^{2L} 
+\end{align}
+While $\gamma(t)$ diverges as $t^{\frac{1}{2+\beta}}$ in the infinite depth limit, we see that at large but finite depth, there is a maximal $\gamma$ which enables stability along the top eigendirection. Specifically we need $\gamma < \frac{2L}{\lambda_1}$ and approximate the optimal value s
+\begin{align}
+    \gamma_\star \approx L / \lambda_1   .
+\end{align}
+where $\lambda_1$ is the top (maximal eigenvalue). At $\gamma_\star$, the error takes the form
+\begin{align}
+    \mathcal L \approx \sum_{k} \lambda_k (\beta^\star_k)^2 \left( 1 - \lambda_k / \lambda_1  \right)^L \approx \int dk k^{-\nu\beta-1} \exp(-L k^{-\nu}) \approx  L^{-\beta} . 
+\end{align}
+which matches the scaling of $L$ steps of gradient descent on a problem with source exponent $\beta$ \cite{bordelon2021learning}.
+
+
+\subsection{Mapping the Loss Function to a Two Point Deterministic Equivalent}
+
+We utilize dynamical mean field theory (DMFT) result of Appendix \ref{app:two_point_det_equiv} to compute the effective loss as a function of $N,L$ and $\gamma$. We start with a representation of the relevant polynomial in $\bm M$ with the Cauchy integral formula 
+\begin{align}
+    \left( \bm I - \gamma L^{-1} \bm M \right)^{L}  = \int_{\mathcal C} \frac{d\omega }{2\pi} \left[ i\omega + \bm M \right]^{-1} \left( 1 + \gamma L^{-1} i \omega \right)^{L} ,
+\end{align}
+where the contour $\mathcal C$ encloses the positive imaginary axis in complex plane \citep{bender2013advanced}.  Next, we define $\v(\gamma) = \left( \bm I - \gamma L^{-1} \bm M \right)^{L} \bm\beta_\star$ 
+\begin{align}
+    \mathcal L = \frac{1}{D} \left< \v(\gamma)^\top \bm\Lambda \v(\gamma)  \right> = \text{tr} \  \bm\Omega \left[  \left( \bm I - \gamma L^{-1} \bm M \right)^{L} \right]^\top \bm \Lambda \left( \bm I - \gamma L^{-1} \bm M \right)^{L}    
+\end{align}
+The loss can thus be expressed as a double integral involving the resolvents 
+\begin{align}
+    \mathcal L = \int_{\mathcal C \times\mathcal C} \frac{d \omega d\omega' }{(2\pi )^2} ( 1 + \gamma L^{-1} i\omega)^L (1 + \gamma L^{-1} i\omega')^L \ \ \text{tr}  \ \bm\Omega \left[ \left[ i\omega + \bm M \right]^{-1}\right]^\top \bm \Lambda \left[i\omega' + \bm M \right]^{-1} 
+\end{align}
+The main result needed is the following deterministic equivalent from Appendix \ref{app:two_point_det_equiv}.
+\begin{align}
+    &\text{tr} \ \bm\Omega \  \left[ \left[ i\omega + \bm M \right]^{-1}\right]^\top \bm\Lambda \left[i\omega' + \bm M \right]^{-1}  \nonumber
+    \\
+    &\simeq \text{tr}  \left( i \omega + \Psi_{v\chi}(\omega) \bm A \right)^{-1} \left[ \bm\Omega  - \bm I \Psi_{\chi\chi}(\omega,\omega') \right]  \left( i \omega' + \Psi_{v\chi}(\omega') \bm A \right)^{-1} \bm\Lambda
+\end{align}
+where $\Psi_{v\chi}(\omega) = i\omega / i\omega_{(\bm A^\top \bm A)^2}$ can be determined from the equation
+\begin{align}
+    i\omega_{(\bm A^\top \bm A)^2}(\tau) i\omega_{\hat{\bm\Sigma}}(\tau) = \frac{1-\tau}{\tau} ( i \omega )
+\end{align}
+Once $\tau$ is identified as a function of $\omega$, we can compute $\Psi_{v\chi}$ and $\Psi_{\chi\chi}$ from the formulae in \ref{app:two_point_det_equiv}. 
+
+
+\subsection{Orthogonal projection and A is Structured Wishart}\label{app:orthogonal_proj_structured_Wishart}
+
+In this section, we describe what these relations imply for a product matrix that arises in our \textbf{RRS} setting, which is a free product of the width projection matrix $(\bm A^\top \bm A)^2$ where $\bm A \in \mathbb{R}^{N \times D}$ has rank at most $N$ and the empirical covariance for data in the context $\hat{\bm\Sigma} = \frac{1}{P} \bm X \bm X^\top \in \mathbb{R}^{D\times D}$,
+\begin{align}
+    \bm M = \bm O \  \left( \bm A^\top \bm A \right)^2 \  \bm O^\top \ \hat{\bm\Sigma} ,
+\end{align}
+where $\bm O$ is a random orthogonal matrix sampled from the Haar measure. The data $\bm X \in \mathbb{R}^{P \times D}$ are comprised of random iid vectors with covariance $\bm\Lambda$, which we take to be diagonal without loss of generality. Further, we let $\bm A^\top \bm A$ be a rank $N$ projection matrix
+\begin{align}
+      \bm A^\top \bm A  =  \sum_{k=1}^N \bm e_k \bm e_k^\top \in \mathbb{R}^{D \times D}
+\end{align}
+where $\bm e_k \in \mathbb{R}^{D}$ are Cartesian (one-hot) unit vectors. To utilize the result in Appendix \ref{app:two_point_det_equiv}, we first need to compute the necessary resolvents for these two matrices. Let $\alpha_N \equiv N/D$ be the ratio between width $N$ and input dimension $D$ and $\alpha_P = \frac{P}{D}$ represent the ratio of context length to input dimension, then   
+\begin{align}
+    \tau = \text{tr} (\bm A^\top \bm A)^2 \left( i\omega_{(\bm A^\top \bm A)^2} +  (\bm A^\top \bm A)^2  \right)^{-1} = \frac{\alpha_N}{i\omega_{(\bm A^\top \bm A)^2} + 1} \implies i\omega_{(\bm A^\top \bm A)^2} = - 1 + \frac{\alpha_N}{\tau}
+\end{align}
+The other matrix can be easily worked out for a structured Wishart with $P/D = \alpha_P$ following the techniques of \cite{bordelon2024dynamical} which reveals that 
+\begin{align}
+    \tau = \text{tr} \  \hat{\bm\Sigma} \left( i \omega_{\hat{\bm\Sigma}} +  \hat{\bm\Sigma} \right)^{-1} =   \text{tr} \bm\Lambda \left( i \omega_{\hat{\bm\Sigma}} (1-\alpha_P^{-1} \tau)^{-1} + \bm\Lambda \right)^{-1} .
+\end{align}
+
+Using our result for products we find
+\begin{align}
+    &\left( - 1 + \frac{\alpha_{N}}{\tau} \right)    \left( i \omega_{\hat{\bm\Sigma}}(\tau)  \right) = \left( - 1 + \frac{1}{\tau}  \right)  i \omega \nonumber
+    \\
+    &\tau =   \text{tr} \bm\Lambda \left( i \omega_{\hat{\bm\Sigma}}(1-\alpha_P^{-1} \tau)^{-1} + \bm\Lambda \right)^{-1} \nonumber
+    \\
+    &=    \text{tr} \bm\Lambda \left(  i\omega \  (-1+\tau^{-1}) (-1 + \alpha_N/\tau)^{-1} (1- \tau / \alpha_P )^{-1}  +  \bm\Lambda \right)^{-1} .
+\end{align}
+
+\paragraph{Width Bottleneck} Now we obtain the scaling of the loss with width $N$ in the regime where $t,P,L,D \to \infty$. To do, we examining the structure of the equations at $\alpha_P \to \infty$ and $i \omega \to 0$, which correspond to taking gradient flow time $\gamma \to \infty$ (which is the correct solution for noise free problems at infinite depth). In this limit $\tau =  \alpha_N$ so we have that 
+\begin{align}
+     \tau = \frac{N}{D} = \text{tr} \bm\Lambda \left( i\omega_{\hat{\bm\Sigma}} + \bm \Lambda \right)^{-1} = \frac{1}{D} \sum_{k=1}^D \frac{\lambda_k}{i\omega_{\hat{\bm\Sigma}} + \lambda_k}.
+\end{align}
+For powerlaw features $\lambda_k \sim k^{-\nu}$ we find an approximate solution for $i\omega_{\hat{\bm\Sigma}}$
+\begin{align}
+    \lambda_k \sim k^{-\nu} \implies i\omega_{\hat{\bm\Sigma}} \approx N^{- \nu}  .
+\end{align}
+Thus the loss at width $N$ and context length $P$ can be approximated as 
+\begin{align}
+    \lim_{t, L,P \to \infty}  \mathcal L(t, N , P , L ) =   \sum_k \frac{(i\omega_{\hat{\bm\Sigma}} )^2 \lambda_k (\beta^\star_k)^2}{ (  i\omega_{\hat{\bm\Sigma}} + \lambda_k )^2} \sim \sum_k \frac{k^{-\nu\beta-1}}{ ( 1 +  k^{-\nu} N^\nu )  } \approx N^{-\nu\beta}
+\end{align}
+
+\paragraph{Context Bottleneck} Following the same logic, we can investigate the regime where performance is limited by context $P$. To access an approximation for this regime, we take $\alpha_N \to 1$ and $i\omega \to 0$. In this case, we have $i \omega = i\omega_{\hat{\bm\Sigma}}$. Since $1-\alpha_P/\tau \to 0$ as $i\omega\to 0$, we introduce the leading order behavior for small $i\omega$
+\begin{align}
+    1- \frac{\alpha_P} \tau \sim r^{-1} i\omega \ , \  i\omega \to 0
+\end{align}
+where $r$ is a (currently) unknown value. Plugging this into the self consistency equation, we identify the value of $r$
+\begin{align}
+    P = \sum_k \frac{\lambda_k}{r + \lambda_k }  \approx r^{ - \frac{1}{\nu }}
+\end{align}
+which gives the scaling $r \approx P^{-\nu}$. We can now use the final value of the resolvent $\left( i\omega + \bm\Lambda \right)^{-1}$
+\begin{align}
+    \mathcal L = \sum_k \frac{r^2 \lambda_k (\beta^\star_k)^2}{(r+\lambda_k)^2} \approx \sum_k \frac{k^{-\nu \beta - 1}}{(1 + k^{-\nu } P^\nu )^2} \sim P^{- \nu \beta} .
+\end{align}
+
+\paragraph{Rank Deficiency/Null Space Interpretation} These last two scaling laws express the simple fact that rank $N$ or rank $P$ matrices only allow the top $N$ or $P$ eigendirections to be learned \citep{bordelon2024dynamical}. 
+
+\section{Enhancing Realism of the Model}
+
+\subsection{Different Parameters for Each Layer}\label{app:diff_layers}
+
+In this section, we analyze the case where the model is allowed $L$ distinct attention layers along the residual stream $\{ \bm\Gamma^\ell \}_{\ell=1}^L$ instead of a single attention layer matrix $\bm\Gamma$ which is applied $L$ times recurrently. We focus our attention on the RRS setting at large width and large context length where the model still exhibits nontrivial depth and pretraining time scaling laws. We first consider the noise free setting $\sigma^2 = 0$ before considering the role of target noise. 
+
+\subsubsection{Noise Free Loss Function at Large Width and Context Length} 
+First, we note that by the rotational invariance, each of the matrices is isotropic $\bm\Gamma^\ell = \gamma^\ell \bm I$ so that 
+\begin{align}
+    \mathcal L(\{ \gamma^\ell \}) = \left< \left| \bm\Lambda^{1/2} \prod_{\ell=1}^L\left[ \bm I - L^{-1} \gamma^\ell \bm M \right] \bar{\bm\beta} \right|^2 \right> \ , \ \bm M = \bm O \left( \bm A^\top \bm A \right)^2 \bm O^\top \hat{\bm\Sigma} 
+\end{align}
+We note that, due to commutativity of the matrix products $\prod_{\ell=1}^L\left[ \bm I - L^{-1} \gamma^\ell \bm M \right]$, which means that this loss function is permutation symmetric in the $\{\gamma^\ell\}$ variables. We therefore expect permutation symmetric dynamics and a solution where $\gamma^\ell = \gamma$. Indeed, analyzing the gradient flow from $\gamma^\ell = 0$ for all $\ell$ leads to a balanced solution where all of these are equal since
+\begin{align}
+    \frac{\partial}{\partial \gamma^\ell}\mathcal L(\{ \gamma^\ell \})|_{\gamma^k = \gamma} = \frac{\partial}{\partial \gamma^{\ell'}}\mathcal L(\{ \gamma^\ell \})|_{\gamma^k = \gamma} \ , \ \forall \ell,\ell' \in \{1,...,L\} .
+\end{align}
+Thus gradient flow will maintain a balance in these parameters. Further, this flow will exactly match the dynamics of the recurrent model if the learning rate is upscaled by $L$. We plot these dynamics and show balancing of the $\gamma^\ell(t)$ variables in Figure \ref{fig:decoupled_layers_fig}. 
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.38\linewidth]{figures/decoupled_layers_powerlaw_dynamics.pdf}
+    \includegraphics[width=0.45\linewidth]{figures/gamma_ells_balanced_powerlaw.pdf}
+    \caption{Dynamics for layer-decoupled reduced $\Gamma$ model. (a) The loss dynamics under powerlaw RRS covariates exhibit the same powerlaws. (b) The different scale factors remain balanced throughout gradient flow $\gamma^k(t) =\gamma(t)$ for all $k \in \{1,...,L \}$ due to permutation symmetry.  }
+    \label{fig:decoupled_layers_fig}
+\end{figure}
+
+\subsubsection{Noisy Target Function}
+
+The predictor in the case of a noisy target function with decoupled layers can be expressed in terms of the evolution of the weight discrepancy $\bm v^\ell \equiv \bar{\bm\beta} - \hat{\bm\beta}^\ell$ which has the recursion
+\begin{align}
+    \bm v^{\ell} = \bm v^{\ell-1} - \gamma^\ell L^{-1} \bm M \bm v^{\ell-1} - \frac{\sigma \sqrt{D}}{P} \gamma^\ell L^{-1} \bm X \bm\epsilon   \  , \ \ell \in \{1,...,L\}
+\end{align}
+Defining the matrices $\bm A^\ell = \left[ \bm I - \gamma^\ell L^{-1} \bm M \right]$ and $\bm b = \frac{\sigma\sqrt D}{L P} \bm X \bm \epsilon$ so that $\bm v^\ell = \bm A^\ell \bm v^{\ell-1} + \gamma^\ell \bm b$
+\begin{align}
+    \bm v^L = \prod_{\ell=1}^L \bm A^\ell \bar{\bm\beta} + \sum_{\ell=1}^L \gamma^\ell \left( \prod_{k=\ell+1}^L \bm A^k \right) \bm b
+\end{align}
+Since the loss function takes the form $\mathcal L = \frac{1}{D} \left<  \bm v^L \cdot \bm \Lambda \bm v^L  \right>$ we have 
+\begin{align}
+    \mathcal L = &\frac{1}{D} \left< \bar{\bm\beta}^\top \left( \prod_{\ell} \bm A^\ell \right)^\top \bm\Lambda  \left( \prod_{\ell} \bm A^\ell \right) \bar{\bm\beta} \right> \nonumber
+    \\
+    &+ \frac{1}{D} \sum_{\ell \ell'} \gamma^\ell \gamma^{\ell'}  \left< \bm b^\top \left( \prod_{k=\ell+1}^L \bm A^k \right) \bm\Lambda \left( \prod_{k=\ell'+1}^L \bm A^k \right) \bm b \right>
+\end{align}
+Using the fact that $\left< \bm b \bm b^\top \right> = \sigma^2 L^{-2} \alpha^{-1} \bm\Lambda$ we have the following loss function
+\begin{align}
+    \mathcal L = &\frac{1}{D} \left< \left| \bm\Lambda^{1/2} \prod_{\ell=1}^L \bm A^\ell \bar{\bm\beta}  \right|^2 \right> + \frac{\sigma^2}{L^2 \alpha} \sum_{\ell \ell'} \gamma^\ell \gamma^{\ell'} \text{tr} \bm\Lambda \left( \prod_{k=\ell+1}^L \bm A^k \right) \bm\Lambda \left( \prod_{k=\ell'+1}^L \bm A^k \right) . 
+\end{align}
+
+
+\subsection{Decoupling Weights in Attention Layers}\label{app:decoupling_layers}
+
+We note that for the \textbf{ISO} and \textbf{RRS} settings, we can exploit similar symmetry arguments as in \ref{app:grad_flow_iso_deep} and \ref{app:rrs_setting} to argue that the gradient updates for $\bm W_x, \bm W_k, \bm W_q$ are isotropic and that $\bm W_v$ gets an update in the $\w_o \bm w_y^\top$ direction. The gradient flow can be expressed in terms of the original gradients on $\bm\Gamma$
+\begin{align}
+    \partial_t \bm W_i = - \frac{\partial \mathcal L}{ \partial \bm\Gamma} \cdot \frac{\partial \bm\Gamma}{\partial  \bm W_i} \ , \ i \in \{ x, k, q, v , o, y\} 
+\end{align}
+As before, under the assumption of small initial conditions, we can reduce the loss to a collection of ODEs on scalars representing the scale of each weight matrix
+\begin{align}
+\mathcal L(w_o, w_v, w_q, w_k, w_x, w_y) &= \text{tr}  \ \bm\Omega \bm\Lambda \left[  \bm I - w_o w_y \left( \bm I  -  \left[1 - L^{-1}  w_v w_k w_q  (w_x)^2 \bm\Lambda \right]^L \right) \right]^{2}
+\end{align}
+Gradient flow dynamics on this loss function can reproduce the dynamics of the decoupled self attention model. Under the further assumption that $w_o= w_y=1$, we can simplify the loss further to 
+\begin{align}
+\mathcal L(w_v, w_q, w_k, w_x) &= \text{tr} \  \bm\Omega \bm\Lambda  \left[ \bm I - L^{-1}  w_v w_k w_q  (w_x)^2 \bm\Lambda \right]^{2L}
+\end{align}
+We note that $w_x$ will be updated twice as quickly as the other weights under gradient flow. To achieve balance, we can initialize it to have $w_x(0) = \sqrt{2} w_k(0)$ and have $w_q(0) = w_k(0)=w_v(0) = \sigma$. In this case, the loss can be further reduced to a function of a single variable
+\begin{align}
+\mathcal L(w_v, w_q, w_k, w_x) &= \text{tr} \ \bm\Omega \bm\Lambda  \left[ \bm I - L^{-1}  w(t)^5 \bm\Lambda \right]^{2L}
+\end{align}
+Under source and capacity assumptions, this will generate the following dynamics at large depth $L$
+\begin{align}
+    w(t) = t^{\frac{5}{5\beta + 2}} \implies \mathcal L \sim t^{- \frac{5\beta}{5\beta + 2}} .
+\end{align}
+\begin{wrapfigure}{r}{0.42\textwidth}
+  \begin{center}
+    \includegraphics[width=0.3\textwidth]{figures/SOFTMAXMLP_T20000_lr0p0005_loss_vs_t.pdf}
+  \end{center}
+  \caption{Softmax attention model with MLP Blocks on the residual stream also benefit from increasing the depth.}
+  \label{fig:softmaxandmlpappendix}
+\end{wrapfigure}
+
+\subsection{Softmax Attention}
+We also provide numerical experiments with non-recurrent softmax attention, decoupled layers, and Adam. In this context we use CompleteP scaling for the learning rate $\Theta_L(1)$ \citep{dey2025don}. The results are provided in Figure \ref{fig:full_att_dynamics} (c). 
+
+Supplementing this figure is an equivalent figure for a non-recurrent architecture with alternating softmax attention and MLP with GELU activation, given by Figure \ref{fig:softmaxandmlpappendix}.
+
+\end{document}

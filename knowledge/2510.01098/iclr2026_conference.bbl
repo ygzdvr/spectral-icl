@@ -1,0 +1,400 @@
+\begin{thebibliography}{77}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Achiam et~al.(2023)Achiam, Adler, Agarwal, Ahmad, Akkaya, Aleman, Almeida, Altenschmidt, Altman, Anadkat, et~al.]{achiam2023gpt}
+Josh Achiam, Steven Adler, Sandhini Agarwal, Lama Ahmad, Ilge Akkaya, Florencia~Leoni Aleman, Diogo Almeida, Janko Altenschmidt, Sam Altman, Shyamal Anadkat, et~al.
+\newblock Gpt-4 technical report.
+\newblock \emph{arXiv preprint arXiv:2303.08774}, 2023.
+
+\bibitem[Advani et~al.(2020)Advani, Saxe, and Sompolinsky]{advani2020high}
+Madhu~S Advani, Andrew~M Saxe, and Haim Sompolinsky.
+\newblock High-dimensional dynamics of generalization error in neural networks.
+\newblock \emph{Neural Networks}, 132:\penalty0 428--446, 2020.
+
+\bibitem[Ahn et~al.(2023)Ahn, Cheng, Daneshmand, and Sra]{ahn2023transformerslearnimplementpreconditioned}
+Kwangjun Ahn, Xiang Cheng, Hadi Daneshmand, and Suvrit Sra.
+\newblock Transformers learn to implement preconditioned gradient descent for in-context learning, 2023.
+\newblock URL \url{https://arxiv.org/abs/2306.00297}.
+
+\bibitem[Aky{\"u}rek et~al.(2022)Aky{\"u}rek, Schuurmans, Andreas, Ma, and Zhou]{akyurek2022learning}
+Ekin Aky{\"u}rek, Dale Schuurmans, Jacob Andreas, Tengyu Ma, and Denny Zhou.
+\newblock What learning algorithm is in-context learning? investigations with linear models.
+\newblock \emph{arXiv preprint arXiv:2211.15661}, 2022.
+
+\bibitem[Atanasov et~al.(2022)Atanasov, Bordelon, and Pehlevan]{atanasov2022neural}
+Alexander Atanasov, Blake Bordelon, and Cengiz Pehlevan.
+\newblock Neural networks as kernel learners: The silent alignment effect.
+\newblock In \emph{International Conference on Learning Representations}, 2022.
+\newblock URL \url{https://openreview.net/forum?id=1NvflqAdoom}.
+
+\bibitem[Atanasov et~al.(2023)Atanasov, Bordelon, Sainathan, and Pehlevan]{atanasov2023onset}
+Alexander Atanasov, Blake Bordelon, Sabarish Sainathan, and Cengiz Pehlevan.
+\newblock The onset of variance-limited behavior for networks in the lazy and rich regimes.
+\newblock In \emph{The Eleventh International Conference on Learning Representations}, 2023.
+\newblock URL \url{https://openreview.net/forum?id=JLINxPOVTh7}.
+
+\bibitem[Atanasov et~al.(2025)Atanasov, Bordelon, Zavatone-Veth, Paquette, and Pehlevan]{atanasov2025two}
+Alexander Atanasov, Blake Bordelon, Jacob~A Zavatone-Veth, Courtney Paquette, and Cengiz Pehlevan.
+\newblock Two-point deterministic equivalence for stochastic gradient dynamics in linear models.
+\newblock \emph{arXiv preprint arXiv:2502.05074}, 2025.
+
+\bibitem[Bahri et~al.(2021)Bahri, Dyer, Kaplan, Lee, and Sharma]{bahri2021explaining}
+Yasaman Bahri, Ethan Dyer, Jared Kaplan, Jaehoon Lee, and Utkarsh Sharma.
+\newblock Explaining neural scaling laws.
+\newblock \emph{arXiv preprint arXiv:2102.06701}, 2021.
+
+\bibitem[Bai et~al.(2023)Bai, Chen, Wang, Xiong, and Mei]{bai2023transformers}
+Yu~Bai, Fan Chen, Huan Wang, Caiming Xiong, and Song Mei.
+\newblock Transformers as statisticians: Provable in-context learning with in-context algorithm selection.
+\newblock \emph{Advances in neural information processing systems}, 36:\penalty0 57125--57211, 2023.
+
+\bibitem[Bender \& Orszag(2013)Bender and Orszag]{bender2013advanced}
+Carl~M Bender and Steven~A Orszag.
+\newblock \emph{Advanced mathematical methods for scientists and engineers I: Asymptotic methods and perturbation theory}.
+\newblock Springer Science \& Business Media, 2013.
+
+\bibitem[Bordelon \& Pehlevan(2021)Bordelon and Pehlevan]{bordelon2021learning}
+Blake Bordelon and Cengiz Pehlevan.
+\newblock Learning curves for sgd on structured features.
+\newblock \emph{arXiv preprint arXiv:2106.02713}, 2021.
+
+\bibitem[Bordelon \& Pehlevan(2022{\natexlab{a}})Bordelon and Pehlevan]{bordelon2022learning}
+Blake Bordelon and Cengiz Pehlevan.
+\newblock Learning curves for {SGD} on structured features.
+\newblock In \emph{International Conference on Learning Representations}, 2022{\natexlab{a}}.
+\newblock URL \url{https://openreview.net/forum?id=WPI2vbkAl3Q}.
+
+\bibitem[Bordelon \& Pehlevan(2022{\natexlab{b}})Bordelon and Pehlevan]{bordelon2022self}
+Blake Bordelon and Cengiz Pehlevan.
+\newblock Self-consistent dynamical field theory of kernel evolution in wide neural networks.
+\newblock \emph{Advances in Neural Information Processing Systems}, 35:\penalty0 32240--32256, 2022{\natexlab{b}}.
+
+\bibitem[Bordelon et~al.({\natexlab{a}})Bordelon, Atanasov, and Pehlevan]{bordelon2025feature}
+Blake Bordelon, Alexander Atanasov, and Cengiz Pehlevan.
+\newblock How feature learning can improve neural scaling laws.
+\newblock In \emph{The Thirteenth International Conference on Learning Representations}, {\natexlab{a}}.
+
+\bibitem[Bordelon et~al.({\natexlab{b}})Bordelon, Noci, Li, Hanin, and Pehlevan]{bordelon2023depthwise}
+Blake Bordelon, Lorenzo Noci, Mufan~Bill Li, Boris Hanin, and Cengiz Pehlevan.
+\newblock Depthwise hyperparameter transfer in residual networks: Dynamics and scaling limit.
+\newblock In \emph{The Twelfth International Conference on Learning Representations}, {\natexlab{b}}.
+
+\bibitem[Bordelon et~al.(2020)Bordelon, Canatar, and Pehlevan]{bordelon2020spectrum}
+Blake Bordelon, Abdulkadir Canatar, and Cengiz Pehlevan.
+\newblock Spectrum dependent learning curves in kernel regression and wide neural networks.
+\newblock In \emph{International Conference on Machine Learning}, pp.\  1024--1034. PMLR, 2020.
+
+\bibitem[Bordelon et~al.(2024{\natexlab{a}})Bordelon, Atanasov, and Pehlevan]{bordelon2024dynamical}
+Blake Bordelon, Alexander Atanasov, and Cengiz Pehlevan.
+\newblock A dynamical model of neural scaling laws.
+\newblock In \emph{Proceedings of the 41st International Conference on Machine Learning}, pp.\  4345--4382, 2024{\natexlab{a}}.
+
+\bibitem[Bordelon et~al.(2024{\natexlab{b}})Bordelon, Chaudhry, and Pehlevan]{bordelon2024infinite}
+Blake Bordelon, Hamza Chaudhry, and Cengiz Pehlevan.
+\newblock Infinite limits of multi-head transformer dynamics.
+\newblock \emph{Advances in Neural Information Processing Systems}, 37:\penalty0 35824--35878, 2024{\natexlab{b}}.
+
+\bibitem[Brown et~al.(2020)Brown, Mann, Ryder, Subbiah, Kaplan, Dhariwal, Neelakantan, Shyam, Sastry, Askell, et~al.]{brown2020language}
+Tom Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared~D Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, et~al.
+\newblock Language models are few-shot learners.
+\newblock \emph{Advances in neural information processing systems}, 33:\penalty0 1877--1901, 2020.
+
+\bibitem[Chan et~al.(2022)Chan, Santoro, Lampinen, Wang, Singh, Richemond, McClelland, and Hill]{chan2022datadistributionalpropertiesdrive}
+Stephanie C.~Y. Chan, Adam Santoro, Andrew~K. Lampinen, Jane~X. Wang, Aaditya Singh, Pierre~H. Richemond, Jay McClelland, and Felix Hill.
+\newblock Data distributional properties drive emergent in-context learning in transformers, 2022.
+\newblock URL \url{https://arxiv.org/abs/2205.05055}.
+
+\bibitem[Chen et~al.(2024)Chen, Sheen, Wang, and Yang]{chen2024training}
+Siyu Chen, Heejune Sheen, Tianhao Wang, and Zhuoran Yang.
+\newblock Training dynamics of multi-head softmax attention for in-context learning: Emergence, convergence, and optimality.
+\newblock \emph{arXiv preprint arXiv:2402.19442}, 2024.
+
+\bibitem[Chizat \& Bach(2018)Chizat and Bach]{chizat2018global}
+Lenaic Chizat and Francis Bach.
+\newblock On the global convergence of gradient descent for over-parameterized models using optimal transport.
+\newblock \emph{Advances in neural information processing systems}, 31, 2018.
+
+\bibitem[Chizat \& Netrapalli(2024)Chizat and Netrapalli]{chizat2024feature}
+L{\'e}na{\"\i}c Chizat and Praneeth Netrapalli.
+\newblock The feature speed formula: a flexible approach to scale hyper-parameters of deep neural networks.
+\newblock \emph{Advances in Neural Information Processing Systems}, 37:\penalty0 62362--62383, 2024.
+
+\bibitem[Cui et~al.(2021)Cui, Loureiro, Krzakala, and Zdeborov{\'a}]{cui2021generalization}
+Hugo Cui, Bruno Loureiro, Florent Krzakala, and Lenka Zdeborov{\'a}.
+\newblock Generalization error rates in kernel regression: The crossover from the noiseless to noisy regime.
+\newblock \emph{Advances in Neural Information Processing Systems}, 34:\penalty0 10131--10143, 2021.
+
+\bibitem[Defilippis et~al.(2024)Defilippis, Loureiro, and Misiakiewicz]{defilippis2024dimension}
+Leonardo Defilippis, Bruno Loureiro, and Theodor Misiakiewicz.
+\newblock Dimension-free deterministic equivalents and scaling laws for random feature regression.
+\newblock \emph{Advances in Neural Information Processing Systems}, 37:\penalty0 104630--104693, 2024.
+
+\bibitem[Dehghani et~al.(2018)Dehghani, Gouws, Vinyals, Uszkoreit, and Kaiser]{dehghani2018universal}
+Mostafa Dehghani, Stephan Gouws, Oriol Vinyals, Jakob Uszkoreit, and {\L}ukasz Kaiser.
+\newblock Universal transformers.
+\newblock \emph{arXiv preprint arXiv:1807.03819}, 2018.
+
+\bibitem[Dey et~al.(2025)Dey, Zhang, Noci, Li, Bordelon, Bergsma, Pehlevan, Hanin, and Hestness]{dey2025don}
+Nolan Dey, Bin~Claire Zhang, Lorenzo Noci, Mufan Li, Blake Bordelon, Shane Bergsma, Cengiz Pehlevan, Boris Hanin, and Joel Hestness.
+\newblock Don't be lazy: Completep enables compute-efficient deep transformers.
+\newblock \emph{arXiv preprint arXiv:2505.01618}, 2025.
+
+\bibitem[Dosovitskiy et~al.(2020)Dosovitskiy, Beyer, Kolesnikov, Weissenborn, Zhai, Unterthiner, Dehghani, Minderer, Heigold, Gelly, et~al.]{dosovitskiy2020image}
+Alexey Dosovitskiy, Lucas Beyer, Alexander Kolesnikov, Dirk Weissenborn, Xiaohua Zhai, Thomas Unterthiner, Mostafa Dehghani, Matthias Minderer, Georg Heigold, Sylvain Gelly, et~al.
+\newblock An image is worth 16x16 words: Transformers for image recognition at scale.
+\newblock \emph{arXiv preprint arXiv:2010.11929}, 2020.
+
+\bibitem[Garg et~al.(2022)Garg, Tsipras, Liang, and Valiant]{garg2022can}
+Shivam Garg, Dimitris Tsipras, Percy~S Liang, and Gregory Valiant.
+\newblock What can transformers learn in-context? a case study of simple function classes.
+\newblock \emph{Advances in neural information processing systems}, 35:\penalty0 30583--30598, 2022.
+
+\bibitem[Gatmiry et~al.(2024)Gatmiry, Saunshi, Reddi, Jegelka, and Kumar]{gatmiry2024roledepthloopingincontext}
+Khashayar Gatmiry, Nikunj Saunshi, Sashank~J. Reddi, Stefanie Jegelka, and Sanjiv Kumar.
+\newblock On the role of depth and looping for in-context learning with task diversity, 2024.
+\newblock URL \url{https://arxiv.org/abs/2410.21698}.
+
+\bibitem[Geiger et~al.(2020)Geiger, Spigler, Jacot, and Wyart]{geiger2020disentangling}
+Mario Geiger, Stefano Spigler, Arthur Jacot, and Matthieu Wyart.
+\newblock Disentangling feature and lazy training in deep neural networks.
+\newblock \emph{Journal of Statistical Mechanics: Theory and Experiment}, 2020\penalty0 (11):\penalty0 113301, 2020.
+
+\bibitem[Geiping et~al.(2025)Geiping, McLeish, Jain, Kirchenbauer, Singh, Bartoldson, Kailkhura, Bhatele, and Goldstein]{geiping2025scaling}
+Jonas Geiping, Sean McLeish, Neel Jain, John Kirchenbauer, Siddharth Singh, Brian~R Bartoldson, Bhavya Kailkhura, Abhinav Bhatele, and Tom Goldstein.
+\newblock Scaling up test-time compute with latent reasoning: A recurrent depth approach.
+\newblock \emph{arXiv preprint arXiv:2502.05171}, 2025.
+
+\bibitem[He et~al.(2024)He, Doshi, Das, and Gromov]{iclmodular_learningtogrok}
+Tianyu He, Darshil Doshi, Aritra Das, and Andrey Gromov.
+\newblock Learning to grok: Emergence of in-context learning and skill composition in modular arithmetic tasks.
+\newblock In A.~Globerson, L.~Mackey, D.~Belgrave, A.~Fan, U.~Paquet, J.~Tomczak, and C.~Zhang (eds.), \emph{Advances in Neural Information Processing Systems}, volume~37, pp.\  13244--13273. Curran Associates, Inc., 2024.
+\newblock URL \url{https://proceedings.neurips.cc/paper_files/paper/2024/file/17d60fef592086d1a5cb136f1946df59-Paper-Conference.pdf}.
+
+\bibitem[Hestness et~al.(2017)Hestness, Narang, Ardalani, Diamos, Jun, Kianinejad, Patwary, Yang, and Zhou]{hestness2017deep}
+Joel Hestness, Sharan Narang, Newsha Ardalani, Gregory Diamos, Heewoo Jun, Hassan Kianinejad, Md~Mostofa~Ali Patwary, Yang Yang, and Yanqi Zhou.
+\newblock Deep learning scaling is predictable, empirically.
+\newblock \emph{arXiv preprint arXiv:1712.00409}, 2017.
+
+\bibitem[Hoffmann et~al.(2022)Hoffmann, Borgeaud, Mensch, Buchatskaya, Cai, Rutherford, Casas, Hendricks, Welbl, Clark, et~al.]{hoffmann2022training}
+Jordan Hoffmann, Sebastian Borgeaud, Arthur Mensch, Elena Buchatskaya, Trevor Cai, Eliza Rutherford, Diego de~Las Casas, Lisa~Anne Hendricks, Johannes Welbl, Aidan Clark, et~al.
+\newblock Training compute-optimal large language models.
+\newblock \emph{arXiv preprint arXiv:2203.15556}, 2022.
+
+\bibitem[Kaplan et~al.(2020)Kaplan, McCandlish, Henighan, Brown, Chess, Child, Gray, Radford, Wu, and Amodei]{kaplan2020scaling}
+Jared Kaplan, Sam McCandlish, Tom Henighan, Tom~B Brown, Benjamin Chess, Rewon Child, Scott Gray, Alec Radford, Jeffrey Wu, and Dario Amodei.
+\newblock Scaling laws for neural language models.
+\newblock \emph{arXiv preprint arXiv:2001.08361}, 2020.
+
+\bibitem[Kim et~al.(2024)Kim, Nakamaki, and Suzuki]{kim2024transformersminimaxoptimalnonparametric}
+Juno Kim, Tai Nakamaki, and Taiji Suzuki.
+\newblock Transformers are minimax optimal nonparametric in-context learners, 2024.
+\newblock URL \url{https://arxiv.org/abs/2408.12186}.
+
+\bibitem[Kratsios \& Furuya(2025)Kratsios and Furuya]{kratsios2025incontextuniversalityenoughmlps}
+Anastasis Kratsios and Takashi Furuya.
+\newblock Is in-context universality enough? mlps are also universal in-context, 2025.
+\newblock URL \url{https://arxiv.org/abs/2502.03327}.
+
+\bibitem[Kunstner \& Bach(2025)Kunstner and Bach]{kunstner2025scaling}
+Frederik Kunstner and Francis Bach.
+\newblock Scaling laws for gradient descent and sign descent for linear bigram models under zipf's law.
+\newblock \emph{arXiv preprint arXiv:2505.19227}, 2025.
+
+\bibitem[Letey et~al.(2025)Letey, Zavatone-Veth, Lu, and Pehlevan]{letey2025pretraintesttaskalignmentgoverns}
+Mary~I. Letey, Jacob~A. Zavatone-Veth, Yue~M. Lu, and Cengiz Pehlevan.
+\newblock Pretrain-test task alignment governs generalization in in-context learning, 2025.
+\newblock URL \url{https://arxiv.org/abs/2509.26551}.
+
+\bibitem[Li et~al.(2023)Li, Ildiz, Papailiopoulos, and Oymak]{li2023transformersalgorithmsgeneralizationstability}
+Yingcong Li, M.~Emrullah Ildiz, Dimitris Papailiopoulos, and Samet Oymak.
+\newblock Transformers as algorithms: Generalization and stability in in-context learning, 2023.
+\newblock URL \url{https://arxiv.org/abs/2301.07067}.
+
+\bibitem[Lin et~al.(2024)Lin, Wu, Kakade, Bartlett, and Lee]{lin2024scaling}
+Licong Lin, Jingfeng Wu, Sham~M Kakade, Peter~L Bartlett, and Jason~D Lee.
+\newblock Scaling laws in linear regression: Compute, parameters, and data.
+\newblock \emph{arXiv preprint arXiv:2406.08466}, 2024.
+
+\bibitem[Liu et~al.(2024{\natexlab{a}})Liu, Cai, Chen, and Li]{liu2024betterunderstandingincontextlearning}
+Shang Liu, Zhongze Cai, Guanting Chen, and Xiaocheng Li.
+\newblock Towards better understanding of in-context learning ability from in-context uncertainty quantification, 2024{\natexlab{a}}.
+\newblock URL \url{https://arxiv.org/abs/2405.15115}.
+
+\bibitem[Liu et~al.(2024{\natexlab{b}})Liu, Boull{\'e}, Sarfati, and Earls]{liu2024llms}
+Toni~JB Liu, Nicolas Boull{\'e}, Rapha{\"e}l Sarfati, and Christopher~J Earls.
+\newblock Llms learn governing principles of dynamical systems, revealing an in-context neural scaling law.
+\newblock \emph{arXiv preprint arXiv:2402.00795}, 2024{\natexlab{b}}.
+
+\bibitem[Lu et~al.(2025)Lu, Letey, Zavatone-Veth, Maiti, and Pehlevan]{lu2025asymptotictheoryincontextlearning}
+Yue~M. Lu, Mary Letey, Jacob~A. Zavatone-Veth, Anindita Maiti, and Cengiz Pehlevan.
+\newblock Asymptotic theory of in-context learning by linear attention.
+\newblock \emph{Proceedings of the National Academy of Sciences}, 122\penalty0 (28):\penalty0 e2502599122, 2025.
+\newblock \doi{10.1073/pnas.2502599122}.
+\newblock URL \url{https://www.pnas.org/doi/abs/10.1073/pnas.2502599122}.
+
+\bibitem[Mahankali et~al.(2023)Mahankali, Hashimoto, and Ma]{mahankali2023stepgradientdescentprovably}
+Arvind Mahankali, Tatsunori~B. Hashimoto, and Tengyu Ma.
+\newblock One step of gradient descent is provably the optimal in-context learner with one layer of linear self-attention, 2023.
+\newblock URL \url{https://arxiv.org/abs/2307.03576}.
+
+\bibitem[Maloney et~al.(2022)Maloney, Roberts, and Sully]{maloney2022solvable}
+Alexander Maloney, Daniel~A Roberts, and James Sully.
+\newblock A solvable model of neural scaling laws.
+\newblock \emph{arXiv preprint arXiv:2210.16859}, 2022.
+
+\bibitem[McCracken et~al.(2025)McCracken, Moisescu-Pareja, Letourneau, Precup, and Love]{mccracken2025uncoveringuniversalabstractalgorithm}
+Gavin McCracken, Gabriela Moisescu-Pareja, Vincent Letourneau, Doina Precup, and Jonathan Love.
+\newblock Uncovering a universal abstract algorithm for modular addition in neural networks, 2025.
+\newblock URL \url{https://arxiv.org/abs/2505.18266}.
+
+\bibitem[Mei et~al.(2018)Mei, Montanari, and Nguyen]{mei2018mean}
+Song Mei, Andrea Montanari, and Phan-Minh Nguyen.
+\newblock A mean field view of the landscape of two-layer neural networks.
+\newblock \emph{Proceedings of the National Academy of Sciences}, 115\penalty0 (33):\penalty0 E7665--E7671, 2018.
+
+\bibitem[Merrill \& Sabharwal(2025)Merrill and Sabharwal]{merrill2025little}
+William Merrill and Ashish Sabharwal.
+\newblock A little depth goes a long way: The expressive power of log-depth transformers.
+\newblock \emph{arXiv preprint arXiv:2503.03961}, 2025.
+
+\bibitem[Mignacco et~al.(2020)Mignacco, Krzakala, Urbani, and Zdeborov{\'a}]{mignacco2020dynamical}
+Francesca Mignacco, Florent Krzakala, Pierfrancesco Urbani, and Lenka Zdeborov{\'a}.
+\newblock Dynamical mean-field theory for stochastic gradient descent in gaussian mixture classification.
+\newblock \emph{Advances in Neural Information Processing Systems}, 33:\penalty0 9540--9550, 2020.
+
+\bibitem[Montanari \& Urbani(2025)Montanari and Urbani]{montanari2025dynamical}
+Andrea Montanari and Pierfrancesco Urbani.
+\newblock Dynamical decoupling of generalization and overfitting in large two-layer networks.
+\newblock \emph{arXiv preprint arXiv:2502.21269}, 2025.
+
+\bibitem[Noci et~al.(2023)Noci, Li, Li, He, Hofmann, Maddison, and Roy]{noci2023shaped}
+Lorenzo Noci, Chuning Li, Mufan Li, Bobby He, Thomas Hofmann, Chris~J Maddison, and Dan Roy.
+\newblock The shaped transformer: Attention models in the infinite depth-and-width limit.
+\newblock \emph{Advances in Neural Information Processing Systems}, 36:\penalty0 54250--54281, 2023.
+
+\bibitem[Panwar et~al.(2024)Panwar, Ahuja, and Goyal]{panwar2024incontextlearningbayesianprism}
+Madhur Panwar, Kabir Ahuja, and Navin Goyal.
+\newblock In-context learning through the bayesian prism, 2024.
+\newblock URL \url{https://arxiv.org/abs/2306.04891}.
+
+\bibitem[Paquette et~al.(2024)Paquette, Paquette, Xiao, and Pennington]{paquette20244+}
+Elliot Paquette, Courtney Paquette, Lechao Xiao, and Jeffrey Pennington.
+\newblock 4+ 3 phases of compute-optimal neural scaling laws.
+\newblock \emph{arXiv preprint arXiv:2405.15074}, 2024.
+
+\bibitem[Park et~al.(2024)Park, Lee, Lubana, Yang, Okawa, Nishi, Wattenberg, and Tanaka]{park2024iclr}
+Core~Francisco Park, Andrew Lee, Ekdeep~Singh Lubana, Yongyi Yang, Maya Okawa, Kento Nishi, Martin Wattenberg, and Hidenori Tanaka.
+\newblock Iclr: In-context learning of representations.
+\newblock \emph{arXiv preprint arXiv:2501.00070}, 2024.
+
+\bibitem[Pathak et~al.(2023)Pathak, Sen, Kong, and Das]{pathak2023transformersoptimallylearnregression}
+Reese Pathak, Rajat Sen, Weihao Kong, and Abhimanyu Das.
+\newblock Transformers can optimally learn regression mixture models, 2023.
+\newblock URL \url{https://arxiv.org/abs/2311.08362}.
+
+\bibitem[Potters \& Bouchaud(2020)Potters and Bouchaud]{potters2020first}
+Marc Potters and Jean-Philippe Bouchaud.
+\newblock \emph{A first course in random matrix theory: for physicists, engineers and data scientists}.
+\newblock Cambridge University Press, 2020.
+
+\bibitem[Raventós et~al.(2023)Raventós, Paul, Chen, and Ganguli]{raventós2023pretrainingtaskdiversityemergence}
+Allan Raventós, Mansheej Paul, Feng Chen, and Surya Ganguli.
+\newblock Pretraining task diversity and the emergence of non-bayesian in-context learning for regression, 2023.
+\newblock URL \url{https://arxiv.org/abs/2306.15063}.
+
+\bibitem[Simon et~al.(2023)Simon, Karkada, Ghosh, and Belkin]{simon2023more}
+James~B Simon, Dhruva Karkada, Nikhil Ghosh, and Mikhail Belkin.
+\newblock More is better in modern machine learning: when infinite overparameterization is optimal and overfitting is obligatory.
+\newblock \emph{arXiv preprint arXiv:2311.14646}, 2023.
+
+\bibitem[Sonthalia et~al.(2024)Sonthalia, Lok, and Rebrova]{sonthalia2024regularization}
+Rishi Sonthalia, Jackie Lok, and Elizaveta Rebrova.
+\newblock On regularization via early stopping for least squares regression.
+\newblock \emph{arXiv preprint arXiv:2406.04425}, 2024.
+
+\bibitem[Spigler et~al.(2020)Spigler, Geiger, and Wyart]{spigler2020asymptotic}
+Stefano Spigler, Mario Geiger, and Matthieu Wyart.
+\newblock Asymptotic learning curves of kernel methods: empirical data versus teacher--student paradigm.
+\newblock \emph{Journal of Statistical Mechanics: Theory and Experiment}, 2020\penalty0 (12):\penalty0 124001, 2020.
+
+\bibitem[Tong \& Pehlevan(2025)Tong and Pehlevan]{tong2025mlpslearnincontextregression}
+William~L. Tong and Cengiz Pehlevan.
+\newblock Mlps learn in-context on regression and classification tasks, 2025.
+\newblock URL \url{https://arxiv.org/abs/2405.15618}.
+
+\bibitem[Vaswani et~al.(2017)Vaswani, Shazeer, Parmar, Uszkoreit, Jones, Gomez, Kaiser, and Polosukhin]{vaswani2017attention}
+Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan~N Gomez, {\L}ukasz Kaiser, and Illia Polosukhin.
+\newblock Attention is all you need.
+\newblock \emph{Advances in neural information processing systems}, 30, 2017.
+
+\bibitem[Vladymyrov et~al.(2024)Vladymyrov, von Oswald, Sandler, and Ge]{vladymyrov2024lineartransformersversatileincontext}
+Max Vladymyrov, Johannes von Oswald, Mark Sandler, and Rong Ge.
+\newblock Linear transformers are versatile in-context learners, 2024.
+\newblock URL \url{https://arxiv.org/abs/2402.14180}.
+
+\bibitem[Von~Oswald et~al.(2023)Von~Oswald, Niklasson, Randazzo, Sacramento, Mordvintsev, Zhmoginov, and Vladymyrov]{von2023transformers}
+Johannes Von~Oswald, Eyvind Niklasson, Ettore Randazzo, Jo{\~a}o Sacramento, Alexander Mordvintsev, Andrey Zhmoginov, and Max Vladymyrov.
+\newblock Transformers learn in-context by gradient descent.
+\newblock In \emph{International Conference on Machine Learning}, pp.\  35151--35174. PMLR, 2023.
+
+\bibitem[Wang et~al.(2025)Wang, Li, Sun, Chen, Liu, Wu, Lu, Song, and Yadkori]{wang2025hierarchical}
+Guan Wang, Jin Li, Yuhao Sun, Xing Chen, Changling Liu, Yue Wu, Meng Lu, Sen Song, and Yasin~Abbasi Yadkori.
+\newblock Hierarchical reasoning model.
+\newblock \emph{arXiv preprint arXiv:2506.21734}, 2025.
+
+\bibitem[Wu et~al.(2024)Wu, Zou, Chen, Braverman, Gu, and Bartlett]{wu2024pretrainingtasksneededincontext}
+Jingfeng Wu, Difan Zou, Zixiang Chen, Vladimir Braverman, Quanquan Gu, and Peter~L. Bartlett.
+\newblock How many pretraining tasks are needed for in-context learning of linear regression?, 2024.
+\newblock URL \url{https://arxiv.org/abs/2310.08391}.
+
+\bibitem[Wurgaft et~al.(2025)Wurgaft, Lubana, Park, Tanaka, Reddy, and Goodman]{wurgaft2025context}
+Daniel Wurgaft, Ekdeep~Singh Lubana, Core~Francisco Park, Hidenori Tanaka, Gautam Reddy, and Noah~D Goodman.
+\newblock In-context learning strategies emerge rationally.
+\newblock \emph{arXiv preprint arXiv:2506.17859}, 2025.
+
+\bibitem[Xie et~al.(2021)Xie, Raghunathan, Liang, and Ma]{xie2021explanation}
+Sang~Michael Xie, Aditi Raghunathan, Percy Liang, and Tengyu Ma.
+\newblock An explanation of in-context learning as implicit bayesian inference.
+\newblock \emph{arXiv preprint arXiv:2111.02080}, 2021.
+
+\bibitem[Yang \& Hu(2021)Yang and Hu]{yang2021tensor}
+Greg Yang and Edward~J Hu.
+\newblock Tensor programs iv: Feature learning in infinite-width neural networks.
+\newblock In \emph{International Conference on Machine Learning}, pp.\  11727--11737. PMLR, 2021.
+
+\bibitem[Yang et~al.(2021)Yang, Hu, Babuschkin, Sidor, Liu, Farhi, Ryder, Pachocki, Chen, and Gao]{yang2021tuning}
+Greg Yang, Edward~J Hu, Igor Babuschkin, Szymon Sidor, Xiaodong Liu, David Farhi, Nick Ryder, Jakub Pachocki, Weizhu Chen, and Jianfeng Gao.
+\newblock Tuning large neural networks via zero-shot hyperparameter transfer.
+\newblock In A.~Beygelzimer, Y.~Dauphin, P.~Liang, and J.~Wortman Vaughan (eds.), \emph{Advances in Neural Information Processing Systems}, 2021.
+\newblock URL \url{https://openreview.net/forum?id=Bx6qKuBM2AD}.
+
+\bibitem[Yang et~al.(2023)Yang, Yu, Zhu, and Hayou]{yang2023tensor}
+Greg Yang, Dingli Yu, Chen Zhu, and Soufiane Hayou.
+\newblock Tensor programs vi: Feature learning in infinite-depth neural networks.
+\newblock \emph{arXiv preprint arXiv:2310.02244}, 2023.
+
+\bibitem[Zhang et~al.(2023{\natexlab{a}})Zhang, Frei, and Bartlett]{zhang2023trainedtransformerslearnlinear}
+Ruiqi Zhang, Spencer Frei, and Peter~L. Bartlett.
+\newblock Trained transformers learn linear models in-context, 2023{\natexlab{a}}.
+\newblock URL \url{https://arxiv.org/abs/2306.09927}.
+
+\bibitem[Zhang et~al.(2025)Zhang, Singh, Latham, and Saxe]{zhang2025trainingdynamicsincontextlearning}
+Yedi Zhang, Aaditya~K. Singh, Peter~E. Latham, and Andrew Saxe.
+\newblock Training dynamics of in-context learning in linear attention, 2025.
+\newblock URL \url{https://arxiv.org/abs/2501.16265}.
+
+\bibitem[Zhang et~al.(2023{\natexlab{b}})Zhang, Zhang, Yang, and Wang]{zhang2023and}
+Yufeng Zhang, Fengzhuo Zhang, Zhuoran Yang, and Zhaoran Wang.
+\newblock What and how does in-context learning learn? bayesian model averaging, parameterization, and generalization.
+\newblock \emph{arXiv preprint arXiv:2305.19420}, 2023{\natexlab{b}}.
+
+\bibitem[Zhu et~al.(2025)Zhu, Zhang, Shi, Wang, Zhou, and Qin]{zhu20254th}
+Ruike Zhu, Hanwen Zhang, Tianyu Shi, Chi Wang, Tianyi Zhou, and Zengyi Qin.
+\newblock The 4th dimension for scaling model size.
+\newblock \emph{arXiv preprint arXiv:2506.18233}, 2025.
+
+\end{thebibliography}
