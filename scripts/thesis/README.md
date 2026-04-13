@@ -13,13 +13,29 @@ navigational aid only.
 
 ```
 scripts/thesis/
-├── utils/           shared utilities (metadata, plotting, later: fourier, partitions, …)
+├── utils/           shared utilities (see list below)
 ├── theoremA/        Theorem A (bridge) exact experiments   — Section 8
 ├── theoremB/        Theorem B (circulant / stationary)     — Section 6
 ├── theoremC/        Theorem C (band-RRS / hybrid)          — Section 7
 ├── architectures/   architecture-aligned validation        — Section 9
 └── scaling_laws/    conditional empirical scaling-law tier — Section 10
 ```
+
+### `utils/` contents
+
+| File | Purpose | Spec |
+|---|---|---|
+| `run_metadata.py` | `ThesisRunDir`, `RunContext`, env + git fingerprint | v4 §§2, 4.1 |
+| `plotting.py` | canonical style, `save_both`, overlay / heatmap / frontier helpers | v4 §4.2 |
+| `_test_scaffold.py` | end-to-end smoke test for the metadata + plotting scaffold | — |
+| `fourier_ops.py` | unitary DFT (isolated complex), real-even symbol constructors, circulant diag, off-diagonal Fourier energy | v4 §4 |
+| `partitions.py` | `BlockPartition`, `equal_blocks`, `dyadic_ladder`, `custom_ladder`, mass-preserving `mass_preserving_block_spectrum` / `mass_preserving_block_task` | v4 §5 |
+| `commutants.py` | block-commutant projection, block-scalar extraction / reconstruction, violation metric, `refines` | v4 §6 *(not yet implemented)* |
+| `metrics.py` | reduced-model err, (A,B)-perturbation bound, γ★ trajectory, oracle commutant loss, contraction overlay, OOD slope, frontier regret | v4 §7 *(not yet implemented)* |
+| `cost_models.py` | canonical compute proxy and wall-clock calibration | v4 §8 *(not yet implemented)* |
+| `fit_powerlaws.py` | log-log LSQ with fixed fit windows, bootstrap CI, held-out eval | v4 §9 *(not yet implemented)* |
+| `data_generators.py` | GA, G1, G2 operator-only / sampled, G3 | v4 §10 *(not yet implemented)* |
+| `_self_tests/` | hard-gate self-tests per v4 §12 | *(not yet implemented)* |
 
 Companion directories:
 
@@ -115,6 +131,17 @@ A passing run prints one confirmation line; any failure raises an
 
 ## Implementation status (per Section 13 of the plan)
 
-Currently implemented: **Step 1** — scaffolding, `run_metadata.py`,
-`plotting.py`. The next step adds `fourier_ops.py`, `partitions.py`,
-`commutants.py`, `metrics.py`, and `cost_models.py` under `utils/`.
+- **Step 1a** ✅ — scaffolding + `run_metadata.py` + `plotting.py`.
+- **Step 1b** in progress, per the v4 Step-1 Generator / Utility Specification:
+  1. ✅ `fourier_ops.py` (§4)
+  2. ✅ `partitions.py` (§5)
+  3. ⏳ `commutants.py` (§6)
+  4. ⏳ `metrics.py` (§7)
+  5. ⏳ `cost_models.py` (§8)
+  6. ⏳ `fit_powerlaws.py` (§9)
+  7. ⏳ `data_generators.py` (§10)
+  8. ⏳ `_self_tests/run_all.py` (§12)
+
+Each file is implemented and audited one at a time, under the v4 spec as the
+sole source of truth. The `_self_tests/` harness will gate every subsequent
+step of the thesis plan (Phase I controls onward).
