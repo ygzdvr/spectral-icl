@@ -1,0 +1,6 @@
+run_id: run_theoremB_circulant_modes-20260413T042839Z-4acdf309
+phase: theoremB
+script: run_theoremB_circulant_modes
+status: failed
+wall_clock_seconds: 33.728
+error: KeyError('mode_err_max')

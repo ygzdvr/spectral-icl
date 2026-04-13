@@ -1,0 +1,40 @@
+{
+  "script_stem": "run_compute_scaling_joint",
+  "plan_reference": "EXPERIMENT_PLAN_FINAL.MD \u00a75",
+  "source_path": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/run_compute_scaling_joint",
+  "frozen_utc": "2026-04-13T03:09:02.413170+00:00",
+  "git_commit": "46ab837",
+  "git_dirty_at_freeze": true,
+  "env": {
+    "python_version": "3.14.3",
+    "python_full_version": "3.14.3 (main, Mar 20 2026, 00:34:32) [Clang 22.1.1 ]",
+    "platform": "Linux-5.14.0-570.94.1.el9_6.x86_64-x86_64-with-glibc2.34",
+    "hostname": "della-gpu.princeton.edu",
+    "torch_version": "2.11.0+cu130",
+    "cuda_available": true,
+    "cuda_version": "13.0"
+  },
+  "config_source": "frozen-dataclass defaults in configs/ at the recorded git commit; reproduced by re-running the listed reproduction_command from the same commit",
+  "reproduction_command": "python -u scripts/run_compute_scaling_joint.py --device cuda --dtype float64 --no-show",
+  "artifacts": [
+    {
+      "path": "figures/compute_scaling_joint_linear_more_NL.png",
+      "sha256": "34d5768cec28e6eb7fa529e27df8ee5b022157888bf3903b9b20288228aa73e8",
+      "size_bytes": 106030
+    },
+    {
+      "path": "npz/compute_scaling_joint_data.npz",
+      "sha256": "2701ca8ec2b6bde4083396ef9a86c0ce438e9ac535f2ae4e15928a4c219fa0e3",
+      "size_bytes": 2003092
+    },
+    {
+      "path": "pdfs/compute_scaling_joint_linear_more_NL.pdf",
+      "sha256": "0d38e1a87250360c1c2bf8c4c79f0d4e7555a9b2bf3672af1d6aee6a0209bcf7",
+      "size_bytes": 119962
+    }
+  ],
+  "n_files": 3,
+  "total_bytes": 2229084,
+  "freeze_mode": "archive_by_copy_of_existing_outputs",
+  "archival_note": "This control is a freeze-BY-COPY of an existing successful reproduction of the Bordelon baseline under outputs/<script_stem>/. It was NOT produced by a fresh invocation of the reproduction_command by this freezer; the freezer copies, hashes (SHA-256), and marks read-only the pre-existing artifacts as an immutable archival control baseline. To regenerate these artifacts from scratch, run the reproduction_command from the recorded git_commit on an equivalent environment."
+}

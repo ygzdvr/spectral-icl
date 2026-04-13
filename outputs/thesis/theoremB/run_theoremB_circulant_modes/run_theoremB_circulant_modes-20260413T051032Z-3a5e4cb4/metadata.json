@@ -1,0 +1,56 @@
+{
+  "run_id": "run_theoremB_circulant_modes-20260413T051032Z-3a5e4cb4",
+  "script_stem": "run_theoremB_circulant_modes",
+  "phase": "theoremB",
+  "root": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremB/run_theoremB_circulant_modes/run_theoremB_circulant_modes-20260413T051032Z-3a5e4cb4",
+  "started_utc": "2026-04-13T05:10:32.611509+00:00",
+  "seeds": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "git_commit": "46ab837",
+  "git_dirty": true,
+  "env": {
+    "python_version": "3.14.3",
+    "python_full_version": "3.14.3 (main, Mar 20 2026, 00:34:32) [Clang 22.1.1 ]",
+    "python_executable": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/.venv/bin/python",
+    "platform": "Linux-5.14.0-570.94.1.el9_6.x86_64-x86_64-with-glibc2.34",
+    "hostname": "della-gpu.princeton.edu",
+    "torch_version": "2.11.0+cu130",
+    "cuda_available": true,
+    "cuda_version": "13.0",
+    "cudnn_version": 91900,
+    "gpu_count": 1,
+    "gpu_names": [
+      "NVIDIA A100-PCIE-40GB"
+    ]
+  },
+  "notes": null,
+  "status": "completed",
+  "finished_utc": "2026-04-13T05:11:36.355606+00:00",
+  "wall_clock_seconds": 63.74417805671692,
+  "compute_proxy": 57.83935185102746,
+  "measured_compute": null,
+  "per_step_wall_clock": {
+    "n_steps": 8,
+    "mean": 7.229853295430075,
+    "median": 5.5944657707586884,
+    "total": 57.8388263634406
+  },
+  "error": null,
+  "extras": {
+    "n_trials": 8,
+    "n_failures": 0,
+    "failures": [],
+    "device": "cpu",
+    "max_errors": {
+      "mode_rel_err_max": 2.49771945133992e-15,
+      "mode_abs_err_max": 2.3592239273284576e-16,
+      "transfer_rel_err_max": 2.4430855209493078e-15,
+      "transfer_abs_err_max": 2.4424906541753444e-15,
+      "off_diagonal_fourier_energy": 0.0
+    }
+  }
+}

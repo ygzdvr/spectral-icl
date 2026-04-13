@@ -1,0 +1,40 @@
+{
+  "script_stem": "run_softmax_depth_sweep",
+  "plan_reference": "EXPERIMENT_PLAN_FINAL.MD \u00a75",
+  "source_path": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/run_softmax_depth_sweep",
+  "frozen_utc": "2026-04-13T03:09:02.444959+00:00",
+  "git_commit": "46ab837",
+  "git_dirty_at_freeze": true,
+  "env": {
+    "python_version": "3.14.3",
+    "python_full_version": "3.14.3 (main, Mar 20 2026, 00:34:32) [Clang 22.1.1 ]",
+    "platform": "Linux-5.14.0-570.94.1.el9_6.x86_64-x86_64-with-glibc2.34",
+    "hostname": "della-gpu.princeton.edu",
+    "torch_version": "2.11.0+cu130",
+    "cuda_available": true,
+    "cuda_version": "13.0"
+  },
+  "config_source": "frozen-dataclass defaults in configs/ at the recorded git commit; reproduced by re-running the listed reproduction_command from the same commit",
+  "reproduction_command": "python -u scripts/run_softmax_depth_sweep.py --device cuda --dtype float64 --no-show",
+  "artifacts": [
+    {
+      "path": "figures/softmax_depth_sweep.png",
+      "sha256": "8c673e5b5631b9b19dd0e5627fda5c68d613a3cde238fa400a141c6ca1977ea5",
+      "size_bytes": 61144
+    },
+    {
+      "path": "npz/softmax_depth_sweep_losses.npz",
+      "sha256": "7473a8a93c3bf84c4ff2a5ad21d818baf14557eda09c9118f053d180b0b58e58",
+      "size_bytes": 601312
+    },
+    {
+      "path": "pdfs/softmax_depth_sweep.pdf",
+      "sha256": "3327a85654ce788b1e0e55f82ce5274771a212de9a1721d278a3061d3fe5135f",
+      "size_bytes": 219108
+    }
+  ],
+  "n_files": 3,
+  "total_bytes": 881564,
+  "freeze_mode": "archive_by_copy_of_existing_outputs",
+  "archival_note": "This control is a freeze-BY-COPY of an existing successful reproduction of the Bordelon baseline under outputs/<script_stem>/. It was NOT produced by a fresh invocation of the reproduction_command by this freezer; the freezer copies, hashes (SHA-256), and marks read-only the pre-existing artifacts as an immutable archival control baseline. To regenerate these artifacts from scratch, run the reproduction_command from the recorded git_commit on an equivalent environment."
+}

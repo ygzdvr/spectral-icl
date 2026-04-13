@@ -1,0 +1,65 @@
+{
+  "script_stem": "run_isotropic_depth_vs_alpha",
+  "plan_reference": "EXPERIMENT_PLAN_FINAL.MD \u00a75",
+  "source_path": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/run_isotropic_depth_vs_alpha",
+  "frozen_utc": "2026-04-13T03:08:44.326522+00:00",
+  "git_commit": "46ab837",
+  "git_dirty_at_freeze": true,
+  "env": {
+    "python_version": "3.14.3",
+    "python_full_version": "3.14.3 (main, Mar 20 2026, 00:34:32) [Clang 22.1.1 ]",
+    "platform": "Linux-5.14.0-570.94.1.el9_6.x86_64-x86_64-with-glibc2.34",
+    "hostname": "della-gpu.princeton.edu",
+    "torch_version": "2.11.0+cu130",
+    "cuda_available": true,
+    "cuda_version": "13.0"
+  },
+  "config_source": "frozen-dataclass defaults in configs/ at the recorded git commit; reproduced by re-running the listed reproduction_command from the same commit",
+  "reproduction_command": "python -u scripts/run_isotropic_depth_vs_alpha.py --device cuda --dtype float64 --no-show",
+  "artifacts": [
+    {
+      "path": "figures/depth_vs_alpha_isotropic.png",
+      "sha256": "3fa647651712d9afa6aaf5bf221cd7bb9ca43d7350aabddf9d40b94bcbb24a2e",
+      "size_bytes": 116603
+    },
+    {
+      "path": "figures/train_dynamics_vary_L.png",
+      "sha256": "7d3ed7657b41fd5592217792cc2c14137cba610f3e415eeb5e26d56e899652ad",
+      "size_bytes": 95350
+    },
+    {
+      "path": "figures/train_dynamics_vary_alpha.png",
+      "sha256": "d89b4a82f05039042c81b5479e118f8f581b00a53486e8938bee25fbd59679ca",
+      "size_bytes": 128440
+    },
+    {
+      "path": "npz/isotropic_depth_vs_alpha_losses.npz",
+      "sha256": "b0acc3c58fa66c52fe77deb87cadac53a47f57f56766519a5f466bd90d49543e",
+      "size_bytes": 1654812
+    },
+    {
+      "path": "pdfs/depth_vs_alpha_isotropic.pdf",
+      "sha256": "9b05b99f4c3ff16f141baa5ed58e08e252e96018f9c9376760fb07176fe36474",
+      "size_bytes": 20960
+    },
+    {
+      "path": "pdfs/train_dynamics_vary_L.pdf",
+      "sha256": "d66918be67cad898d0ee7fd90395d8b59d71428191ab0de98ef69752077ca0a2",
+      "size_bytes": 226334
+    },
+    {
+      "path": "pdfs/train_dynamics_vary_alpha.pdf",
+      "sha256": "70a8e2e1446f7ee567eb8d75540ebe9ecb2ee7a76870e1f5cac7c976172bdd8c",
+      "size_bytes": 256905
+    },
+    {
+      "path": "pt/isotropic_depth_vs_alpha_artifacts.pt",
+      "sha256": "3720e7dc423f240ae5e54e6a5ce09ef091838d9b80dcf21d4ed54dcf4c7067e7",
+      "size_bytes": 1657701
+    }
+  ],
+  "n_files": 8,
+  "total_bytes": 4157105,
+  "freeze_mode": "archive_by_copy_of_existing_outputs",
+  "archival_note": "This control is a freeze-BY-COPY of an existing successful reproduction of the Bordelon baseline under outputs/<script_stem>/. It was NOT produced by a fresh invocation of the reproduction_command by this freezer; the freezer copies, hashes (SHA-256), and marks read-only the pre-existing artifacts as an immutable archival control baseline. To regenerate these artifacts from scratch, run the reproduction_command from the recorded git_commit on an equivalent environment."
+}

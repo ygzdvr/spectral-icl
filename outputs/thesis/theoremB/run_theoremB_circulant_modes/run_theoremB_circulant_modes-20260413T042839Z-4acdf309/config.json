@@ -1,0 +1,57 @@
+{
+  "P_list": [
+    16,
+    32,
+    64
+  ],
+  "L_list": [
+    1,
+    2,
+    4,
+    8
+  ],
+  "symbol_kinds": [
+    "flat",
+    "power_law",
+    "multiband"
+  ],
+  "T": 100,
+  "eta": 0.0001,
+  "power_law_nu": 0.5,
+  "task_spec_nu_beta": 1.0,
+  "multiband": [
+    [
+      0,
+      2,
+      1.0
+    ],
+    [
+      5,
+      7,
+      0.8
+    ]
+  ],
+  "query_mode": "full_window",
+  "matched_query_realization": "independent",
+  "tol_err": 1e-10,
+  "figure_P": 32,
+  "figure_symbol": "power_law",
+  "figure_mode_indices": [
+    0,
+    1,
+    2,
+    4,
+    8
+  ],
+  "figure_L_list": [
+    1,
+    2,
+    4,
+    8
+  ],
+  "transfer_P": 32,
+  "transfer_L": 4,
+  "transfer_symbol": "power_law",
+  "dtype": "float64",
+  "device": "cuda"
+}

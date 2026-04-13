@@ -1,0 +1,50 @@
+{
+  "script_stem": "run_reduced_gamma_dynamics",
+  "plan_reference": "EXPERIMENT_PLAN_FINAL.MD \u00a75",
+  "source_path": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/run_reduced_gamma_dynamics",
+  "frozen_utc": "2026-04-13T03:09:02.396345+00:00",
+  "git_commit": "46ab837",
+  "git_dirty_at_freeze": true,
+  "env": {
+    "python_version": "3.14.3",
+    "python_full_version": "3.14.3 (main, Mar 20 2026, 00:34:32) [Clang 22.1.1 ]",
+    "platform": "Linux-5.14.0-570.94.1.el9_6.x86_64-x86_64-with-glibc2.34",
+    "hostname": "della-gpu.princeton.edu",
+    "torch_version": "2.11.0+cu130",
+    "cuda_available": true,
+    "cuda_version": "13.0"
+  },
+  "config_source": "frozen-dataclass defaults in configs/ at the recorded git commit; reproduced by re-running the listed reproduction_command from the same commit",
+  "reproduction_command": "python -u scripts/run_reduced_gamma_dynamics.py --device cuda --dtype float64 --no-show",
+  "artifacts": [
+    {
+      "path": "figures/loss_landscape_powerlaw.png",
+      "sha256": "42da23aaebf36d9b27acb5eeb4a5a7e9fbfc2b024fa320ae2ed8901bac094862",
+      "size_bytes": 88766
+    },
+    {
+      "path": "figures/min_loss_vs_depth_powerlaw.png",
+      "sha256": "e1c7a1545e3fa0372fd5773a1bf74f5eb51b5d5c200556af2638d737b06a3a18",
+      "size_bytes": 61444
+    },
+    {
+      "path": "npz/reduced_gamma_landscape.npz",
+      "sha256": "2386c06b3eb95c0719139981a69c67f537104574cfdbeb9b22e4ca8d12519846",
+      "size_bytes": 36212
+    },
+    {
+      "path": "pdfs/loss_landscape_powerlaw.pdf",
+      "sha256": "fca8c7d06464b6719115212ae4622b3a9bf96d33cbc91fd49b827a82ba165d2f",
+      "size_bytes": 15147
+    },
+    {
+      "path": "pdfs/min_loss_vs_depth_powerlaw.pdf",
+      "sha256": "31d5538123383c27d73c4384dbc86a3030c427e060dc0f90b823c8165b99ebe7",
+      "size_bytes": 11761
+    }
+  ],
+  "n_files": 5,
+  "total_bytes": 213330,
+  "freeze_mode": "archive_by_copy_of_existing_outputs",
+  "archival_note": "This control is a freeze-BY-COPY of an existing successful reproduction of the Bordelon baseline under outputs/<script_stem>/. It was NOT produced by a fresh invocation of the reproduction_command by this freezer; the freezer copies, hashes (SHA-256), and marks read-only the pre-existing artifacts as an immutable archival control baseline. To regenerate these artifacts from scratch, run the reproduction_command from the recorded git_commit on an equivalent environment."
+}

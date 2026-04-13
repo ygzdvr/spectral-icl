@@ -132,16 +132,26 @@ A passing run prints one confirmation line; any failure raises an
 ## Implementation status (per Section 13 of the plan)
 
 - **Step 1a** ✅ — scaffolding + `run_metadata.py` + `plotting.py`.
-- **Step 1b** in progress, per the v4 Step-1 Generator / Utility Specification:
-  1. ✅ `fourier_ops.py` (§4)
-  2. ✅ `partitions.py` (§5)
-  3. ⏳ `commutants.py` (§6)
-  4. ⏳ `metrics.py` (§7)
-  5. ⏳ `cost_models.py` (§8)
-  6. ⏳ `fit_powerlaws.py` (§9)
-  7. ⏳ `data_generators.py` (§10)
-  8. ⏳ `_self_tests/run_all.py` (§12)
+- **Step 1b** ✅ — full utility / generator layer:
+  `fourier_ops.py` (§4), `partitions.py` (§5), `commutants.py` (§6),
+  `metrics.py` (§7), `cost_models.py` (§8), `fit_powerlaws.py` (§9),
+  `data_generators.py` (§10), `_self_tests/run_all.py` (§12).
+  Harness runs green (`exact: 51/51`, `MC: 6/6`) via
+  `python -u scripts/thesis/utils/_self_tests/run_all.py`.
+- **Step 2** ✅ — Bordelon control suite archived under
+  `outputs/thesis/controls/<script_stem>/` for the six controls listed in
+  plan §5. **Freeze mode: archive-by-copy of existing reproduced outputs,
+  not a fresh rerun.** The freezer (`scripts/thesis/freeze_bordelon_controls.py`)
+  copies the artifacts that were already under `outputs/<script_stem>/`, computes
+  SHA-256 hashes for every file, and marks every frozen file read-only (`0444`).
+  Each control carries a per-control `metadata.json` with `freeze_mode`,
+  `archival_note`, SHA-256 hashes, git commit, env fingerprint, and the
+  canonical `reproduction_command`. Top-level index at
+  `outputs/thesis/controls/FROZEN.json`; per-directory prose at
+  `outputs/thesis/controls/README.md`.
 
-Each file is implemented and audited one at a time, under the v4 spec as the
-sole source of truth. The `_self_tests/` harness will gate every subsequent
-step of the thesis plan (Phase I controls onward).
+Next: Step 3 per plan §13 — implement the theorem-B exact scripts under
+`scripts/thesis/theoremB/`, starting with `run_theoremB_circulant_modes.py`
+(experiment B1 of §6.2). The Step-1b utility / generator layer is the sole
+contract the theorem scripts consume; it is frozen unless a real bug is
+exposed by a downstream theorem script.
