@@ -1,16 +1,16 @@
 {
-  "run_id": "run_theoremA_exact_equivalence-20260413T165300Z-7cbc3493",
+  "run_id": "run_theoremA_exact_equivalence-20260413T165457Z-a1a3f216",
   "script_stem": "run_theoremA_exact_equivalence",
   "phase": "theoremA",
-  "root": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremA/run_theoremA_exact_equivalence/run_theoremA_exact_equivalence-20260413T165300Z-7cbc3493",
-  "started_utc": "2026-04-13T16:53:00.112880+00:00",
+  "root": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremA/run_theoremA_exact_equivalence/run_theoremA_exact_equivalence-20260413T165457Z-a1a3f216",
+  "started_utc": "2026-04-13T16:54:57.877207+00:00",
   "seeds": [
     0,
     7,
     13,
     19
   ],
-  "git_commit": "531d741",
+  "git_commit": "cc1133f",
   "git_dirty": true,
   "env": {
     "python_version": "3.14.3",
@@ -28,16 +28,29 @@
     ]
   },
   "notes": "A1 exact theorem-A equivalence test. Operator-level deterministic forward-pass comparison; no training, no architecture search. Three forward routes (R1: full layer simulation; R2: reduced (A_S, B_S) closed form; R3: feature-space reduced-\u0393 closed form) must agree to float64 machine precision in the GD-compatible setting.",
-  "status": "failed",
-  "finished_utc": "2026-04-13T16:54:14.812349+00:00",
-  "wall_clock_seconds": 74.69883704185486,
-  "compute_proxy": null,
+  "status": "completed",
+  "finished_utc": "2026-04-13T16:55:48.987644+00:00",
+  "wall_clock_seconds": 51.11084842681885,
+  "compute_proxy": 47.898904017172754,
   "measured_compute": null,
   "per_step_wall_clock": {
     "n_steps": 192,
-    "mean": 0.3822568635029408,
-    "median": 0.49666983215138316,
-    "total": 73.39331779256463
+    "mean": 0.24891353071385916,
+    "median": 0.1955708093009889,
+    "total": 47.79139789706096
   },
-  "error": "ValueError(\"\\n\\\\le\\n^\\nParseFatalException: Unknown symbol: \\\\le, found '\\\\'  (at char 0), (line:1, col:1)\")"
+  "error": null,
+  "extras": {
+    "worst_R1_R2": 3.779777992958291e-16,
+    "worst_R2_R3": 1.0267610010029903e-15,
+    "worst_R1_R3": 1.1416222735775601e-15,
+    "worst_cell": {
+      "D": 64,
+      "P": 8,
+      "K": 16,
+      "L": 4,
+      "err_R1_R2": 1.9159647913310627e-16,
+      "err_R2_R3": 1.0267610010029903e-15
+    }
+  }
 }

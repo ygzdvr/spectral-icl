@@ -1,0 +1,29 @@
+run_id: run_theoremA_exact_equivalence-20260413T165457Z-a1a3f216
+phase: theoremA
+script: run_theoremA_exact_equivalence
+status: completed
+wall_clock_seconds: 51.111
+compute_proxy: 47.8989
+
+plan_reference: EXPERIMENT_PLAN_FINAL.MD §8.1 (A1)
+category: exact theorem-A operator-level forward-pass equivalence test. Three structurally distinct forward routes (R1 = full L-layer linear-attention structured-mixer simulation; R2 = sample-space reduced (A_S, B_S) recursion; R3 = feature-space reduced-Γ closed form) must agree to float64 machine precision in the GD-compatible setting. No training, no architecture search.
+interpretation: Theorem A asserts that, in the GD-compatible mask regime, the L-layer fully-aligned linear-structured forward map is an exact algebraic identity equal to the closed-form reduced (A_S, B_S) recursion and to its feature-space reduced-Γ special case. A1 verifies all three routes agree to float eps over a (D, P, K, L) sweep. Any cell exceeding the tolerance indicates an implementation bug, not a theorem failure (theorem A is exact in this regime). Architecture-aligned theorem-A bridge checks belong to §9.
+device: cuda
+D_list: [8, 16, 32, 64]
+P_list: [8, 16, 32, 64]
+K_list: [4, 8, 16]
+L_list: [1, 2, 4, 8]
+n_cells: 192
+B: 4
+label_norm: sqrt_D
+Sigma_kind: isotropic
+Omega_kind: isotropic
+Gamma_kind: identity
+mask_kind: gd_compatible
+status: R1_R2_ok+R2_R3_ok
+machine_eps_tol: 1e-10
+worst_R1_R2: 3.779777992958291e-16
+worst_R2_R3: 1.0267610010029903e-15
+worst_R1_R3: 1.1416222735775601e-15
+worst_cell: {'D': 64, 'P': 8, 'K': 16, 'L': 4, 'err_R1_R2': 1.9159647913310627e-16, 'err_R2_R3': 1.0267610010029903e-15}
+sweep_wallclock_seconds: 47.899

@@ -1,6 +1,0 @@
-run_id: run_theoremA_exact_equivalence-20260413T165300Z-7cbc3493
-phase: theoremA
-script: run_theoremA_exact_equivalence
-status: failed
-wall_clock_seconds: 74.699
-error: ValueError("\n\\le\n^\nParseFatalException: Unknown symbol: \\le, found '\\'  (at char 0), (line:1, col:1)")

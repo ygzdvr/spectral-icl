@@ -1,64 +1,74 @@
-"""Experiment A1: exact full structured model versus reduced (A_S, B_S) recursion.
+"""Experiment A1b: full hidden-state structured forward vs reduced (A_S, B_S).
 
-Plan reference: ``EXPERIMENT_PLAN_FINAL.MD`` §8.1.
+Plan reference: ``EXPERIMENT_PLAN_FINAL.MD`` §8.1 (extension of A1).
 
-Theorem-level framing (read carefully)
---------------------------------------
-A1 is the first exact theorem-A experiment. It is a **deterministic
-forward-pass equivalence test** at the operator level — there is NO
-training, NO architecture grid search, NO learned model. The single
-question A1 answers is:
+Why A1b exists (clarification of A1's R1 route)
+-----------------------------------------------
+A1's "R1" route iterates the reduced sample-space operators ``A_S, B_S, T``
+from :func:`ga_generate` directly:
 
-    Does the L-layer fully-aligned linear-structured-mixer forward pass
-    equal the closed-form sample-space reduced (A_S, B_S) recursion to
-    float64 machine precision, for every (D, P, K, L) in the sweep?
+    z_test  ← z_test  + (1/L) · B_S_θ · z_train
+    z_train ← z_train + (1/L) · A_S_θ · z_train.
 
-Theorem A asserts this equivalence as an algebraic identity in the
-GD-compatible case. A1 implements it three different ways and verifies
-they all agree at float eps:
+That is an *iterative form* of the reduced recursion, not a full structured
+forward pass — it consumes the already-reduced ``(A_S, B_S, T)`` as inputs.
+A1b adds the missing route:
 
-(R1) **Full layer simulation.** Initialize ``z_train = y_train``,
-    ``z_test = 0``. At each of L layers apply the residual updates
+    R0 — **true full hidden-state aligned structured forward pass**:
+    constructs the full ``(P + K)``-position residual stream and the full
+    ``(P + K) × (P + K)`` bilinear score matrix from ``(X_train, X_query, Γ)``
+    directly via the theorem-A channel/alignment construction, applies a
+    GD-compatible signed mask, and runs L explicit residual-stream layer
+    updates. R0 *does not* consume ``A_S, B_S, T`` as inputs.
 
-        z_test  ← z_test  + (1/L) · B_S_θ · z_train
-        z_train ← z_train + (1/L) · A_S_θ · z_train
+A1b compares R0 against the same R2 / R3 closed forms used in A1:
 
-    This is the "fully aligned linear structured mixer" forward pass —
-    a discrete L-layer transformer-like residual stream restricted to the
-    GD-compatible attention pattern.
+    R2 — sample-space reduced ``(A_S, B_S)`` recursion (closed form).
+    R3 — feature-space reduced-Γ closed form (GD-compatible special case).
 
-(R2) **Sample-space reduced (A_S, B_S) closed form.** Compute
+Acceptance is the same: float64 machine precision pairwise across
+``(R0, R2, R3)`` over a sweep of ``(D, P, K, L)``.
 
-        f_red = (1/L) · B_S · Σ_{ℓ=0..L-1} T^ℓ · y_train,
-        T = I_P + A_S/L.
+A1's canonical result is unchanged. A1b is a strictly additional check
+that closes the gap between "full-model forward pass" and "reduced
+recursion" identified in the user clarification.
 
-    This is the theorem-A reduced-operator recursion of plan §8.1.
+Aligned-mixer construction (R0)
+-------------------------------
+For the GD-compatible setting with isotropic ``Σ, Ω`` and
+``Γ = identity`` (or arbitrary ``Γ``), the theorem-A aligned linear
+structured mixer at one layer applies, on the full ``(P + K)``-position
+residual-stream scalar channel ``h``,
 
-(R3) **Feature-space reduced-Γ closed form (GD-compatible only).** Run the
-    L-step preconditioned GD iterate in feature space:
+    h_μ^{(ℓ + 1)} = h_μ^{(ℓ)} + (1/L) · Σ_ν  M_signed[μ, ν] · S[μ, ν] · h_ν^{(ℓ)},
 
-        w_0 = 0
-        w_{ℓ+1} = w_ℓ + (1/L) · Γ · X_train · (y_train − X_train^T w_ℓ) / P
-        f_Γ = (1/L) · Σ_{ℓ=0..L-1} X_query^T · (the running prediction sum)
+where
 
-    Equivalently, ``f_Γ = X_query^T · w_running`` where ``w_running``
-    accumulates the L-step iterate. This is the **reduced-Γ special
-    case** required by plan §8.1 in the GD-compatible setting.
+    S[μ, ν] = (x_μ)^T · Γ · (x_ν) / P                  (bilinear score)
+    M_signed[μ, ν] = −1   if μ ∈ train and ν ∈ train     (residual descent)
+    M_signed[μ, ν] = +1   if μ ∈ test  and ν ∈ train     (prediction ascent)
+    M_signed[μ, ν] =  0   otherwise.
 
-All three quantities are EQUAL by theorem A in the GD-compatible case;
-they are computed via three structurally different code paths so the
-test is a strong implementation-correctness check. Acceptance is
+The signed mask encodes the GD direction: train positions descend the
+residual via attention into other train positions; test positions
+accumulate prediction by attending to train positions. The reduced
+operators recovered from this construction are exactly
 
-    max( |R1 − R2| / |R1|, |R2 − R3| / |R2| ) ≤ 1e-10  (float64).
+    A_S^GD = −(1/P) · X_train^T · Γ · X_train,
+    B_S^GD = +(1/P) · X_query^T · Γ · X_train,
 
-If any of the three pairwise errors exceeds float eps in float64, the
-implementation of one path is wrong.
+so the layered residual-stream forward of R0 produces
 
-Sweep (plan §8.1 binding)
--------------------------
-The script sweeps ``D, P, K, L`` per the plan. Default grid: 4×4×3×4 =
-192 cells. Each cell is a few small matrix multiplications, so the full
-sweep finishes in seconds.
+    h_train^{(L)} = T_GD^{L} · y_train,
+    h_test^{(L)}  = (1/L) · B_S^GD · Σ_{ℓ = 0..L−1} T_GD^{ℓ} · y_train,
+
+which is the theorem-A reduced prediction at the query positions.
+
+R0 verifies that the GA generator's ``(A_S, B_S, T)`` outputs are
+consistent with what the FULL aligned linear-attention structured mixer
+produces from the same ``(X, Γ)``, as a forward map. That is the
+end-to-end exactness statement A1 was meant to establish; A1b makes it
+explicit.
 
 Step-1b contract (sole dependencies)
 ------------------------------------
@@ -70,29 +80,27 @@ Step-1b contract (sole dependencies)
 
 Primary outputs
 ---------------
-- ``a1_pairwise_errors`` — heatmap of max pairwise relative error
-  (R1 vs R2, R2 vs R3) over the (D, P) sweep at fixed (K, L). Expected:
-  every cell at float eps.
-- ``a1_error_distribution`` — histogram of all pairwise errors across
-  the full sweep, with the acceptance tolerance overlaid.
-- ``a1_sweep_table`` — a per-cell dump in JSON with
-  (D, P, K, L, err_R1_R2, err_R2_R3) for every trial.
+- ``a1b_pairwise_errors_heatmap`` — max pairwise relative error
+  ``max(err(R0,R2), err(R2,R3))`` over the (D, P) sweep at fixed (K, L).
+- ``a1b_error_distribution`` — histogram of the three pairwise relative
+  errors over all (D, P, K, L) cells.
+- ``a1b_error_vs_L`` — diagnostic on how the worst error grows with L.
 
 Acceptance
 ----------
-1. **Full-vs-reduced (R1 vs R2)**: ``max_err ≤ machine_eps_tol`` over
-   every sweep cell.
-2. **Reduced-AB-vs-Γ (R2 vs R3)** in the GD-compatible case:
-   ``max_err ≤ machine_eps_tol`` over every sweep cell.
+1. **R0 vs R2 (full model vs reduced AB)**: ``max_err ≤ machine_eps_tol``
+   over every sweep cell. This is the missing check that A1's R1 did not
+   exercise.
+2. **R2 vs R3 (reduced AB vs reduced Γ)**: ``max_err ≤ machine_eps_tol``
+   over every sweep cell.
 
-Both are strict — no tolerance for "qualitative agreement". A1 is an
-exactness test.
+Both strict.
 
 Run
 ---
 ::
 
-    python -u scripts/thesis/theoremA/run_theoremA_exact_equivalence.py \\
+    python -u scripts/thesis/theoremA/run_theoremA_exact_equivalence_full_model.py \\
            --device cuda --dtype float64 --no-show
 """
 
@@ -131,12 +139,12 @@ from scripts.thesis.utils.run_metadata import RunContext, ThesisRunDir
 
 
 @dataclass(frozen=True)
-class A1Config:
-    """Frozen configuration for the A1 exact-equivalence sweep.
+class A1bConfig:
+    """Frozen configuration for A1b: full-hidden-state forward vs reduced.
 
-    Default 4 D × 4 P × 3 K × 4 L = 192 cells × 3 forward routes
-    = 576 evaluations. Each evaluation is a few small matmuls, so the
-    full sweep completes in seconds.
+    Default 4 D × 4 P × 3 K × 4 L = 192 cells × 3 routes = 576 forward
+    evaluations; finishes in seconds. Mirrors A1's sweep so the two
+    canonicals are directly comparable.
     """
 
     D_list: tuple[int, ...] = (8, 16, 32, 64)
@@ -144,21 +152,16 @@ class A1Config:
     K_list: tuple[int, ...] = (4, 8, 16)
     L_list: tuple[int, ...] = (1, 2, 4, 8)
 
-    # GA generator config — GD-compatible mask, isotropic Σ, Ω, Γ. The
-    # exact equivalence holds for ANY Σ, Ω, Γ choice; isotropic is the
-    # canonical theorem-A reference.
     Sigma_kind: str = "isotropic"
     Omega_kind: str = "isotropic"
     Gamma_kind: str = "identity"
-    label_norm: str = "sqrt_D"   # plan §3 third: theorem-A defaults to sqrt_D
-    sigma: float = 0.0           # noise-free for exactness
-    B: int = 4                   # batch ≥ 1 stresses the einsum paths
+    label_norm: str = "sqrt_D"   # plan §3 third
+    sigma: float = 0.0
+    B: int = 4
     base_seed: int = 0
 
-    # Acceptance.
     machine_eps_tol: float = 1e-10
 
-    # Figure slices.
     heatmap_K: int = 8
     heatmap_L: int = 4
 
@@ -167,35 +170,71 @@ class A1Config:
 
 
 # ---------------------------------------------------------------------------
-# Three forward routes
+# Three forward routes — R0 is the genuine full-hidden-state structured
+# forward; R2 and R3 are the same closed forms used in A1.
 # ---------------------------------------------------------------------------
 
 
-def _route_R1_full_layer_simulation(
-    A_S: torch.Tensor,   # (B, P, P)
-    B_S: torch.Tensor,   # (B, K, P)
-    y_train: torch.Tensor,  # (B, P)
+def _route_R0_full_hidden_state_forward(
+    X_train: torch.Tensor,    # (B, D, P)
+    X_query: torch.Tensor,    # (B, D, K)
+    Gamma: torch.Tensor,      # (D, D)
+    y_train: torch.Tensor,    # (B, P)
     L: int,
+    P_norm: int,
 ) -> torch.Tensor:
-    """R1: explicit L-layer residual stream. The fully aligned linear
-    structured mixer at each layer applies
+    """**True full-hidden-state aligned structured forward pass.**
 
-        z_test  ← z_test  + (1/L) · B_S_θ · z_train
-        z_train ← z_train + (1/L) · A_S_θ · z_train
-
-    Returns ``f_full = z_test^(L)`` of shape ``(B, K)``.
+    Builds the full ``(P + K, P + K)`` bilinear score matrix from
+    ``X = [X_train | X_query]``, applies a GD-compatible signed mask,
+    and runs an explicit L-layer residual-stream forward on a length-
+    ``(P + K)`` scalar hidden channel. Does NOT consume ``A_S, B_S, T``
+    as inputs — those are constructed only implicitly by the bilinear
+    score on the full sequence. Returns the prediction at the K test
+    positions, shape ``(B, K)``.
     """
-    z_train = y_train.clone()
-    K = int(B_S.shape[-2])
-    z_test = torch.zeros(
-        *y_train.shape[:-1], K,
-        dtype=y_train.dtype, device=y_train.device,
-    )
+    B = int(X_train.shape[0])
+    D = int(X_train.shape[1])
+    P = int(X_train.shape[-1])
+    K = int(X_query.shape[-1])
+
+    dtype = X_train.dtype
+    device = X_train.device
+
+    # Full-sequence feature tensor X ∈ R^{B × D × (P + K)}.
+    X = torch.cat([X_train, X_query], dim=-1)
+
+    # Bilinear "positive" score: S_pos[μ, ν] = x_μ^T Γ x_ν / P, shape (B, P+K, P+K).
+    GammaX = torch.einsum("de,bef->bdf", Gamma, X)
+    S_pos = torch.einsum("bdm,bdn->bmn", X, GammaX) / float(P_norm)
+
+    # Signed GD-compatible mask:
+    #   train → train: -1   (residual descent on training residuals)
+    #   test  → train: +1   (prediction accumulation at queries)
+    #   train → test:  0    (train does not see test labels)
+    #   test  → test:  0    (queries do not attend to other queries)
+    M_signed = torch.zeros(P + K, P + K, dtype=dtype, device=device)
+    M_signed[:P, :P] = -1.0
+    M_signed[P:, :P] = +1.0
+    M_eff = S_pos * M_signed.unsqueeze(0)  # (B, P+K, P+K)
+
+    # Hidden state initialization: y_train at train positions, 0 at test.
+    h = torch.cat(
+        [
+            y_train,
+            torch.zeros(B, K, dtype=dtype, device=device),
+        ],
+        dim=-1,
+    )  # (B, P+K)
+
+    # L explicit residual-stream layer updates.
     inv_L = 1.0 / float(L)
     for _ in range(int(L)):
-        z_test = z_test + inv_L * torch.einsum("bki,bi->bk", B_S, z_train)
-        z_train = z_train + inv_L * torch.einsum("bpi,bi->bp", A_S, z_train)
-    return z_test
+        update = torch.einsum("bmn,bn->bm", M_eff, h)
+        h = h + inv_L * update
+
+    # Prediction = test-position channel value after L layers.
+    return h[:, P:]
 
 
 def _route_R2_reduced_AB(
@@ -204,59 +243,36 @@ def _route_R2_reduced_AB(
     y_train: torch.Tensor,
     L: int,
 ) -> torch.Tensor:
-    """R2: closed-form sample-space reduced (A_S, B_S) recursion:
-
-        f_red = (1/L) · B_S · Σ_{ℓ=0..L-1} T^ℓ · y_train,   T = I + A_S/L.
-
-    Returns ``f_red`` of shape ``(B, K)``. Built by accumulating the
-    Krylov-style sum ``Σ T^ℓ y`` instead of materializing T^ℓ.
-    """
+    """R2: closed-form sample-space reduced (A_S, B_S) recursion (matches A1)."""
     z = y_train.clone()
     sum_T_y = torch.zeros_like(z)
     inv_L = 1.0 / float(L)
     for _ in range(int(L)):
         sum_T_y = sum_T_y + z
-        # z := T z = z + A_S z / L
         z = z + inv_L * torch.einsum("bpi,bi->bp", A_S, z)
     return inv_L * torch.einsum("bki,bi->bk", B_S, sum_T_y)
 
 
 def _route_R3_reduced_Gamma_feature_space(
-    X_train: torch.Tensor,   # (B, D, P)
-    X_query: torch.Tensor,   # (B, D, K)
-    Gamma: torch.Tensor,     # (D, D)
-    y_train: torch.Tensor,   # (B, P)
+    X_train: torch.Tensor,
+    X_query: torch.Tensor,
+    Gamma: torch.Tensor,
+    y_train: torch.Tensor,
     L: int,
     P_norm: int,
 ) -> torch.Tensor:
-    """R3: feature-space preconditioned GD reduced-Γ closed form
-    (GD-compatible setting only). Iterates
-
-        w_0 = 0
-        r_ℓ = y_train − X_train^T w_ℓ
-        w_{ℓ+1} = w_ℓ + (1/L) · Γ · X_train · r_ℓ / P
-
-    For L iterations. Returns ``f_Γ = X_query^T w_L`` of shape (B, K).
-
-    Mathematically equivalent to R2 because (i) the residual r_ℓ
-    satisfies r_ℓ = T_GD^ℓ · y_train with T_GD = I + A_S_GD/L and
-    A_S_GD = -X_train^T Γ X_train / P, and (ii) the cumulative w iterate
-    satisfies w_L = (1/L) · Γ · X_train · Σ T_GD^ℓ · y_train / P.
-    """
+    """R3: feature-space preconditioned-GD reduced-Γ closed form (matches A1)."""
     B = int(X_train.shape[0])
     D = int(X_train.shape[1])
     inv_L = 1.0 / float(L)
     inv_P = 1.0 / float(P_norm)
     w = torch.zeros(B, D, dtype=y_train.dtype, device=y_train.device)
     for _ in range(int(L)):
-        # r = y_train - X_train^T w   (per batch).
         Xt_w = torch.einsum("bdp,bd->bp", X_train, w)
         r = y_train - Xt_w
-        # w := w + (1/L) · Γ · X · r / P
-        Xr = torch.einsum("bdp,bp->bd", X_train, r)        # (B, D)
-        GXr = torch.einsum("de,be->bd", Gamma, Xr)          # (B, D)
+        Xr = torch.einsum("bdp,bp->bd", X_train, r)
+        GXr = torch.einsum("de,be->bd", Gamma, Xr)
         w = w + inv_L * inv_P * GXr
-    # f_Γ = X_query^T w
     return torch.einsum("bdk,bd->bk", X_query, w)
 
 
@@ -266,7 +282,7 @@ def _route_R3_reduced_Gamma_feature_space(
 
 
 def _run_trial(
-    cfg: A1Config, D: int, P: int, K: int, L: int, device: torch.device,
+    cfg: A1bConfig, D: int, P: int, K: int, L: int, device: torch.device,
 ) -> dict[str, Any]:
     seeds = {
         "x": int(cfg.base_seed) + 1000 * D + 100 * P + 10 * K + L,
@@ -286,28 +302,23 @@ def _run_trial(
         return_feature_space=False,
         seeds=seeds,
         dtype=cfg.dtype,
-        device="cpu",  # GA generator builds tensors on CPU; we move below.
+        device="cpu",
     )
     op = ga_generate(g)
     X_train = op["X_train"].to(device)
     X_query = op["X_query"].to(device)
     y_train = op["y_train"].to(device)
     Gamma = op["Gamma"].to(device)
-    A_S = op["A_S_theta"].to(device)
-    B_S = op["B_S_theta"].to(device)
     A_S_GD = op["A_S_GD"].to(device)
-    # In the GD-compatible mask case A_S_θ ≡ A_S_GD; assert it for safety.
-    if not torch.equal(A_S, A_S_GD):
-        raise AssertionError(
-            f"A_S_theta != A_S_GD under mask_kind='gd_compatible' "
-            f"(D={D}, P={P}, K={K}, L={L})"
-        )
+    B_S_GD = op["B_S_GD"].to(device)
 
     t0 = time.perf_counter()
-    f_R1 = _route_R1_full_layer_simulation(A_S, B_S, y_train, L=int(L))
-    t_R1 = time.perf_counter() - t0
+    f_R0 = _route_R0_full_hidden_state_forward(
+        X_train, X_query, Gamma, y_train, L=int(L), P_norm=int(P),
+    )
+    t_R0 = time.perf_counter() - t0
     t0 = time.perf_counter()
-    f_R2 = _route_R2_reduced_AB(A_S, B_S, y_train, L=int(L))
+    f_R2 = _route_R2_reduced_AB(A_S_GD, B_S_GD, y_train, L=int(L))
     t_R2 = time.perf_counter() - t0
     t0 = time.perf_counter()
     f_R3 = _route_R3_reduced_Gamma_feature_space(
@@ -315,19 +326,19 @@ def _run_trial(
     )
     t_R3 = time.perf_counter() - t0
 
-    err_R1_R2 = reduced_model_error(f_R1, f_R2)
+    err_R0_R2 = reduced_model_error(f_R0, f_R2)
     err_R2_R3 = reduced_model_error(f_R2, f_R3)
-    err_R1_R3 = reduced_model_error(f_R1, f_R3)
+    err_R0_R3 = reduced_model_error(f_R0, f_R3)
 
     return {
         "D": int(D), "P": int(P), "K": int(K), "L": int(L),
-        "f_R1": f_R1.detach().cpu(),
+        "f_R0": f_R0.detach().cpu(),
         "f_R2": f_R2.detach().cpu(),
         "f_R3": f_R3.detach().cpu(),
-        "err_R1_R2": float(err_R1_R2),
+        "err_R0_R2": float(err_R0_R2),
         "err_R2_R3": float(err_R2_R3),
-        "err_R1_R3": float(err_R1_R3),
-        "t_R1_seconds": float(t_R1),
+        "err_R0_R3": float(err_R0_R3),
+        "t_R0_seconds": float(t_R0),
         "t_R2_seconds": float(t_R2),
         "t_R3_seconds": float(t_R3),
     }
@@ -339,9 +350,8 @@ def _run_trial(
 
 
 def _plot_pairwise_errors_heatmap(
-    cfg: A1Config, trials: list[dict[str, Any]], run_dir: ThesisRunDir,
+    cfg: A1bConfig, trials: list[dict[str, Any]], run_dir: ThesisRunDir,
 ) -> None:
-    """Heatmap of max(err_R1_R2, err_R2_R3) over (D, P) at fixed (K, L)."""
     import matplotlib.pyplot as plt
 
     K = int(cfg.heatmap_K)
@@ -356,81 +366,70 @@ def _plot_pairwise_errors_heatmap(
             continue
         i_D = D_list.index(int(trial["D"]))
         i_P = P_list.index(int(trial["P"]))
-        grid[i_D, i_P] = max(trial["err_R1_R2"], trial["err_R2_R3"])
+        grid[i_D, i_P] = max(trial["err_R0_R2"], trial["err_R2_R3"])
     floor = 1e-18
     grid_plot = np.where(grid > floor, grid, floor)
-    D_arr = np.asarray(D_list, dtype=float)
-    P_arr = np.asarray(P_list, dtype=float)
     fig, ax = plt.subplots(figsize=(6.0, 4.4))
     _pc, _cb = phase_heatmap(
         ax, grid_plot,
-        x_coords=P_arr, y_coords=D_arr,
+        x_coords=np.asarray(P_list, dtype=float),
+        y_coords=np.asarray(D_list, dtype=float),
         xlabel="P (training context length)",
         ylabel="D (feature dimension)",
         cbar_label=r"max pairwise rel. error",
         log_z=True, log_x=True, log_y=True,
     )
     ax.set_title(
-        rf"A1 max pairwise relative error at K = {K}, L = {L} "
-        r"(expected $\leq$ float eps)",
+        rf"A1b max pairwise relative error at K = {K}, L = {L} "
+        r"(R0 full-model vs R2 reduced AB)",
         fontsize=10,
     )
     fig.tight_layout()
-    save_both(fig, run_dir, "a1_pairwise_errors_heatmap")
+    save_both(fig, run_dir, "a1b_pairwise_errors_heatmap")
     plt.close(fig)
 
 
 def _plot_error_distribution(
-    cfg: A1Config, trials: list[dict[str, Any]], run_dir: ThesisRunDir,
+    cfg: A1bConfig, trials: list[dict[str, Any]], run_dir: ThesisRunDir,
 ) -> None:
-    """Histogram of all pairwise errors across the full sweep."""
     import matplotlib.pyplot as plt
 
-    err_R1_R2 = np.array([t["err_R1_R2"] for t in trials])
+    err_R0_R2 = np.array([t["err_R0_R2"] for t in trials])
     err_R2_R3 = np.array([t["err_R2_R3"] for t in trials])
-    err_R1_R3 = np.array([t["err_R1_R3"] for t in trials])
+    err_R0_R3 = np.array([t["err_R0_R3"] for t in trials])
     floor = 1e-18
-    e1 = np.clip(err_R1_R2, floor, None)
+    e0 = np.clip(err_R0_R2, floor, None)
     e2 = np.clip(err_R2_R3, floor, None)
-    e3 = np.clip(err_R1_R3, floor, None)
-
+    e3 = np.clip(err_R0_R3, floor, None)
     fig, ax = plt.subplots(figsize=(6.4, 4.2))
     bins = np.logspace(-18, -8, 30)
-    ax.hist(
-        e1, bins=bins, alpha=0.6, label="R1 vs R2 (full vs reduced AB)",
-        edgecolor="black", lw=0.4,
-    )
-    ax.hist(
-        e2, bins=bins, alpha=0.6,
-        label="R2 vs R3 (reduced AB vs reduced Γ)",
-        edgecolor="black", lw=0.4,
-    )
-    ax.hist(
-        e3, bins=bins, alpha=0.6, label="R1 vs R3 (full vs reduced Γ)",
-        edgecolor="black", lw=0.4,
-    )
-    ax.axvline(
-        cfg.machine_eps_tol, color="red", lw=0.9, ls="--",
-        label=f"acceptance = {cfg.machine_eps_tol:.0e}",
-    )
+    ax.hist(e0, bins=bins, alpha=0.6,
+            label="R0 vs R2 (full model vs reduced AB)",
+            edgecolor="black", lw=0.4)
+    ax.hist(e2, bins=bins, alpha=0.6,
+            label="R2 vs R3 (reduced AB vs reduced Γ)",
+            edgecolor="black", lw=0.4)
+    ax.hist(e3, bins=bins, alpha=0.6,
+            label="R0 vs R3 (full model vs reduced Γ)",
+            edgecolor="black", lw=0.4)
+    ax.axvline(cfg.machine_eps_tol, color="red", lw=0.9, ls="--",
+               label=f"acceptance = {cfg.machine_eps_tol:.0e}")
     ax.set_xscale("log")
     ax.set_xlabel("relative error")
     ax.set_ylabel("count")
     ax.set_title(
-        f"A1 pairwise relative-error distribution over {len(trials)} cells "
-        f"(D × P × K × L)",
+        f"A1b pairwise relative-error distribution over {len(trials)} cells",
         fontsize=10,
     )
     ax.legend(fontsize=8)
     fig.tight_layout()
-    save_both(fig, run_dir, "a1_error_distribution")
+    save_both(fig, run_dir, "a1b_error_distribution")
     plt.close(fig)
 
 
 def _plot_error_vs_L(
-    cfg: A1Config, trials: list[dict[str, Any]], run_dir: ThesisRunDir,
+    cfg: A1bConfig, trials: list[dict[str, Any]], run_dir: ThesisRunDir,
 ) -> None:
-    """Diagnostic: how does the worst pairwise error depend on L?"""
     import matplotlib.pyplot as plt
 
     L_list = list(cfg.L_list)
@@ -441,7 +440,7 @@ def _plot_error_vs_L(
             L_max_err.append(np.nan)
             continue
         L_max_err.append(
-            max(max(t["err_R1_R2"], t["err_R2_R3"]) for t in sub)
+            max(max(t["err_R0_R2"], t["err_R2_R3"]) for t in sub)
         )
     fig, ax = plt.subplots(figsize=(5.5, 3.8))
     ax.plot(
@@ -456,11 +455,10 @@ def _plot_error_vs_L(
     ax.set_yscale("log")
     ax.set_xlabel("depth L")
     ax.set_ylabel("max pairwise rel. error")
-    ax.set_title("A1 error growth with depth (expected ~ L-step roundoff)",
-                 fontsize=10)
+    ax.set_title("A1b error growth with depth", fontsize=10)
     ax.legend(fontsize=8)
     fig.tight_layout()
-    save_both(fig, run_dir, "a1_error_vs_L")
+    save_both(fig, run_dir, "a1b_error_vs_L")
     plt.close(fig)
 
 
@@ -476,8 +474,9 @@ def _parse_list_ints(s: str) -> tuple[int, ...]:
 def _cli() -> argparse.Namespace:
     p = argparse.ArgumentParser(
         description=(
-            "Experiment A1: exact full structured model vs reduced "
-            "(A_S, B_S) recursion (plan §8.1)."
+            "Experiment A1b: full-hidden-state structured forward vs "
+            "reduced (A_S, B_S) and reduced-Γ closed forms (plan §8.1, "
+            "extension of A1)."
         )
     )
     p.add_argument(
@@ -494,8 +493,8 @@ def _cli() -> argparse.Namespace:
     return p.parse_args()
 
 
-def _config_from_cli(args: argparse.Namespace) -> A1Config:
-    base = A1Config()
+def _config_from_cli(args: argparse.Namespace) -> A1bConfig:
+    base = A1bConfig()
     overrides: dict[str, Any] = {}
     if args.dtype is not None:
         overrides["dtype"] = args.dtype
@@ -532,7 +531,7 @@ def main() -> int:
 
     cfg = _config_from_cli(args)
     device = _resolve_device(cfg.device)
-    print(f"[A1] device = {device}")
+    print(f"[A1b] device = {device}")
 
     run = ThesisRunDir(__file__, phase="theoremA")
     with RunContext(
@@ -541,12 +540,14 @@ def main() -> int:
         seeds=[cfg.base_seed, cfg.base_seed + 7,
                cfg.base_seed + 13, cfg.base_seed + 19],
         notes=(
-            "A1 exact theorem-A equivalence test. Operator-level "
-            "deterministic forward-pass comparison; no training, no "
-            "architecture search. Three forward routes (R1: full layer "
-            "simulation; R2: reduced (A_S, B_S) closed form; R3: "
-            "feature-space reduced-Γ closed form) must agree to float64 "
-            "machine precision in the GD-compatible setting."
+            "A1b: true full-hidden-state aligned structured forward vs "
+            "reduced (A_S, B_S) and reduced-Γ closed forms. R0 builds "
+            "the full (P+K)-position residual stream and (P+K)×(P+K) "
+            "bilinear score from (X, Γ) directly, applies a "
+            "GD-compatible signed mask, and runs L explicit residual-"
+            "stream layer updates — without consuming the GA-generator's "
+            "(A_S, B_S, T) as inputs. Closes the gap left by A1's R1, "
+            "which iterated the reduced operators directly."
         ),
     ) as ctx:
         apply_thesis_style()
@@ -571,9 +572,9 @@ def main() -> int:
                             f"[{idx:>4d}/{n_total}] "
                             f"D={int(D):>3d} P={int(P):>3d} "
                             f"K={int(K):>3d} L={int(L):>2d}  "
-                            f"err_R1_R2 = {trial['err_R1_R2']:.2e}  "
+                            f"err_R0_R2 = {trial['err_R0_R2']:.2e}  "
                             f"err_R2_R3 = {trial['err_R2_R3']:.2e}  "
-                            f"err_R1_R3 = {trial['err_R1_R3']:.2e}  "
+                            f"err_R0_R3 = {trial['err_R0_R3']:.2e}  "
                             f"({dt*1000:.1f} ms)"
                         )
                         trials.append(trial)
@@ -590,36 +591,38 @@ def main() -> int:
         K_list = list(cfg.K_list)
         L_list = list(cfg.L_list)
         shape = (len(D_list), len(P_list), len(K_list), len(L_list))
-        err_R1_R2_grid = np.zeros(shape)
+        err_R0_R2_grid = np.zeros(shape)
         err_R2_R3_grid = np.zeros(shape)
-        err_R1_R3_grid = np.zeros(shape)
+        err_R0_R3_grid = np.zeros(shape)
         for trial in trials:
             i = D_list.index(trial["D"])
             j = P_list.index(trial["P"])
             k = K_list.index(trial["K"])
             l = L_list.index(trial["L"])
-            err_R1_R2_grid[i, j, k, l] = trial["err_R1_R2"]
+            err_R0_R2_grid[i, j, k, l] = trial["err_R0_R2"]
             err_R2_R3_grid[i, j, k, l] = trial["err_R2_R3"]
-            err_R1_R3_grid[i, j, k, l] = trial["err_R1_R3"]
+            err_R0_R3_grid[i, j, k, l] = trial["err_R0_R3"]
         npz_payload: dict[str, np.ndarray] = {
             "D_list": np.asarray(D_list, dtype=np.int64),
             "P_list": np.asarray(P_list, dtype=np.int64),
             "K_list": np.asarray(K_list, dtype=np.int64),
             "L_list": np.asarray(L_list, dtype=np.int64),
-            "err_R1_R2_grid": err_R1_R2_grid,
+            "err_R0_R2_grid": err_R0_R2_grid,
             "err_R2_R3_grid": err_R2_R3_grid,
-            "err_R1_R3_grid": err_R1_R3_grid,
+            "err_R0_R3_grid": err_R0_R3_grid,
         }
-        np.savez_compressed(run.npz_path("exact_equivalence"), **npz_payload)
+        np.savez_compressed(
+            run.npz_path("exact_equivalence_full_model"), **npz_payload,
+        )
 
         # --- Per-cell JSON ---
         rows = [
             {
                 "D": t["D"], "P": t["P"], "K": t["K"], "L": t["L"],
-                "err_R1_R2": float(t["err_R1_R2"]),
+                "err_R0_R2": float(t["err_R0_R2"]),
                 "err_R2_R3": float(t["err_R2_R3"]),
-                "err_R1_R3": float(t["err_R1_R3"]),
-                "t_R1_seconds": float(t["t_R1_seconds"]),
+                "err_R0_R3": float(t["err_R0_R3"]),
+                "t_R0_seconds": float(t["t_R0_seconds"]),
                 "t_R2_seconds": float(t["t_R2_seconds"]),
                 "t_R3_seconds": float(t["t_R3_seconds"]),
             }
@@ -630,37 +633,35 @@ def main() -> int:
         )
 
         # --- Acceptance ---
-        worst_R1_R2 = max(t["err_R1_R2"] for t in trials)
+        worst_R0_R2 = max(t["err_R0_R2"] for t in trials)
         worst_R2_R3 = max(t["err_R2_R3"] for t in trials)
-        worst_R1_R3 = max(t["err_R1_R3"] for t in trials)
-        ok_R1_R2 = worst_R1_R2 <= cfg.machine_eps_tol
+        worst_R0_R3 = max(t["err_R0_R3"] for t in trials)
+        ok_R0_R2 = worst_R0_R2 <= cfg.machine_eps_tol
         ok_R2_R3 = worst_R2_R3 <= cfg.machine_eps_tol
-        all_ok = ok_R1_R2 and ok_R2_R3
+        all_ok = ok_R0_R2 and ok_R2_R3
 
-        # Identify the cell with the worst overall error.
         worst_cell: dict[str, Any] | None = None
         worst_err = 0.0
         for t in trials:
-            err_max = max(t["err_R1_R2"], t["err_R2_R3"])
+            err_max = max(t["err_R0_R2"], t["err_R2_R3"])
             if err_max > worst_err:
                 worst_err = err_max
                 worst_cell = {
-                    "D": t["D"], "P": t["P"],
-                    "K": t["K"], "L": t["L"],
-                    "err_R1_R2": float(t["err_R1_R2"]),
+                    "D": t["D"], "P": t["P"], "K": t["K"], "L": t["L"],
+                    "err_R0_R2": float(t["err_R0_R2"]),
                     "err_R2_R3": float(t["err_R2_R3"]),
                 }
 
         ctx.record_compute_proxy(float(sweep_wall))
-        ctx.record_extra("worst_R1_R2", worst_R1_R2)
+        ctx.record_extra("worst_R0_R2", worst_R0_R2)
         ctx.record_extra("worst_R2_R3", worst_R2_R3)
-        ctx.record_extra("worst_R1_R3", worst_R1_R3)
+        ctx.record_extra("worst_R0_R3", worst_R0_R3)
         ctx.record_extra("worst_cell", worst_cell)
 
         status_parts: list[str] = []
         status_parts.append(
-            "R1_R2_ok" if ok_R1_R2 else
-            f"R1_R2_violated(worst={worst_R1_R2:.2e})"
+            "R0_R2_ok" if ok_R0_R2 else
+            f"R0_R2_violated(worst={worst_R0_R2:.2e})"
         )
         status_parts.append(
             "R2_R3_ok" if ok_R2_R3 else
@@ -670,29 +671,32 @@ def main() -> int:
 
         ctx.write_summary(
             {
-                "plan_reference": "EXPERIMENT_PLAN_FINAL.MD §8.1 (A1)",
+                "plan_reference": (
+                    "EXPERIMENT_PLAN_FINAL.MD §8.1 (A1, A1b extension)"
+                ),
                 "category": (
                     "exact theorem-A operator-level forward-pass "
-                    "equivalence test. Three structurally distinct "
-                    "forward routes (R1 = full L-layer linear-attention "
-                    "structured-mixer simulation; R2 = sample-space "
-                    "reduced (A_S, B_S) recursion; R3 = feature-space "
-                    "reduced-Γ closed form) must agree to float64 "
-                    "machine precision in the GD-compatible setting. "
-                    "No training, no architecture search."
+                    "equivalence test — A1b adds the TRUE full-hidden-"
+                    "state aligned structured forward pass (R0) that "
+                    "A1's R1 (iterative reduced recursion) did not "
+                    "exercise. R0 builds the full (P+K)×(P+K) bilinear "
+                    "score from (X, Γ) and applies L explicit residual-"
+                    "stream layer updates with a GD-compatible signed "
+                    "mask, without consuming the GA-generator's "
+                    "(A_S, B_S, T) as inputs. Compared against the same "
+                    "R2 (reduced AB closed form) and R3 (reduced-Γ "
+                    "closed form) used in A1."
                 ),
                 "interpretation": (
-                    "Theorem A asserts that, in the GD-compatible mask "
-                    "regime, the L-layer fully-aligned linear-structured "
-                    "forward map is an exact algebraic identity equal to "
-                    "the closed-form reduced (A_S, B_S) recursion and "
-                    "to its feature-space reduced-Γ special case. A1 "
-                    "verifies all three routes agree to float eps over "
-                    "a (D, P, K, L) sweep. Any cell exceeding the "
-                    "tolerance indicates an implementation bug, not a "
-                    "theorem failure (theorem A is exact in this "
-                    "regime). Architecture-aligned theorem-A bridge "
-                    "checks belong to §9."
+                    "If R0 (full model) agrees with R2 (reduced AB) "
+                    "to float64 machine precision, the GA generator's "
+                    "(A_S, B_S, T) outputs are exactly consistent with "
+                    "the forward map of the aligned linear-attention "
+                    "structured mixer in the GD-compatible regime — "
+                    "this is the end-to-end exactness statement "
+                    "theorem A asserts. A1's canonical result remains "
+                    "valid and unchanged; A1b is a strictly additional "
+                    "check closing the full-vs-reduced gap."
                 ),
                 "device": str(device),
                 "D_list": list(cfg.D_list),
@@ -708,9 +712,9 @@ def main() -> int:
                 "mask_kind": "gd_compatible",
                 "status": status,
                 "machine_eps_tol": cfg.machine_eps_tol,
-                "worst_R1_R2": float(worst_R1_R2),
+                "worst_R0_R2": float(worst_R0_R2),
                 "worst_R2_R3": float(worst_R2_R3),
-                "worst_R1_R3": float(worst_R1_R3),
+                "worst_R0_R3": float(worst_R0_R3),
                 "worst_cell": worst_cell,
                 "sweep_wallclock_seconds": round(float(sweep_wall), 3),
             }
@@ -718,12 +722,12 @@ def main() -> int:
 
         print()
         print("=" * 72)
-        print(f" A1 exact theorem-A equivalence on {device}")
+        print(f" A1b full-hidden-state vs reduced equivalence on {device}")
         print(f"   N cells = {len(trials)} (D × P × K × L)")
         print(
-            f"   worst R1 vs R2 (full vs reduced AB)  = "
-            f"{worst_R1_R2:.3e}  "
-            f"{'OK' if ok_R1_R2 else 'FAIL'}  "
+            f"   worst R0 vs R2 (full model vs reduced AB) = "
+            f"{worst_R0_R2:.3e}  "
+            f"{'OK' if ok_R0_R2 else 'FAIL'}  "
             f"(tol = {cfg.machine_eps_tol:.1e})"
         )
         print(
@@ -733,8 +737,8 @@ def main() -> int:
             f"(tol = {cfg.machine_eps_tol:.1e})"
         )
         print(
-            f"   worst R1 vs R3 (full vs reduced Γ)   = "
-            f"{worst_R1_R3:.3e}  (diagnostic)"
+            f"   worst R0 vs R3 (full model vs reduced Γ) = "
+            f"{worst_R0_R3:.3e}  (diagnostic)"
         )
         if worst_cell is not None and worst_err > 0:
             print(
