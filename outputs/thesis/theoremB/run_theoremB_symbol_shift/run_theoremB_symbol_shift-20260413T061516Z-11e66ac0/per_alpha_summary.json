@@ -1,0 +1,973 @@
+{
+  "family1": [
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.0,
+      "L": 1,
+      "L_ood": 2.434408114143288,
+      "ratio_to_matched": 1.0
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.0,
+      "L": 2,
+      "L_ood": 3.8643263622491006,
+      "ratio_to_matched": 1.0
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.0,
+      "L": 4,
+      "L_ood": 4.77277274374156,
+      "ratio_to_matched": 1.0
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.0,
+      "L": 8,
+      "L_ood": 5.282218945255922,
+      "ratio_to_matched": 1.0
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.0,
+      "L": 16,
+      "L_ood": 5.55120120253417,
+      "ratio_to_matched": 1.0
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.02,
+      "L": 1,
+      "L_ood": 2.4590350976977393,
+      "ratio_to_matched": 1.0101162099367706
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.02,
+      "L": 2,
+      "L_ood": 3.8957089294148655,
+      "ratio_to_matched": 1.0081210964664744
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.02,
+      "L": 4,
+      "L_ood": 4.805893262087199,
+      "ratio_to_matched": 1.0069394710630355
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.02,
+      "L": 8,
+      "L_ood": 5.315581412495444,
+      "ratio_to_matched": 1.0063159947713802
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.02,
+      "L": 16,
+      "L_ood": 5.5845056200037835,
+      "ratio_to_matched": 1.0059994974519046
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.05,
+      "L": 1,
+      "L_ood": 2.495975573029417,
+      "ratio_to_matched": 1.0252905248419266
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.05,
+      "L": 2,
+      "L_ood": 3.9427827801635127,
+      "ratio_to_matched": 1.0203027411661858
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.05,
+      "L": 4,
+      "L_ood": 4.855574039605656,
+      "ratio_to_matched": 1.0173486776575886
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.05,
+      "L": 8,
+      "L_ood": 5.365625113354726,
+      "ratio_to_matched": 1.0157899869284504
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.05,
+      "L": 16,
+      "L_ood": 5.634462246208202,
+      "ratio_to_matched": 1.0149987436297614
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.1,
+      "L": 1,
+      "L_ood": 2.5575430319155457,
+      "ratio_to_matched": 1.0505810496838535
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.1,
+      "L": 2,
+      "L_ood": 4.021239198077925,
+      "ratio_to_matched": 1.0406054823323718
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.1,
+      "L": 4,
+      "L_ood": 4.938375335469753,
+      "ratio_to_matched": 1.034697355315177
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.1,
+      "L": 8,
+      "L_ood": 5.44903128145353,
+      "ratio_to_matched": 1.031579973856901
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.1,
+      "L": 16,
+      "L_ood": 5.717723289882235,
+      "ratio_to_matched": 1.0299974872595226
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.15,
+      "L": 1,
+      "L_ood": 2.6191104908016745,
+      "ratio_to_matched": 1.07587157452578
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.15,
+      "L": 2,
+      "L_ood": 4.099695615992337,
+      "ratio_to_matched": 1.0609082234985576
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.15,
+      "L": 4,
+      "L_ood": 5.021176631333849,
+      "ratio_to_matched": 1.0520460329727654
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.15,
+      "L": 8,
+      "L_ood": 5.532437449552335,
+      "ratio_to_matched": 1.0473699607853513
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.15,
+      "L": 16,
+      "L_ood": 5.800984333556267,
+      "ratio_to_matched": 1.0449962308892837
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.2,
+      "L": 1,
+      "L_ood": 2.6806779496878037,
+      "ratio_to_matched": 1.1011620993677071
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.2,
+      "L": 2,
+      "L_ood": 4.178152033906748,
+      "ratio_to_matched": 1.0812109646647432
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.2,
+      "L": 4,
+      "L_ood": 5.1039779271979455,
+      "ratio_to_matched": 1.0693947106303539
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.2,
+      "L": 8,
+      "L_ood": 5.615843617651138,
+      "ratio_to_matched": 1.0631599477138016
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.2,
+      "L": 16,
+      "L_ood": 5.884245377230299,
+      "ratio_to_matched": 1.0599949745190451
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.3,
+      "L": 1,
+      "L_ood": 2.8038128674600613,
+      "ratio_to_matched": 1.1517431490515604
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.3,
+      "L": 2,
+      "L_ood": 4.335064869735572,
+      "ratio_to_matched": 1.1218164469971148
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.3,
+      "L": 4,
+      "L_ood": 5.269580518926137,
+      "ratio_to_matched": 1.1040920659455307
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.3,
+      "L": 8,
+      "L_ood": 5.782655953848746,
+      "ratio_to_matched": 1.0947399215707023
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.3,
+      "L": 16,
+      "L_ood": 6.050767464578363,
+      "ratio_to_matched": 1.0899924617785672
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.4,
+      "L": 1,
+      "L_ood": 2.9269477852323194,
+      "ratio_to_matched": 1.202324198735414
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.4,
+      "L": 2,
+      "L_ood": 4.491977705564397,
+      "ratio_to_matched": 1.1624219293294866
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.4,
+      "L": 4,
+      "L_ood": 5.43518311065433,
+      "ratio_to_matched": 1.1387894212607075
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.4,
+      "L": 8,
+      "L_ood": 5.949468290046354,
+      "ratio_to_matched": 1.126319895427603
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.4,
+      "L": 16,
+      "L_ood": 6.217289551926427,
+      "ratio_to_matched": 1.1199899490380898
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.5,
+      "L": 1,
+      "L_ood": 3.050082703004577,
+      "ratio_to_matched": 1.2529052484192675
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.5,
+      "L": 2,
+      "L_ood": 4.648890541393221,
+      "ratio_to_matched": 1.2030274116618584
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.5,
+      "L": 4,
+      "L_ood": 5.600785702382524,
+      "ratio_to_matched": 1.1734867765758847
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.5,
+      "L": 8,
+      "L_ood": 6.116280626243961,
+      "ratio_to_matched": 1.1578998692845037
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.5,
+      "L": 16,
+      "L_ood": 6.383811639274493,
+      "ratio_to_matched": 1.1499874362976124
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.65,
+      "L": 1,
+      "L_ood": 3.2347850796629642,
+      "ratio_to_matched": 1.328776822945048
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.65,
+      "L": 2,
+      "L_ood": 4.8842597951364555,
+      "ratio_to_matched": 1.2639356351604156
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.65,
+      "L": 4,
+      "L_ood": 5.849189589974811,
+      "ratio_to_matched": 1.2255328095486497
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.65,
+      "L": 8,
+      "L_ood": 6.366499130540373,
+      "ratio_to_matched": 1.205269830069855
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.65,
+      "L": 16,
+      "L_ood": 6.633594770296588,
+      "ratio_to_matched": 1.1949836671868959
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.8,
+      "L": 1,
+      "L_ood": 3.4194874563213506,
+      "ratio_to_matched": 1.4046483974708281
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.8,
+      "L": 2,
+      "L_ood": 5.119629048879692,
+      "ratio_to_matched": 1.3248438586589733
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.8,
+      "L": 4,
+      "L_ood": 6.0975934775671,
+      "ratio_to_matched": 1.2775788425214152
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.8,
+      "L": 8,
+      "L_ood": 6.616717634836785,
+      "ratio_to_matched": 1.252639790855206
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.8,
+      "L": 16,
+      "L_ood": 6.883377901318685,
+      "ratio_to_matched": 1.2399798980761796
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 1.0,
+      "L": 1,
+      "L_ood": 3.6657572918658663,
+      "ratio_to_matched": 1.5058104968385353
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 1.0,
+      "L": 2,
+      "L_ood": 5.43345472053734,
+      "ratio_to_matched": 1.4060548233237167
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 1.0,
+      "L": 4,
+      "L_ood": 6.428798661023486,
+      "ratio_to_matched": 1.346973553151769
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 1.0,
+      "L": 8,
+      "L_ood": 6.950342307232001,
+      "ratio_to_matched": 1.3157997385690074
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 1.0,
+      "L": 16,
+      "L_ood": 7.216422076014813,
+      "ratio_to_matched": 1.2999748725952243
+    }
+  ],
+  "family2": [
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.0,
+      "L": 1,
+      "L_ood_median": 2.434408114143288,
+      "L_ood_min": 2.434408114143288,
+      "L_ood_max": 2.434408114143288,
+      "ratio_to_matched_median": 1.0
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.0,
+      "L": 2,
+      "L_ood_median": 3.8643263622491006,
+      "L_ood_min": 3.8643263622491006,
+      "L_ood_max": 3.8643263622491006,
+      "ratio_to_matched_median": 1.0
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.0,
+      "L": 4,
+      "L_ood_median": 4.77277274374156,
+      "L_ood_min": 4.77277274374156,
+      "L_ood_max": 4.77277274374156,
+      "ratio_to_matched_median": 1.0
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.0,
+      "L": 8,
+      "L_ood_median": 5.282218945255922,
+      "L_ood_min": 5.282218945255922,
+      "L_ood_max": 5.282218945255922,
+      "ratio_to_matched_median": 1.0
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.0,
+      "L": 16,
+      "L_ood_median": 5.55120120253417,
+      "L_ood_min": 5.55120120253417,
+      "L_ood_max": 5.55120120253417,
+      "ratio_to_matched_median": 1.0
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.02,
+      "L": 1,
+      "L_ood_median": 2.45752471433875,
+      "L_ood_min": 2.4534813361970658,
+      "L_ood_max": 2.4603673759335978,
+      "ratio_to_matched_median": 1.0094957784856042
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.02,
+      "L": 2,
+      "L_ood_median": 3.893513525558231,
+      "L_ood_min": 3.887912675566711,
+      "L_ood_max": 3.899179268730601,
+      "ratio_to_matched_median": 1.007552975751288
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.02,
+      "L": 4,
+      "L_ood_median": 4.803368728202771,
+      "L_ood_min": 4.796949726670779,
+      "L_ood_max": 4.809105850697879,
+      "ratio_to_matched_median": 1.006410526145694
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.02,
+      "L": 8,
+      "L_ood_median": 5.312819482849152,
+      "L_ood_min": 5.306242759995849,
+      "L_ood_max": 5.318402108075713,
+      "ratio_to_matched_median": 1.0057931217752178
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.02,
+      "L": 16,
+      "L_ood_median": 5.58161292172262,
+      "L_ood_min": 5.575020871539554,
+      "L_ood_max": 5.5870851342471886,
+      "ratio_to_matched_median": 1.0054784033363027
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.05,
+      "L": 1,
+      "L_ood_median": 2.492199614631944,
+      "L_ood_min": 2.4820911692777328,
+      "L_ood_max": 2.499306268619063,
+      "ratio_to_matched_median": 1.0237394462140106
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.05,
+      "L": 2,
+      "L_ood_median": 3.9372942705219263,
+      "L_ood_min": 3.9232921455431264,
+      "L_ood_max": 3.9514586284528512,
+      "ratio_to_matched_median": 1.0188824393782199
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.05,
+      "L": 4,
+      "L_ood_median": 4.849262704894587,
+      "L_ood_min": 4.833215201064608,
+      "L_ood_max": 4.863605511132357,
+      "ratio_to_matched_median": 1.0160263153642348
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.05,
+      "L": 8,
+      "L_ood_median": 5.358720289238995,
+      "L_ood_min": 5.342278482105737,
+      "L_ood_max": 5.372676852305396,
+      "ratio_to_matched_median": 1.0144828044380443
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.05,
+      "L": 16,
+      "L_ood_median": 5.627230500505294,
+      "L_ood_min": 5.61075037504763,
+      "L_ood_max": 5.640911031816717,
+      "ratio_to_matched_median": 1.0136960083407562
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.1,
+      "L": 1,
+      "L_ood_median": 2.5499911151205996,
+      "L_ood_min": 2.5297742244121775,
+      "L_ood_max": 2.5642044230948375,
+      "ratio_to_matched_median": 1.0474788924280214
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.1,
+      "L": 2,
+      "L_ood_median": 4.010262178794752,
+      "L_ood_min": 3.9822579288371527,
+      "L_ood_max": 4.038590894656602,
+      "ratio_to_matched_median": 1.03776487875644
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.1,
+      "L": 4,
+      "L_ood_median": 4.925752666047613,
+      "L_ood_min": 4.8936576583876565,
+      "L_ood_max": 4.954438278523154,
+      "ratio_to_matched_median": 1.0320526307284696
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.1,
+      "L": 8,
+      "L_ood_median": 5.43522163322207,
+      "L_ood_min": 5.402338018955553,
+      "L_ood_max": 5.4631347593548725,
+      "ratio_to_matched_median": 1.0289656088760886
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.1,
+      "L": 16,
+      "L_ood_median": 5.70325979847642,
+      "L_ood_min": 5.670299547561089,
+      "L_ood_max": 5.730620861099265,
+      "ratio_to_matched_median": 1.027392016681513
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.15,
+      "L": 1,
+      "L_ood_median": 2.6077826156092554,
+      "L_ood_min": 2.5774572795466226,
+      "L_ood_max": 2.6291025775706123,
+      "ratio_to_matched_median": 1.071218338642032
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.15,
+      "L": 2,
+      "L_ood_median": 4.0832300870675775,
+      "L_ood_min": 4.041223712131179,
+      "L_ood_max": 4.125723160860353,
+      "ratio_to_matched_median": 1.0566473181346596
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.15,
+      "L": 4,
+      "L_ood_median": 5.002242627200639,
+      "L_ood_min": 4.954100115710704,
+      "L_ood_max": 5.04527104591395,
+      "ratio_to_matched_median": 1.0480789460927045
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.15,
+      "L": 8,
+      "L_ood_median": 5.511722977205142,
+      "L_ood_min": 5.462397555805367,
+      "L_ood_max": 5.553592666404346,
+      "ratio_to_matched_median": 1.0434484133141326
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.15,
+      "L": 16,
+      "L_ood_median": 5.779289096447544,
+      "L_ood_min": 5.729848720074549,
+      "L_ood_max": 5.820330690381811,
+      "ratio_to_matched_median": 1.041088025022269
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.2,
+      "L": 1,
+      "L_ood_median": 2.6655741160979116,
+      "L_ood_min": 2.6251403346810678,
+      "L_ood_max": 2.6940007320463875,
+      "ratio_to_matched_median": 1.094957784856043
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.2,
+      "L": 2,
+      "L_ood_median": 4.156197995340404,
+      "L_ood_min": 4.100189495425205,
+      "L_ood_max": 4.212855427064104,
+      "ratio_to_matched_median": 1.0755297575128797
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.2,
+      "L": 4,
+      "L_ood_median": 5.078732588353666,
+      "L_ood_min": 5.014542573033752,
+      "L_ood_max": 5.136103813304747,
+      "ratio_to_matched_median": 1.0641052614569393
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.2,
+      "L": 8,
+      "L_ood_median": 5.588224321188217,
+      "L_ood_min": 5.522457092655183,
+      "L_ood_max": 5.644050573453821,
+      "ratio_to_matched_median": 1.057931217752177
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.2,
+      "L": 16,
+      "L_ood_median": 5.855318394418669,
+      "L_ood_min": 5.789397892588009,
+      "L_ood_max": 5.91004051966436,
+      "ratio_to_matched_median": 1.0547840333630254
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.3,
+      "L": 1,
+      "L_ood_median": 2.781157117075223,
+      "L_ood_min": 2.720506444949957,
+      "L_ood_max": 2.823797040997937,
+      "ratio_to_matched_median": 1.1424366772840644
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.3,
+      "L": 2,
+      "L_ood_median": 4.302133811886055,
+      "L_ood_min": 4.218121062013257,
+      "L_ood_max": 4.3871199594716055,
+      "ratio_to_matched_median": 1.1132946362693195
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.3,
+      "L": 4,
+      "L_ood_median": 5.231712510659718,
+      "L_ood_min": 5.135427487679847,
+      "L_ood_max": 5.31776934808634,
+      "ratio_to_matched_median": 1.0961578921854087
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.3,
+      "L": 8,
+      "L_ood_median": 5.741227009154363,
+      "L_ood_min": 5.642576166354812,
+      "L_ood_max": 5.82496638755277,
+      "ratio_to_matched_median": 1.086896826628265
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.3,
+      "L": 16,
+      "L_ood_median": 6.007376990360917,
+      "L_ood_min": 5.908496237614928,
+      "L_ood_max": 6.089460178229452,
+      "ratio_to_matched_median": 1.0821760500445379
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.4,
+      "L": 1,
+      "L_ood_median": 2.896740118052535,
+      "L_ood_min": 2.815872555218847,
+      "L_ood_max": 2.9535933499494864,
+      "ratio_to_matched_median": 1.1899155697120858
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.4,
+      "L": 2,
+      "L_ood_median": 4.448069628431707,
+      "L_ood_min": 4.336052628601308,
+      "L_ood_max": 4.5613844918791076,
+      "ratio_to_matched_median": 1.1510595150257594
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.4,
+      "L": 4,
+      "L_ood_median": 5.384692432965771,
+      "L_ood_min": 5.256312402325943,
+      "L_ood_max": 5.499434882867934,
+      "ratio_to_matched_median": 1.1282105229138784
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.4,
+      "L": 8,
+      "L_ood_median": 5.89422969712051,
+      "L_ood_min": 5.762695240054442,
+      "L_ood_max": 6.005882201651721,
+      "ratio_to_matched_median": 1.1158624355043534
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.4,
+      "L": 16,
+      "L_ood_median": 6.159435586303166,
+      "L_ood_min": 6.027594582641846,
+      "L_ood_max": 6.2688798367945475,
+      "ratio_to_matched_median": 1.1095680667260506
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.5,
+      "L": 1,
+      "L_ood_median": 3.0123231190298467,
+      "L_ood_min": 2.911238665487737,
+      "L_ood_max": 3.0833896589010363,
+      "ratio_to_matched_median": 1.2373944621401072
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.5,
+      "L": 2,
+      "L_ood_median": 4.594005444977357,
+      "L_ood_min": 4.453984195189361,
+      "L_ood_max": 4.735649024286609,
+      "ratio_to_matched_median": 1.188824393782199
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.5,
+      "L": 4,
+      "L_ood_median": 5.537672355271823,
+      "L_ood_min": 5.377197316972037,
+      "L_ood_max": 5.681100417649526,
+      "ratio_to_matched_median": 1.1602631536423478
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.5,
+      "L": 8,
+      "L_ood_median": 6.047232385086657,
+      "L_ood_min": 5.882814313754071,
+      "L_ood_max": 6.186798015750669,
+      "ratio_to_matched_median": 1.1448280443804417
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.5,
+      "L": 16,
+      "L_ood_median": 6.311494182245415,
+      "L_ood_min": 6.146692927668766,
+      "L_ood_max": 6.448299495359642,
+      "ratio_to_matched_median": 1.1369600834075633
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.65,
+      "L": 1,
+      "L_ood_median": 3.1856976204958145,
+      "L_ood_min": 3.054287830891072,
+      "L_ood_max": 3.278084122328361,
+      "ratio_to_matched_median": 1.3086128007821396
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.65,
+      "L": 2,
+      "L_ood_median": 4.812909169795834,
+      "L_ood_min": 4.630881545071439,
+      "L_ood_max": 4.997045822897862,
+      "ratio_to_matched_median": 1.2454717119168586
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.65,
+      "L": 4,
+      "L_ood_median": 5.767142238730902,
+      "L_ood_min": 5.558524688941182,
+      "L_ood_max": 5.953598719821917,
+      "ratio_to_matched_median": 1.2083420997350522
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.65,
+      "L": 8,
+      "L_ood_median": 6.276736417035877,
+      "L_ood_min": 6.062992924303517,
+      "L_ood_max": 6.458171736899093,
+      "ratio_to_matched_median": 1.1882764576945741
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.65,
+      "L": 16,
+      "L_ood_median": 6.539582076158789,
+      "L_ood_min": 6.325340445209145,
+      "L_ood_max": 6.7174289832072835,
+      "ratio_to_matched_median": 1.1780481084298322
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.8,
+      "L": 1,
+      "L_ood_median": 3.3590721219617823,
+      "L_ood_min": 3.197336996294406,
+      "L_ood_max": 3.472778585755686,
+      "ratio_to_matched_median": 1.3798311394241718
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.8,
+      "L": 2,
+      "L_ood_median": 5.031812894614312,
+      "L_ood_min": 4.807778894953517,
+      "L_ood_max": 5.258442621509115,
+      "ratio_to_matched_median": 1.3021190300515184
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.8,
+      "L": 4,
+      "L_ood_median": 5.9966121221899815,
+      "L_ood_min": 5.739852060910325,
+      "L_ood_max": 6.226097021994308,
+      "ratio_to_matched_median": 1.2564210458277565
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.8,
+      "L": 8,
+      "L_ood_median": 6.506240448985098,
+      "L_ood_min": 6.243171534852962,
+      "L_ood_max": 6.729545458047517,
+      "ratio_to_matched_median": 1.231724871008707
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.8,
+      "L": 16,
+      "L_ood_median": 6.767669970072163,
+      "L_ood_min": 6.503987962749525,
+      "L_ood_max": 6.986558471054925,
+      "ratio_to_matched_median": 1.2191361334521014
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 1.0,
+      "L": 1,
+      "L_ood_median": 3.5902381239164063,
+      "L_ood_min": 3.3880692168321853,
+      "L_ood_max": 3.7323712036587846,
+      "ratio_to_matched_median": 1.4747889242802148
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 1.0,
+      "L": 2,
+      "L_ood_median": 5.323684527705614,
+      "L_ood_min": 5.043642028129622,
+      "L_ood_max": 5.606971686324119,
+      "ratio_to_matched_median": 1.3776487875643981
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 1.0,
+      "L": 4,
+      "L_ood_median": 6.302571966802088,
+      "L_ood_min": 5.981621890202516,
+      "L_ood_max": 6.589428091557495,
+      "ratio_to_matched_median": 1.3205263072846958
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 1.0,
+      "L": 8,
+      "L_ood_median": 6.812245824917391,
+      "L_ood_min": 6.483409682252223,
+      "L_ood_max": 7.091377086245416,
+      "ratio_to_matched_median": 1.2896560887608834
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 1.0,
+      "L": 16,
+      "L_ood_median": 7.071787161956662,
+      "L_ood_min": 6.742184652803363,
+      "L_ood_max": 7.345397788185115,
+      "ratio_to_matched_median": 1.2739201668151268
+    }
+  ],
+  "baseline": {
+    "1": 2.434408114143288,
+    "2": 3.8643263622491006,
+    "4": 4.77277274374156,
+    "8": 5.282218945255922,
+    "16": 5.55120120253417
+  }
+}

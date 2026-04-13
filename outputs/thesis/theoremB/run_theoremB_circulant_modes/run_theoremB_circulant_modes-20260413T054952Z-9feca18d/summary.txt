@@ -1,0 +1,20 @@
+run_id: run_theoremB_circulant_modes-20260413T054952Z-9feca18d
+phase: theoremB
+script: run_theoremB_circulant_modes
+status: completed
+wall_clock_seconds: 42.947
+compute_proxy: 34.9899
+
+plan_reference: EXPERIMENT_PLAN_FINAL.MD §6.2 (B1)
+device: cuda
+acceptance_tolerance: 1e-10
+n_trials: 36
+n_failures: 0
+status: closure_ok
+max_mode_rel_err: 1.0808813584512547e-14
+max_mode_abs_err: 1.8596235662471372e-15
+median_mode_rel_err: 4.630416085693686e-15
+max_transfer_rel_err: 4.884981308350689e-15
+max_transfer_abs_err: 4.884981308350689e-15
+max_off_diagonal_fourier_energy: 0.0
+sweep_wallclock_seconds: 34.99

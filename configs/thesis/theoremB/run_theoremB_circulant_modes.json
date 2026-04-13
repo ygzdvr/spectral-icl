@@ -4,7 +4,7 @@
   "P_list": [16, 32, 64],
   "L_list": [1, 2, 4, 8],
   "symbol_kinds": ["flat", "power_law", "multiband"],
-  "T": 100,
+  "T": 2000,
   "eta": 1e-4,
   "power_law_nu": 0.5,
   "task_spec_nu_beta": 1.0,
@@ -17,7 +17,7 @@
   "figure_mode_indices": [0, 1, 2, 4, 8],
   "figure_L_list": [1, 2, 4, 8],
   "transfer_P": 32,
-  "transfer_L": 4,
+  "transfer_L_list": [1, 2, 4, 8],
   "transfer_symbol": "power_law",
   "dtype": "float64",
   "device": "cuda"

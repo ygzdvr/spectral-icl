@@ -1,0 +1,410 @@
+{
+  "run_id": "run_theoremB_depth_stationary-20260413T060815Z-f2cbb0fb",
+  "script_stem": "run_theoremB_depth_stationary",
+  "phase": "theoremB",
+  "root": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremB/run_theoremB_depth_stationary/run_theoremB_depth_stationary-20260413T060815Z-f2cbb0fb",
+  "started_utc": "2026-04-13T06:08:15.173877+00:00",
+  "seeds": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "git_commit": "501fb0a",
+  "git_dirty": true,
+  "env": {
+    "python_version": "3.14.3",
+    "python_full_version": "3.14.3 (main, Mar 20 2026, 00:34:32) [Clang 22.1.1 ]",
+    "python_executable": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/.venv/bin/python",
+    "platform": "Linux-5.14.0-570.94.1.el9_6.x86_64-x86_64-with-glibc2.34",
+    "hostname": "della-gpu.princeton.edu",
+    "torch_version": "2.11.0+cu130",
+    "cuda_available": true,
+    "cuda_version": "13.0",
+    "cudnn_version": 91900,
+    "gpu_count": 1,
+    "gpu_names": [
+      "NVIDIA A100-PCIE-40GB"
+    ]
+  },
+  "notes": null,
+  "status": "completed",
+  "finished_utc": "2026-04-13T06:11:15.377853+00:00",
+  "wall_clock_seconds": 180.2045075893402,
+  "compute_proxy": 168.87266172096133,
+  "measured_compute": null,
+  "per_step_wall_clock": {
+    "n_steps": 30,
+    "mean": 5.625451295481374,
+    "median": 5.302289313171059,
+    "total": 168.76353886444122
+  },
+  "error": null,
+  "extras": {
+    "n_trials": 30,
+    "device": "cuda",
+    "max_monotonicity_violation": 0.0,
+    "decay_rows": [
+      {
+        "P": 32,
+        "L": 1,
+        "symbol_kind": "power_law",
+        "loss_initial": 45.548416741065736,
+        "loss_final": 1.0079204992408546,
+        "decay_fraction": 0.02212855179952126
+      },
+      {
+        "P": 32,
+        "L": 2,
+        "symbol_kind": "power_law",
+        "loss_initial": 45.548416741065736,
+        "loss_final": 1.831820756180943,
+        "decay_fraction": 0.04021700175868906
+      },
+      {
+        "P": 32,
+        "L": 4,
+        "symbol_kind": "power_law",
+        "loss_initial": 45.548416741065736,
+        "loss_final": 2.363253363207914,
+        "decay_fraction": 0.051884423922846076
+      },
+      {
+        "P": 32,
+        "L": 8,
+        "symbol_kind": "power_law",
+        "loss_initial": 45.548416741065736,
+        "loss_final": 2.6607131761756824,
+        "decay_fraction": 0.05841505296004779
+      },
+      {
+        "P": 32,
+        "L": 16,
+        "symbol_kind": "power_law",
+        "loss_initial": 45.548416741065736,
+        "loss_final": 2.817138329572834,
+        "decay_fraction": 0.0618493140077237
+      },
+      {
+        "P": 32,
+        "L": 1,
+        "symbol_kind": "multiband",
+        "loss_initial": 60.35519544417905,
+        "loss_final": 4.101407319577673e-05,
+        "decay_fraction": 6.795450316072554e-07
+      },
+      {
+        "P": 32,
+        "L": 2,
+        "symbol_kind": "multiband",
+        "loss_initial": 60.35519544417905,
+        "loss_final": 0.002696262187655914,
+        "decay_fraction": 4.467324093332804e-05
+      },
+      {
+        "P": 32,
+        "L": 4,
+        "symbol_kind": "multiband",
+        "loss_initial": 60.35519544417905,
+        "loss_final": 0.03162336561632652,
+        "decay_fraction": 0.0005239543237926243
+      },
+      {
+        "P": 32,
+        "L": 8,
+        "symbol_kind": "multiband",
+        "loss_initial": 60.35519544417905,
+        "loss_final": 0.07064984846125205,
+        "decay_fraction": 0.0011705678018488774
+      },
+      {
+        "P": 32,
+        "L": 16,
+        "symbol_kind": "multiband",
+        "loss_initial": 60.35519544417905,
+        "loss_final": 0.09902771792062068,
+        "decay_fraction": 0.001640748856694679
+      },
+      {
+        "P": 64,
+        "L": 1,
+        "symbol_kind": "power_law",
+        "loss_initial": 106.10584427484466,
+        "loss_final": 2.434408114143288,
+        "decay_fraction": 0.022943204785567425
+      },
+      {
+        "P": 64,
+        "L": 2,
+        "symbol_kind": "power_law",
+        "loss_initial": 106.10584427484466,
+        "loss_final": 3.8643263622491006,
+        "decay_fraction": 0.036419543038924265
+      },
+      {
+        "P": 64,
+        "L": 4,
+        "symbol_kind": "power_law",
+        "loss_initial": 106.10584427484466,
+        "loss_final": 4.77277274374156,
+        "decay_fraction": 0.04498124279920628
+      },
+      {
+        "P": 64,
+        "L": 8,
+        "symbol_kind": "power_law",
+        "loss_initial": 106.10584427484466,
+        "loss_final": 5.282218945255922,
+        "decay_fraction": 0.0497825447915334
+      },
+      {
+        "P": 64,
+        "L": 16,
+        "symbol_kind": "power_law",
+        "loss_initial": 106.10584427484466,
+        "loss_final": 5.55120120253417,
+        "decay_fraction": 0.05231758194350692
+      },
+      {
+        "P": 64,
+        "L": 1,
+        "symbol_kind": "multiband",
+        "loss_initial": 196.59650127349803,
+        "loss_final": 0.00021119666071338,
+        "decay_fraction": 1.0742645944628016e-06
+      },
+      {
+        "P": 64,
+        "L": 2,
+        "symbol_kind": "multiband",
+        "loss_initial": 196.59650127349803,
+        "loss_final": 0.00026342115793910685,
+        "decay_fraction": 1.3399076597637144e-06
+      },
+      {
+        "P": 64,
+        "L": 4,
+        "symbol_kind": "multiband",
+        "loss_initial": 196.59650127349803,
+        "loss_final": 0.003598706801159335,
+        "decay_fraction": 1.8305039905837097e-05
+      },
+      {
+        "P": 64,
+        "L": 8,
+        "symbol_kind": "multiband",
+        "loss_initial": 196.59650127349803,
+        "loss_final": 0.012523697327561475,
+        "decay_fraction": 6.370254427945772e-05
+      },
+      {
+        "P": 64,
+        "L": 16,
+        "symbol_kind": "multiband",
+        "loss_initial": 196.59650127349803,
+        "loss_final": 0.021179410309237957,
+        "decay_fraction": 0.00010773035212754838
+      },
+      {
+        "P": 128,
+        "L": 1,
+        "symbol_kind": "power_law",
+        "loss_initial": 253.61045790372395,
+        "loss_final": 5.388932139679632,
+        "decay_fraction": 0.021248856156102947
+      },
+      {
+        "P": 128,
+        "L": 2,
+        "symbol_kind": "power_law",
+        "loss_initial": 253.61045790372395,
+        "loss_final": 7.889957547216085,
+        "decay_fraction": 0.031110537051320195
+      },
+      {
+        "P": 128,
+        "L": 4,
+        "symbol_kind": "power_law",
+        "loss_initial": 253.61045790372395,
+        "loss_final": 9.466941300286653,
+        "decay_fraction": 0.037328670822717055
+      },
+      {
+        "P": 128,
+        "L": 8,
+        "symbol_kind": "power_law",
+        "loss_initial": 253.61045790372395,
+        "loss_final": 10.35127251061255,
+        "decay_fraction": 0.04081563747872778
+      },
+      {
+        "P": 128,
+        "L": 16,
+        "symbol_kind": "power_law",
+        "loss_initial": 253.61045790372395,
+        "loss_final": 10.819033299085286,
+        "decay_fraction": 0.042660044023864446
+      },
+      {
+        "P": 256,
+        "L": 1,
+        "symbol_kind": "power_law",
+        "loss_initial": 619.192905011374,
+        "loss_final": 11.327247446854479,
+        "decay_fraction": 0.01829356789326649
+      },
+      {
+        "P": 256,
+        "L": 2,
+        "symbol_kind": "power_law",
+        "loss_initial": 619.192905011374,
+        "loss_final": 15.759871912759834,
+        "decay_fraction": 0.02545228116344508
+      },
+      {
+        "P": 256,
+        "L": 4,
+        "symbol_kind": "power_law",
+        "loss_initial": 619.192905011374,
+        "loss_final": 18.54403874000917,
+        "decay_fraction": 0.02994872613998788
+      },
+      {
+        "P": 256,
+        "L": 8,
+        "symbol_kind": "power_law",
+        "loss_initial": 619.192905011374,
+        "loss_final": 20.104441152648654,
+        "decay_fraction": 0.03246878475178806
+      },
+      {
+        "P": 256,
+        "L": 16,
+        "symbol_kind": "power_law",
+        "loss_initial": 619.192905011374,
+        "loss_final": 20.930284004850193,
+        "decay_fraction": 0.03380252557071164
+      }
+    ],
+    "depth_ratios": [
+      {
+        "P": 32,
+        "symbol_kind": "multiband",
+        "L_min": 1,
+        "L_max": 16,
+        "loss_final_L_min": 4.101407319577673e-05,
+        "loss_final_L_max": 0.09902771792062068,
+        "ratio": 2414.48142562972
+      },
+      {
+        "P": 32,
+        "symbol_kind": "power_law",
+        "L_min": 1,
+        "L_max": 16,
+        "loss_final_L_min": 1.0079204992408546,
+        "loss_final_L_max": 2.817138329572834,
+        "ratio": 2.795000529996806
+      },
+      {
+        "P": 64,
+        "symbol_kind": "multiband",
+        "L_min": 1,
+        "L_max": 16,
+        "loss_final_L_min": 0.00021119666071338,
+        "loss_final_L_max": 0.021179410309237957,
+        "ratio": 100.28288438698866
+      },
+      {
+        "P": 64,
+        "symbol_kind": "power_law",
+        "L_min": 1,
+        "L_max": 16,
+        "loss_final_L_min": 2.434408114143288,
+        "loss_final_L_max": 5.55120120253417,
+        "ratio": 2.280308371584498
+      },
+      {
+        "P": 128,
+        "symbol_kind": "power_law",
+        "L_min": 1,
+        "L_max": 16,
+        "loss_final_L_min": 5.388932139679632,
+        "loss_final_L_max": 10.819033299085286,
+        "ratio": 2.0076395505935003
+      },
+      {
+        "P": 256,
+        "symbol_kind": "power_law",
+        "L_min": 1,
+        "L_max": 16,
+        "loss_final_L_min": 11.327247446854479,
+        "loss_final_L_max": 20.930284004850193,
+        "ratio": 1.8477820055623868
+      }
+    ],
+    "initial_losses": {
+      "P32_L1_power_law": 45.548416741065736,
+      "P32_L2_power_law": 45.548416741065736,
+      "P32_L4_power_law": 45.548416741065736,
+      "P32_L8_power_law": 45.548416741065736,
+      "P32_L16_power_law": 45.548416741065736,
+      "P32_L1_multiband": 60.35519544417905,
+      "P32_L2_multiband": 60.35519544417905,
+      "P32_L4_multiband": 60.35519544417905,
+      "P32_L8_multiband": 60.35519544417905,
+      "P32_L16_multiband": 60.35519544417905,
+      "P64_L1_power_law": 106.10584427484466,
+      "P64_L2_power_law": 106.10584427484466,
+      "P64_L4_power_law": 106.10584427484466,
+      "P64_L8_power_law": 106.10584427484466,
+      "P64_L16_power_law": 106.10584427484466,
+      "P64_L1_multiband": 196.59650127349803,
+      "P64_L2_multiband": 196.59650127349803,
+      "P64_L4_multiband": 196.59650127349803,
+      "P64_L8_multiband": 196.59650127349803,
+      "P64_L16_multiband": 196.59650127349803,
+      "P128_L1_power_law": 253.61045790372395,
+      "P128_L2_power_law": 253.61045790372395,
+      "P128_L4_power_law": 253.61045790372395,
+      "P128_L8_power_law": 253.61045790372395,
+      "P128_L16_power_law": 253.61045790372395,
+      "P256_L1_power_law": 619.192905011374,
+      "P256_L2_power_law": 619.192905011374,
+      "P256_L4_power_law": 619.192905011374,
+      "P256_L8_power_law": 619.192905011374,
+      "P256_L16_power_law": 619.192905011374
+    },
+    "final_losses": {
+      "P32_L1_power_law": 1.0079204992408546,
+      "P32_L2_power_law": 1.831820756180943,
+      "P32_L4_power_law": 2.363253363207914,
+      "P32_L8_power_law": 2.6607131761756824,
+      "P32_L16_power_law": 2.817138329572834,
+      "P32_L1_multiband": 4.101407319577673e-05,
+      "P32_L2_multiband": 0.002696262187655914,
+      "P32_L4_multiband": 0.03162336561632652,
+      "P32_L8_multiband": 0.07064984846125205,
+      "P32_L16_multiband": 0.09902771792062068,
+      "P64_L1_power_law": 2.434408114143288,
+      "P64_L2_power_law": 3.8643263622491006,
+      "P64_L4_power_law": 4.77277274374156,
+      "P64_L8_power_law": 5.282218945255922,
+      "P64_L16_power_law": 5.55120120253417,
+      "P64_L1_multiband": 0.00021119666071338,
+      "P64_L2_multiband": 0.00026342115793910685,
+      "P64_L4_multiband": 0.003598706801159335,
+      "P64_L8_multiband": 0.012523697327561475,
+      "P64_L16_multiband": 0.021179410309237957,
+      "P128_L1_power_law": 5.388932139679632,
+      "P128_L2_power_law": 7.889957547216085,
+      "P128_L4_power_law": 9.466941300286653,
+      "P128_L8_power_law": 10.35127251061255,
+      "P128_L16_power_law": 10.819033299085286,
+      "P256_L1_power_law": 11.327247446854479,
+      "P256_L2_power_law": 15.759871912759834,
+      "P256_L4_power_law": 18.54403874000917,
+      "P256_L8_power_law": 20.104441152648654,
+      "P256_L16_power_law": 20.930284004850193
+    }
+  }
+}

@@ -1,0 +1,20 @@
+run_id: run_theoremB_circulant_modes-20260413T054021Z-096dbf62
+phase: theoremB
+script: run_theoremB_circulant_modes
+status: completed
+wall_clock_seconds: 54.016
+compute_proxy: 47.6904
+
+plan_reference: EXPERIMENT_PLAN_FINAL.MD §6.2 (B1)
+device: cpu
+acceptance_tolerance: 1e-10
+n_trials: 4
+n_failures: 0
+status: closure_ok
+max_mode_rel_err: 2.5302991309536365e-15
+max_mode_abs_err: 1.2836953722228372e-16
+median_mode_rel_err: 2.3615742877829193e-15
+max_transfer_rel_err: 1.6655373416886401e-15
+max_transfer_abs_err: 1.6653345369377348e-15
+max_off_diagonal_fourier_energy: 0.0
+sweep_wallclock_seconds: 47.69

@@ -1,0 +1,21 @@
+run_id: run_theoremB_symbol_shift-20260413T061516Z-11e66ac0
+phase: theoremB
+script: run_theoremB_symbol_shift
+status: completed
+wall_clock_seconds: 21.738
+compute_proxy: 18.2747
+
+plan_reference: EXPERIMENT_PLAN_FINAL.MD §6.4 (B3)
+interpretation: Fixed-basis OOD brittleness under symbol-native shifts: structural interpolation (family 1) and frequency-permutation interpolation (family 2). Generic covariance rotation is deliberately excluded from this experiment and belongs to a secondary bridge experiment toward theorem C.
+device: cuda
+n_trials: {'L': 5, 'f1_alphas': 12, 'f2_alphas': 12, 'f2_seeds': 8}
+status: matched_ok+brittleness_ok
+matched_baseline_tol: 1e-10
+matched_baseline_f1_err: 0.0
+matched_baseline_f2_err: 0.0
+brittleness_alpha: 1.0
+brittleness_ratio_min: 1.25
+brittleness_rows: [{'L': 1, 'alpha': 1.0, 'L_ood': 3.6657572918658663, 'baseline': 2.434408114143288, 'ratio': 1.5058104968385353}, {'L': 2, 'alpha': 1.0, 'L_ood': 5.43345472053734, 'baseline': 3.8643263622491006, 'ratio': 1.4060548233237167}, {'L': 4, 'alpha': 1.0, 'L_ood': 6.428798661023486, 'baseline': 4.77277274374156, 'ratio': 1.346973553151769}, {'L': 8, 'alpha': 1.0, 'L_ood': 6.950342307232001, 'baseline': 5.282218945255922, 'ratio': 1.3157997385690074}, {'L': 16, 'alpha': 1.0, 'L_ood': 7.216422076014813, 'baseline': 5.55120120253417, 'ratio': 1.2999748725952243}]
+train_wallclock_seconds: 18.252
+f1_wallclock_seconds: 0.003
+f2_wallclock_seconds: 0.02

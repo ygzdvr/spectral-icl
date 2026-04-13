@@ -152,9 +152,9 @@ class B1Config:
     figure_symbol: str = "power_law"
     figure_mode_indices: tuple[int, ...] = (0, 1, 2, 4, 8)
     figure_L_list: tuple[int, ...] = (1, 2, 4, 8)
-    # Transfer-function figure slice.
+    # Transfer-function figure sweep.
     transfer_P: int = 32
-    transfer_L: int = 4
+    transfer_L_list: tuple[int, ...] = (1, 2, 4, 8)
     transfer_symbol: str = "power_law"
     dtype: str = "float64"
     device: str = "cuda"
@@ -495,36 +495,50 @@ def _plot_mode_trajectories_loglog(
 def _plot_transfer_function(
     trials: list[dict[str, Any]], cfg: B1Config, run_dir: ThesisRunDir
 ) -> None:
-    """Secondary figure: terminal transfer function T(k), empirical vs theory."""
+    """Secondary figure: overlaid terminal transfer-function depth sweep."""
     import matplotlib.pyplot as plt
 
-    candidates = [
+    slice_trials = [
         t for t in trials
         if t["P"] == cfg.transfer_P
-        and t["L"] == cfg.transfer_L
         and t["symbol_kind"] == cfg.transfer_symbol
+        and t["L"] in cfg.transfer_L_list
     ]
-    if not candidates:
+    slice_trials.sort(key=lambda t: t["L"])
+    if not slice_trials:
         return
-    trial = candidates[0]
-    P = trial["P"]
-    k_axis = np.arange(P)
 
-    fig, ax = plt.subplots(figsize=(5.5, 3.8))
-    ax.plot(k_axis, trial["T_emp"].numpy(), color="C0", lw=1.5, label="empirical")
-    overlay_reference(
-        ax, k_axis, trial["T_star"].numpy(), label="exact theory",
-        style="--", color="black", lw=1.0,
-    )
+    P = slice_trials[0]["P"]
+    k_axis = np.arange(P)
+    depth_colors = sequential_colors(len(slice_trials), palette="rocket")
+
+    fig, ax = plt.subplots(figsize=(6.0, 4.0))
+    for color, trial in zip(depth_colors, slice_trials):
+        ax.plot(
+            k_axis,
+            trial["T_emp"].numpy(),
+            color=color,
+            lw=1.5,
+            label=f"empirical L={trial['L']}",
+        )
+        overlay_reference(
+            ax,
+            k_axis,
+            trial["T_star"].numpy(),
+            label=f"theory L={trial['L']}",
+            style="--",
+            color=color,
+            lw=1.0,
+        )
     ax.set_xlabel("mode index k")
     ax.set_ylabel(r"$T(k) = (1 - L^{-1} s_k \gamma_k)^L$")
-    ax.set_title(
-        f"B1 terminal transfer function "
-        f"({trial['symbol_kind']}, P={P}, L={trial['L']})",
+    fig.suptitle(
+        f"B1 terminal transfer function depth sweep, overlaid "
+        f"({cfg.transfer_symbol}, P={P})",
         fontsize=11,
     )
-    ax.legend(fontsize=9)
-    fig.tight_layout()
+    ax.legend(fontsize=8, frameon=True, ncol=2)
+    fig.tight_layout(rect=(0, 0, 1, 0.95))
     save_both(fig, run_dir, "transfer_function")
     plt.close(fig)
 

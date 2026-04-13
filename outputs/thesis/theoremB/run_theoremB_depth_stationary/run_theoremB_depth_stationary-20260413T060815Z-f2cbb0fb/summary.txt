@@ -1,0 +1,19 @@
+run_id: run_theoremB_depth_stationary-20260413T060815Z-f2cbb0fb
+phase: theoremB
+script: run_theoremB_depth_stationary
+status: completed
+wall_clock_seconds: 180.205
+compute_proxy: 168.873
+
+plan_reference: EXPERIMENT_PLAN_FINAL.MD §6.3 (B2)
+interpretation: Finite-time matched-stationary depth-irrelevance experiment: no evidence of a depth-dependent asymptotic floor; finite-T cross-L differences are transient-rate effects (L=1 exponential, L>1 polynomial of order -1/(2L-2)).
+device: cuda
+n_trials: 30
+status: monotonicity_ok+depth_decay_ok
+monotonicity_slack: 1e-09
+max_monotonicity_violation: 0.0
+depth_decay_fraction_max: 0.2
+max_decay_fraction_observed: 0.0618493140077237
+worst_decay_trial: {'P': 32, 'L': 16, 'symbol_kind': 'power_law', 'loss_initial': 45.548416741065736, 'loss_final': 2.817138329572834, 'decay_fraction': 0.0618493140077237}
+depth_ratios: [{'P': 32, 'symbol_kind': 'multiband', 'L_min': 1, 'L_max': 16, 'loss_final_L_min': 4.101407319577673e-05, 'loss_final_L_max': 0.09902771792062068, 'ratio': 2414.48142562972}, {'P': 32, 'symbol_kind': 'power_law', 'L_min': 1, 'L_max': 16, 'loss_final_L_min': 1.0079204992408546, 'loss_final_L_max': 2.817138329572834, 'ratio': 2.795000529996806}, {'P': 64, 'symbol_kind': 'multiband', 'L_min': 1, 'L_max': 16, 'loss_final_L_min': 0.00021119666071338, 'loss_final_L_max': 0.021179410309237957, 'ratio': 100.28288438698866}, {'P': 64, 'symbol_kind': 'power_law', 'L_min': 1, 'L_max': 16, 'loss_final_L_min': 2.434408114143288, 'loss_final_L_max': 5.55120120253417, 'ratio': 2.280308371584498}, {'P': 128, 'symbol_kind': 'power_law', 'L_min': 1, 'L_max': 16, 'loss_final_L_min': 5.388932139679632, 'loss_final_L_max': 10.819033299085286, 'ratio': 2.0076395505935003}, {'P': 256, 'symbol_kind': 'power_law', 'L_min': 1, 'L_max': 16, 'loss_final_L_min': 11.327247446854479, 'loss_final_L_max': 20.930284004850193, 'ratio': 1.8477820055623868}]
+sweep_wallclock_seconds: 168.873
