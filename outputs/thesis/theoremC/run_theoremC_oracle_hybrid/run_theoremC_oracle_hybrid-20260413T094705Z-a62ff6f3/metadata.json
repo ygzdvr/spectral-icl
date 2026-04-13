@@ -1,0 +1,61 @@
+{
+  "run_id": "run_theoremC_oracle_hybrid-20260413T094705Z-a62ff6f3",
+  "script_stem": "run_theoremC_oracle_hybrid",
+  "phase": "theoremC",
+  "root": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremC/run_theoremC_oracle_hybrid/run_theoremC_oracle_hybrid-20260413T094705Z-a62ff6f3",
+  "started_utc": "2026-04-13T09:47:05.171407+00:00",
+  "seeds": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "git_commit": "531d741",
+  "git_dirty": true,
+  "env": {
+    "python_version": "3.14.3",
+    "python_full_version": "3.14.3 (main, Mar 20 2026, 00:34:32) [Clang 22.1.1 ]",
+    "python_executable": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/.venv/bin/python",
+    "platform": "Linux-5.14.0-570.94.1.el9_6.x86_64-x86_64-with-glibc2.34",
+    "hostname": "della-gpu.princeton.edu",
+    "torch_version": "2.11.0+cu130",
+    "cuda_available": true,
+    "cuda_version": "13.0",
+    "cudnn_version": 91900,
+    "gpu_count": 1,
+    "gpu_names": [
+      "NVIDIA A100-PCIE-40GB"
+    ]
+  },
+  "notes": "C6 'oracle hybrid defined correctly' (plan \u00a77.6). Operator-level exact optimization only. The oracle hybrid is the REFINED COMMUTANT OPTIMUM, not a learned or estimated projector; architecture approximations belong to \u00a79.",
+  "status": "completed",
+  "finished_utc": "2026-04-13T09:47:29.803135+00:00",
+  "wall_clock_seconds": 24.632174253463745,
+  "compute_proxy": 19.175699981860816,
+  "measured_compute": null,
+  "per_step_wall_clock": {
+    "n_steps": 0,
+    "mean": null,
+    "median": null,
+    "total": null
+  },
+  "error": null,
+  "extras": {
+    "worst_c_h_neg": -5.2372630487944275e-12,
+    "worst_h_u_neg": -1.0573842846257585e-11,
+    "worst_unconstrained": 2.158039274002296e-10,
+    "worst_F_m2": 5.083990249454828e-06,
+    "aggregates_at_L_primary": {
+      "argmax_L_coarse_cell": {
+        "m": 8,
+        "kappa": 10.0,
+        "L": 4,
+        "L_coarse": 0.560020256008645,
+        "L_hybrid": 0.03726598797156281,
+        "captured_fraction": 0.9334559999004973
+      },
+      "max_captured_fraction_at_L_primary": 0.9999999999960367,
+      "min_captured_fraction_at_L_primary": 0.9290975141772166
+    }
+  }
+}

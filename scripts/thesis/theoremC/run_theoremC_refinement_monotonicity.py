@@ -8,7 +8,11 @@ Validate the theorem-C **refinement monotonicity** statement exactly at the
 operator level, extending C4's single dyadic step to a full ladder from the
 coarsest partition down to singletons:
 
-    B^{(0)}  ⊒  B^{(1)}  ⊒  ...  ⊒  B^{(J)}.
+    B^{(0)}  ⊒  B^{(1)}  ⊒  ...  ⊒  B^{(J)},
+
+with ``J + 1`` ladder levels and ``J`` refinement steps. On the default
+D = 64 dyadic ladder this is **7 ladder levels and 6 refinement steps**
+(block sizes 64 → 32 → 16 → 8 → 4 → 2 → 1).
 
 For a fixed ambient spectrum ``(λ, ω)`` and a fixed depth ``L``, let
 
@@ -142,9 +146,10 @@ from scripts.thesis.utils.run_metadata import RunContext, ThesisRunDir
 class C5Config:
     """Frozen configuration for the refinement-monotonicity ladder.
 
-    Default ladder is the full dyadic refinement on D = 64 (7 levels, block
-    sizes 64 → 32 → 16 → 8 → 4 → 2 → 1). Default κ sweep has 7 values that
-    span the flat-ladder regime to the full-staircase regime. Two depths
+    Default ladder is the full dyadic refinement on D = 64:
+    **7 ladder levels and 6 refinement steps** (block sizes
+    64 → 32 → 16 → 8 → 4 → 2 → 1). Default κ sweep has 7 values that span
+    the flat-ladder regime to the full-staircase regime. Two depths
     confirm the ladder structure across L.
     """
 
@@ -739,21 +744,27 @@ def main() -> int:
                 "interpretation": (
                     "For every κ and every depth L, the block-commutant "
                     "optimum L★(j) is monotonically non-increasing along "
-                    "the dyadic refinement ladder j = 0 → J, reaching 0 "
-                    "at the singleton partition. At κ = 1 every level "
-                    "attains 0 (trivial flat ladder, no heterogeneity to "
-                    "resolve). At large κ, every dyadic step that "
-                    "separates heterogeneous modes produces a strict "
-                    "drop, and the full ladder traces a monotone "
-                    "staircase from a large L★(0) down to 0. The κ sweep "
-                    "makes this transition visually explicit. Depth "
-                    "enters only as a secondary axis; the staircase "
-                    "structure persists across L, confirming that the "
-                    "theorem-C hybrid-refinement story is depth-robust."
+                    "the dyadic refinement ladder of "
+                    f"{result['n_levels']} ladder levels and "
+                    f"{result['n_levels'] - 1} refinement steps "
+                    "(j = 0 → J), reaching 0 at the singleton partition. "
+                    "At κ = 1 every level attains 0 (trivial flat "
+                    "ladder, no heterogeneity to resolve). At large κ, "
+                    "every dyadic step that separates heterogeneous "
+                    "modes produces a strict drop, and the full ladder "
+                    "traces a monotone staircase from a large L★(0) "
+                    "down to 0. The κ sweep makes this transition "
+                    "visually explicit. Depth enters only as a "
+                    "secondary axis; the staircase structure persists "
+                    "across L, confirming that the theorem-C hybrid-"
+                    "refinement story is depth-robust. The singleton "
+                    "level is an oracle sanity endpoint only, not the "
+                    "theorem object under test."
                 ),
                 "device": str(device),
                 "D": cfg.D,
-                "J_used": result["n_levels"] - 1,
+                "n_ladder_levels": result["n_levels"],
+                "n_refinement_steps": result["n_levels"] - 1,
                 "level_sizes": result["level_sizes"],
                 "per_level_nblocks": result["per_level_nblocks"].tolist(),
                 "kappa_list": list(cfg.kappa_list),

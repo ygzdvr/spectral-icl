@@ -1,16 +1,16 @@
 {
-  "run_id": "run_theoremC_refinement_monotonicity-20260413T092339Z-7819b556",
+  "run_id": "run_theoremC_refinement_monotonicity-20260413T094019Z-3f84bcd0",
   "script_stem": "run_theoremC_refinement_monotonicity",
   "phase": "theoremC",
-  "root": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremC/run_theoremC_refinement_monotonicity/run_theoremC_refinement_monotonicity-20260413T092339Z-7819b556",
-  "started_utc": "2026-04-13T09:23:39.209486+00:00",
+  "root": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremC/run_theoremC_refinement_monotonicity/run_theoremC_refinement_monotonicity-20260413T094019Z-3f84bcd0",
+  "started_utc": "2026-04-13T09:40:19.877701+00:00",
   "seeds": [
     0,
     1,
     2,
     3
   ],
-  "git_commit": "443070b",
+  "git_commit": "531d741",
   "git_dirty": true,
   "env": {
     "python_version": "3.14.3",
@@ -29,9 +29,9 @@
   },
   "notes": "C5 theorem-C refinement monotonicity ladder. Operator-level exact optimization only; no learned architectures. Extends C4's one-step dyadic gain to a full multi-level ladder.",
   "status": "completed",
-  "finished_utc": "2026-04-13T09:23:53.946897+00:00",
-  "wall_clock_seconds": 14.737821102142334,
-  "compute_proxy": 10.130145603325218,
+  "finished_utc": "2026-04-13T09:40:30.964578+00:00",
+  "wall_clock_seconds": 11.087340831756592,
+  "compute_proxy": 7.083495174068958,
   "measured_compute": null,
   "per_step_wall_clock": {
     "n_steps": 0,
