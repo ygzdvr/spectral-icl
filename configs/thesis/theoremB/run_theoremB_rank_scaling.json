@@ -1,0 +1,21 @@
+{
+  "_comment": "Default-value reference for run_theoremB_rank_scaling.py (B4). Mirrors the B4Config dataclass defaults so they can be diffed. The script does NOT auto-load this JSON; to override defaults, pass CLI flags on the command line. See EXPERIMENT_PLAN_FINAL.MD §6.5 and the script's module docstring. B4 uses the same (eta, T) as B2/B3 so the full-rank matched asymptote reproduces B2 numerics. Spectral rank r is the primary control variable; the joint (r, L_S) sweep tests the theorem-B pure-spectral-shape law BEFORE hybridization.",
+  "plan_reference": "EXPERIMENT_PLAN_FINAL.MD §6.5 (B4)",
+  "P": 256,
+  "r_list": [1, 2, 4, 8, 16, 32, 64, 128],
+  "L_list": [1, 2, 4, 8],
+  "T": 100000,
+  "eta": 5e-5,
+  "base_symbol_kind": "power_law",
+  "power_law_nu": 0.5,
+  "task_spec_nu_beta": 1.0,
+  "multiband": [[0, 2, 1.0], [5, 7, 0.8]],
+  "floor_fit_window_r": [4, 64],
+  "floor_exponent_tol": 0.15,
+  "depth_collapse_ratio_max": 5.0,
+  "depth_fixed_r_list": [4, 16, 64],
+  "query_mode": "full_window",
+  "matched_query_realization": "independent",
+  "dtype": "float64",
+  "device": "cuda"
+}

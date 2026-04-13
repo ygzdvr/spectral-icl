@@ -1,0 +1,27 @@
+run_id: run_theoremC_phase_diagram-20260413T090447Z-a95a1cc9
+phase: theoremC
+script: run_theoremC_phase_diagram
+status: completed
+wall_clock_seconds: 27.941
+compute_proxy: 21.3331
+
+plan_reference: EXPERIMENT_PLAN_FINAL.MD §7.4 (C4)
+headline_status: C4 is the main headline figure of the thesis experiments. The phase diagram is a theorem-level map of where hybrid refinement matters. Drawn purely at the operator-level exact-optimization layer; no learned architectures, no trained networks.
+category: operator-level exact theorem-C validation — mass-preserving band-RRS with (m, κ, L) as axes; L-BFGS over block scalars in coarse and dyadically-finer commutant classes.
+interpretation: Panel (a) is the spectral-only obstruction L_coarse(m, κ) at fixed depth. Panel (b) is the oracle refined optimum L_fine(m, κ) at the dyadically-finer partition m/2 (theorem-C oracle hybrid = direct optimization over the refined commutant class; no learned projector). Panel (c) is their difference — the theorem-C refinement gain of one dyadic step. The homogeneous slice κ=1 lies at zero everywhere (no heterogeneity, no obstruction) and the m=1 row is identically zero (singleton = fully unconstrained). Depth enters only as a secondary axis and shows that the refinement gain persists across L; the headline 2D picture is therefore robust to depth. Any architectural comparison of these quantities belongs to the later architecture-aligned tier.
+device: cuda
+D: 64
+m_list: [1, 2, 4, 8, 16, 32]
+kappa_list: [1.0, 1.2, 1.5, 2.0, 3.0, 5.0, 10.0]
+L_list: [1, 2, 4, 8, 16]
+L_primary: 4
+status: refinement_nonneg_ok+kappa1_zero_ok+full_oracle_ok
+refinement_nonnegativity_tol: 1e-07
+kappa_1_tol: 1e-09
+full_oracle_tol: 1e-07
+worst_neg_gap: -5.2372630487944275e-12
+worst_neg_cell: {'m': 2, 'kappa': 1.5, 'L': 16, 'gap': -5.2372630487944275e-12}
+kappa_one_worst: 9.691188990238273e-12
+full_oracle_worst: 2.158039274002296e-10
+aggregates_at_L_primary: {'max_L_coarse_at_L_primary': 0.560020256008645, 'max_gap_at_L_primary': 0.5227542680370822, 'argmax_cell': {'m': 8, 'kappa': 10.0, 'L': 4, 'gap': 0.5227542680370822}}
+sweep_wallclock_seconds: 21.333

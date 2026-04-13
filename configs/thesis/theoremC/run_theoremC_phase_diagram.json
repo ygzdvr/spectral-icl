@@ -1,0 +1,23 @@
+{
+  "_comment": "Default-value reference for run_theoremC_phase_diagram.py (C4). Mirrors the C4Config dataclass defaults. The script does NOT auto-load this JSON; to override defaults pass CLI flags. See EXPERIMENT_PLAN_FINAL.MD §7.4 and the script's module docstring. C4 is the thesis's main headline figure: a theorem-C heterogeneity phase diagram over (m, κ, L) computed by operator-level exact optimization only — no learned architectures.",
+  "plan_reference": "EXPERIMENT_PLAN_FINAL.MD §7.4 (C4)",
+  "D": 64,
+  "m_list": [1, 2, 4, 8, 16, 32],
+  "kappa_list": [1.0, 1.2, 1.5, 2.0, 3.0, 5.0, 10.0],
+  "L_list": [1, 2, 4, 8, 16],
+  "L_primary": 4,
+  "block_mean_lam": 1.0,
+  "block_mean_omega": 1.0,
+  "kappa_omega_matches_lam": true,
+  "xi_shape": "linear",
+  "spectral_basis_kind": "dct2",
+  "depth_interaction_kappas": [1.2, 2.0, 5.0],
+  "refinement_nonnegativity_tol": 1e-7,
+  "kappa_1_tol": 1e-9,
+  "full_oracle_tol": 1e-7,
+  "optimizer": "lbfgs",
+  "max_iter": 500,
+  "compute_full_oracle": true,
+  "dtype": "float64",
+  "device": "cuda"
+}

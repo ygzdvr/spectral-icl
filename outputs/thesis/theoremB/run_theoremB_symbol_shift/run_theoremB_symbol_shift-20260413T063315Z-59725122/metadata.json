@@ -1,9 +1,9 @@
 {
-  "run_id": "run_theoremB_symbol_shift-20260413T061516Z-11e66ac0",
+  "run_id": "run_theoremB_symbol_shift-20260413T063315Z-59725122",
   "script_stem": "run_theoremB_symbol_shift",
   "phase": "theoremB",
-  "root": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremB/run_theoremB_symbol_shift/run_theoremB_symbol_shift-20260413T061516Z-11e66ac0",
-  "started_utc": "2026-04-13T06:15:16.420093+00:00",
+  "root": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremB/run_theoremB_symbol_shift/run_theoremB_symbol_shift-20260413T063315Z-59725122",
+  "started_utc": "2026-04-13T06:33:15.012496+00:00",
   "seeds": [
     17,
     23,
@@ -14,7 +14,7 @@
     61,
     71
   ],
-  "git_commit": "501fb0a",
+  "git_commit": "443070b",
   "git_dirty": true,
   "env": {
     "python_version": "3.14.3",
@@ -33,9 +33,9 @@
   },
   "notes": null,
   "status": "completed",
-  "finished_utc": "2026-04-13T06:15:38.158064+00:00",
-  "wall_clock_seconds": 21.738476276397705,
-  "compute_proxy": 18.274719443637878,
+  "finished_utc": "2026-04-13T06:33:38.172147+00:00",
+  "wall_clock_seconds": 23.160176992416382,
+  "compute_proxy": 18.636743920855224,
   "measured_compute": null,
   "per_step_wall_clock": {
     "n_steps": 0,
@@ -88,8 +88,8 @@
         "ratio": 1.2999748725952243
       }
     ],
-    "train_seconds": 18.25163578474894,
-    "f1_seconds": 0.002749405801296234,
-    "f2_seconds": 0.02033425308763981
+    "train_seconds": 18.587387502659112,
+    "f1_seconds": 0.0030341199599206448,
+    "f2_seconds": 0.04632229823619127
   }
 }

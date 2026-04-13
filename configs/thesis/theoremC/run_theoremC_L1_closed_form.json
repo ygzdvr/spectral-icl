@@ -1,0 +1,23 @@
+{
+  "_comment": "Default-value reference for run_theoremC_L1_closed_form.py (C3). Mirrors the C3Config dataclass defaults. The script does NOT auto-load this JSON; to override defaults pass CLI flags. See EXPERIMENT_PLAN_FINAL.MD §7.3 and the script's module docstring. C3 validates the theorem-C closed-form L=1 block-commutant lower bound against L-BFGS numerical optimum and visualizes the obstruction's dependence on within-block heterogeneity κ. Ancestry: run_loss_vs_w.py, run_loss_landscape.py.",
+  "plan_reference": "EXPERIMENT_PLAN_FINAL.MD §7.3 (C3)",
+  "D": 64,
+  "partition_m_list": [1, 2, 4, 8, 16, 32],
+  "kappa_list": [1.0, 1.1, 1.2, 1.5, 2.0, 3.0, 5.0, 10.0],
+  "block_mean_lam": 1.0,
+  "block_mean_omega": 1.0,
+  "kappa_omega_matches_lam": true,
+  "xi_shape": "linear",
+  "spectral_basis_kind": "dct2",
+  "closed_form_tol": 1e-8,
+  "q_tol": 1e-6,
+  "zero_tol": 1e-10,
+  "landscape_m": 8,
+  "landscape_kappas": [1.0, 2.0, 5.0, 10.0],
+  "landscape_q_range_multiplier": 2.0,
+  "landscape_n_points": 201,
+  "optimizer": "lbfgs",
+  "max_iter": 500,
+  "dtype": "float64",
+  "device": "cuda"
+}

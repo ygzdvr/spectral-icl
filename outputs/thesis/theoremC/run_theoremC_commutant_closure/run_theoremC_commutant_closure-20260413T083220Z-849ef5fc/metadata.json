@@ -1,0 +1,205 @@
+{
+  "run_id": "run_theoremC_commutant_closure-20260413T083220Z-849ef5fc",
+  "script_stem": "run_theoremC_commutant_closure",
+  "phase": "theoremC",
+  "root": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremC/run_theoremC_commutant_closure/run_theoremC_commutant_closure-20260413T083220Z-849ef5fc",
+  "started_utc": "2026-04-13T08:32:20.587239+00:00",
+  "seeds": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "git_commit": "443070b",
+  "git_dirty": true,
+  "env": {
+    "python_version": "3.14.3",
+    "python_full_version": "3.14.3 (main, Mar 20 2026, 00:34:32) [Clang 22.1.1 ]",
+    "python_executable": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/.venv/bin/python",
+    "platform": "Linux-5.14.0-570.94.1.el9_6.x86_64-x86_64-with-glibc2.34",
+    "hostname": "della-gpu.princeton.edu",
+    "torch_version": "2.11.0+cu130",
+    "cuda_available": true,
+    "cuda_version": "13.0",
+    "cudnn_version": 91900,
+    "gpu_count": 1,
+    "gpu_names": [
+      "NVIDIA A100-PCIE-40GB"
+    ]
+  },
+  "notes": "C1: operator-level band-RRS commutant closure. C2: grouped scalar dynamics validated against the matrix path.",
+  "status": "completed",
+  "finished_utc": "2026-04-13T08:33:43.412460+00:00",
+  "wall_clock_seconds": 82.82580947875977,
+  "compute_proxy": 75.93894377863035,
+  "measured_compute": null,
+  "per_step_wall_clock": {
+    "n_steps": 4,
+    "mean": 8.77470456075389,
+    "median": 8.786730336025357,
+    "total": 35.09881824301556
+  },
+  "error": null,
+  "extras": {
+    "cv_r_max_all": 0.0,
+    "cv_n_final_min": 0.025186923281580367,
+    "q_err_max_all": 0.0,
+    "per_trial": [
+      {
+        "L": 1,
+        "cv_r_max": 0.0,
+        "cv_r_final": 0.0,
+        "cv_n_max": 0.29633540906464667,
+        "cv_n_final": 0.047060402344569395,
+        "q_err_max": 0.0
+      },
+      {
+        "L": 2,
+        "cv_r_max": 0.0,
+        "cv_r_final": 0.0,
+        "cv_n_max": 0.29633540906464667,
+        "cv_n_final": 0.027475743673348735,
+        "q_err_max": 0.0
+      },
+      {
+        "L": 4,
+        "cv_r_max": 0.0,
+        "cv_r_final": 0.0,
+        "cv_n_max": 0.29633540906464667,
+        "cv_n_final": 0.025186923281580367,
+        "q_err_max": 0.0
+      },
+      {
+        "L": 8,
+        "cv_r_max": 0.0,
+        "cv_r_final": 0.0,
+        "cv_n_max": 0.29633540906464667,
+        "cv_n_final": 0.025260117246594774,
+        "q_err_max": 0.0
+      }
+    ],
+    "mc_consistency_rows": [
+      {
+        "checkpoint_step": 0,
+        "checkpoint_fraction": 0.0,
+        "N": 100,
+        "L": 4,
+        "abs_err_frobenius": 0.33184327155014026,
+        "rel_err_frobenius": 0.06796237534674071,
+        "alg_norm": 4.882749754656046,
+        "seconds": 1.5545045472681522
+      },
+      {
+        "checkpoint_step": 0,
+        "checkpoint_fraction": 0.0,
+        "N": 1000,
+        "L": 4,
+        "abs_err_frobenius": 0.10036774277834395,
+        "rel_err_frobenius": 0.020555577865246165,
+        "alg_norm": 4.882749754656046,
+        "seconds": 2.21971899503842
+      },
+      {
+        "checkpoint_step": 0,
+        "checkpoint_fraction": 0.0,
+        "N": 10000,
+        "L": 4,
+        "abs_err_frobenius": 0.03257531281409797,
+        "rel_err_frobenius": 0.006671509794872268,
+        "alg_norm": 4.882749754656046,
+        "seconds": 4.664253630209714
+      },
+      {
+        "checkpoint_step": 0,
+        "checkpoint_fraction": 0.0,
+        "N": 50000,
+        "L": 4,
+        "abs_err_frobenius": 0.01439158672780974,
+        "rel_err_frobenius": 0.002947434837119463,
+        "alg_norm": 4.882749754656046,
+        "seconds": 5.729082347359508
+      },
+      {
+        "checkpoint_step": 2500,
+        "checkpoint_fraction": 0.5,
+        "N": 100,
+        "L": 4,
+        "abs_err_frobenius": 0.012376102655797763,
+        "rel_err_frobenius": 0.034573460632068696,
+        "alg_norm": 0.35796539974706143,
+        "seconds": 1.1957704317755997
+      },
+      {
+        "checkpoint_step": 2500,
+        "checkpoint_fraction": 0.5,
+        "N": 1000,
+        "L": 4,
+        "abs_err_frobenius": 0.004047394123529544,
+        "rel_err_frobenius": 0.011306662952311692,
+        "alg_norm": 0.35796539974706143,
+        "seconds": 2.2102251490578055
+      },
+      {
+        "checkpoint_step": 2500,
+        "checkpoint_fraction": 0.5,
+        "N": 10000,
+        "L": 4,
+        "abs_err_frobenius": 0.0012521086941205952,
+        "rel_err_frobenius": 0.003497848381450654,
+        "alg_norm": 0.35796539974706143,
+        "seconds": 4.381472860928625
+      },
+      {
+        "checkpoint_step": 2500,
+        "checkpoint_fraction": 0.5,
+        "N": 50000,
+        "L": 4,
+        "abs_err_frobenius": 0.000522228532921655,
+        "rel_err_frobenius": 0.0014588799176978053,
+        "alg_norm": 0.35796539974706143,
+        "seconds": 5.880075313616544
+      },
+      {
+        "checkpoint_step": 5000,
+        "checkpoint_fraction": 1.0,
+        "N": 100,
+        "L": 4,
+        "abs_err_frobenius": 0.006776982652784418,
+        "rel_err_frobenius": 0.03332295724639769,
+        "alg_norm": 0.20337278599476732,
+        "seconds": 0.9241288402117789
+      },
+      {
+        "checkpoint_step": 5000,
+        "checkpoint_fraction": 1.0,
+        "N": 1000,
+        "L": 4,
+        "abs_err_frobenius": 0.002183700951996389,
+        "rel_err_frobenius": 0.010737429500781754,
+        "alg_norm": 0.20337278599476732,
+        "seconds": 1.9061528388410807
+      },
+      {
+        "checkpoint_step": 5000,
+        "checkpoint_fraction": 1.0,
+        "N": 10000,
+        "L": 4,
+        "abs_err_frobenius": 0.0006800579809104974,
+        "rel_err_frobenius": 0.003343898632179799,
+        "alg_norm": 0.20337278599476732,
+        "seconds": 4.1915023773908615
+      },
+      {
+        "checkpoint_step": 5000,
+        "checkpoint_fraction": 1.0,
+        "N": 50000,
+        "L": 4,
+        "abs_err_frobenius": 0.00032757722407888296,
+        "rel_err_frobenius": 0.001610723000506623,
+        "alg_norm": 0.20337278599476732,
+        "seconds": 5.940822038799524
+      }
+    ],
+    "mc_worst_at_N_max": 0.002947434837119463
+  }
+}
