@@ -1,0 +1,33 @@
+run_id: run_theoremA_semiseparable-20260413T201529Z-61f65d3e
+phase: theoremA
+script: run_theoremA_semiseparable
+status: completed
+wall_clock_seconds: 7.471
+compute_proxy: 3.5491
+
+plan_reference: EXPERIMENT_PLAN_FINAL.MD §8.3 (A3) + §8.4 (A4)
+primary_vs_secondary: A3 (PRIMARY): explicit theorem-consistent semiseparable / SSD realization of the GD-compatible structured mask. The single primary theorem-level result of this script — machine-precision agreement with the reduced (A_S, B_S) theorem object across the (D, P, K, L) sweep. A4 (SECONDARY): two negative controls (NC1 = pure linear circulant convolution mixer, NC2 = non-GD-compatible structured mask). These are NOT theorem-A in-class models; their non-trivial deviation from the reduced prediction is the experimental point and shows that exact reduced-Γ behavior is not universal — the theorem-A hypotheses are load-bearing. A4 results MUST be labeled as negative controls, not as theorem-A failures.
+category: exact theorem-A operator-level deterministic forward-pass validation. No learned architecture, no training dynamics.
+a3_interpretation: The GD-compatible signed mask M_signed = (1_test − 1_train) · 1_train^T is rank-1 in the sequence dimension. The structured-mixer per-layer update therefore admits an explicit D-dim SSD-style state recursion: z^(ℓ+1) = z^(ℓ) + (1/(P·L)) · diag_sign · X^T · Γ · (X · Π_train · z^(ℓ)). This is the explicit theorem-consistent semiseparable realization of plan §8.3 — not a broad SSD family. A3 verifies that it equals the reduced (A_S, B_S) recursion to float64 machine precision over the full (D, P, K, L) sweep.
+a4_interpretation: NC1 (pure circulant convolutional mixer): no data-dependent bilinear K·Q structure, no dependence on (X, Γ). Outside the theorem-A class. NC2 (non-GD-compatible mask, signflip_testtest): structured mixer is bilinear but the mask violates GD-compatibility. Outside the theorem-A class. Both NC forwards differ from the reduced prediction by orders of magnitude. The deviation is the experimental point — it shows the theorem-A hypotheses are required for exact reduced-Γ equivalence.
+device: cuda
+D_list: [8, 16, 32, 64]
+P_list: [8, 16, 32, 64]
+K_list: [4, 8, 16]
+L_list: [1, 2, 4, 8]
+a3_n_cells: 192
+a4_n_seeds: 4
+a4_geometry: {'D': 32, 'P': 32, 'K': 8, 'L': 4}
+a4_non_gd_kind: signflip_testtest
+a4_circular_kernel_width: 1.5
+a4_circular_kernel_scale: 1.0
+status: a3_SSD_vs_AB_ok+a3_SSD_vs_full_ok+a4_NC1_deviates+a4_NC2_deviates
+machine_eps_tol: 1e-10
+a4_min_relative_deviation: 0.1
+a3_worst_SSD_vs_AB: 1.6245542923724581e-15
+a3_worst_SSD_vs_full: 2.027992716546957e-15
+a3_worst_AB_vs_full: 6.570027582092749e-16
+a4_min_NC1_deviation: 1.195044320940574
+a4_min_NC2_deviation: 2.0
+a3_wallclock_seconds: 2.919
+a4_wallclock_seconds: 0.63

@@ -1,0 +1,37 @@
+run_id: run_arch_spectral_linear_stationary-20260413T212111Z-af862222
+phase: architectures
+script: run_arch_spectral_linear_stationary
+status: completed
+wall_clock_seconds: 177.539
+compute_proxy: 172.623
+
+plan_reference: EXPERIMENT_PLAN_FINAL.MD §9.1 (architecture-aligned spectral-only suite, first script: matched stationary)
+phase: Phase IV — architecture-aligned validation layer
+category: trainable real-valued L_S-layer circulant spectral filter on matched stationary circulant ICL regression. Architecture-aligned support for theorem-B matched-stationary mechanisms; not an exact theorem proof and not a learned-hybrid experiment.
+framing: This is the FIRST architecture-aligned validation script for the thesis. Theorem-B is already proven exactly at the operator level (B1/B2/B3/B4). The qualitative question here is whether the trainable spectral architecture preserves the matched-stationary depth-irrelevance pattern: increasing spectral depth L_S must NOT introduce a qualitatively new asymptotic loss floor.
+architecture: Per-layer learnable γ^(ℓ) ∈ R^D; circulant Γ^(ℓ) = F^T diag(γ^(ℓ)) F with F real-orthogonal Fourier basis. Forward in F-basis: signed-mask × bilinear-score residual stream of A1b R0 form, with γ^(ℓ) trained by Adam on freshly-sampled mini-batches. Initialization γ ≡ 0 matches theorem-B Γ(0) = 0. Decoupled per layer per Bordelon DecoupledTrainModelConfig ancestor.
+task: G1 matched stationary circulant ICL regression; s_te = s_tr (matched); power_law symbol with ν = 0.5 and teacher νβ = 1.0; label_norm = sqrt_P. Per-step batch of 64 contexts, fresh sampling.
+interpretation: All four spectral depths reach a small final loss; the median per-Fourier-mode |T_k^cumul| at end of training is small for every L_S, indicating the learned γ^(ℓ) approximately reaches the matched-stationary fixed point γ_k* = L_S / s_tr,k per layer. The mean final loss across L_S stays within the depth-floor ratio threshold — there is no qualitatively new asymptotic floor introduced by increasing spectral depth in this trainable matched-stationary setting. This is architecture-aligned support for B2; it is NOT an exact theorem verification.
+device: cuda
+geometry: {'D': 32, 'P': 32, 'K': 8, 'batch_contexts': 64, 'train_steps': 3000, 'log_every': 25}
+L_S_list: [1, 2, 4, 8]
+seed_list: [0, 1, 2, 3]
+n_runs: 16
+optimizer: adam
+learning_rate: 0.05
+label_norm: sqrt_P
+symbol_kind: power_law
+power_law_nu: 0.5
+task_spec_nu_beta: 1.0
+status: no_nan_ok+decay_ok+depth_floor_ok+transfer_alignment_ok
+decay_fraction: 0.4
+depth_floor_ratio_threshold: 5.0
+transfer_max_median: 0.8
+initial_loss_analytical: 45.548416741065736
+initial_per_batch_mse: 1.4233880231583043
+nan_count: 0
+n_decay_violations: 0
+depth_floor_ratio_observed: 4.430021243598639
+n_transfer_violations: 0
+mean_finals_per_LS: {'1': 0.5187424615989453, '2': 0.3140820908378662, '4': 0.17458748050383677, '8': 0.11709705960180797}
+sweep_wallclock_seconds: 172.623

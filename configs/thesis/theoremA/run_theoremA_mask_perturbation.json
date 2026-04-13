@@ -1,0 +1,21 @@
+{
+  "_comment": "Default-value reference for run_theoremA_mask_perturbation.py (A2). Mirrors the A2Config dataclass defaults. The script does NOT auto-load this JSON; to override defaults pass CLI flags. See EXPERIMENT_PLAN_FINAL.MD §8.2. A2 is the FAITHFUL theorem-A perturbation diagnostic — it compares the empirical full-model forward error around GD-compatibility against the full additive (A, B)-operator reduced perturbation bound, with A-side and B-side reported separately.",
+  "plan_reference": "EXPERIMENT_PLAN_FINAL.MD §8.2 (A2)",
+  "configs": [[32, 32, 8, 4], [64, 32, 8, 4]],
+  "theta_list": [0.0, 1e-5, 1e-4, 1e-3, 5e-3, 1e-2, 5e-2, 0.1, 0.2],
+  "seed_list": [0, 1, 2, 3],
+  "pattern_seed": 42,
+  "pattern_seed_B": 137,
+  "perturb_modes": ["A_only", "B_only"],
+  "Sigma_kind": "isotropic",
+  "Omega_kind": "isotropic",
+  "Gamma_kind": "identity",
+  "label_norm": "sqrt_D",
+  "sigma": 0.0,
+  "B": 1,
+  "machine_eps_tol": 1e-10,
+  "bound_numerical_slack": 1e-12,
+  "headline_config_idx": 1,
+  "dtype": "float64",
+  "device": "cuda"
+}

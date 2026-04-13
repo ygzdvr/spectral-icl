@@ -1,0 +1,55 @@
+{
+  "run_id": "run_arch_spectral_linear_stationary-20260413T212111Z-af862222",
+  "script_stem": "run_arch_spectral_linear_stationary",
+  "phase": "architectures",
+  "root": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/architectures/run_arch_spectral_linear_stationary/run_arch_spectral_linear_stationary-20260413T212111Z-af862222",
+  "started_utc": "2026-04-13T21:21:11.545176+00:00",
+  "seeds": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "git_commit": "59e482e",
+  "git_dirty": true,
+  "env": {
+    "python_version": "3.14.3",
+    "python_full_version": "3.14.3 (main, Mar 20 2026, 00:34:32) [Clang 22.1.1 ]",
+    "python_executable": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/.venv/bin/python",
+    "platform": "Linux-5.14.0-570.106.1.el9_6.x86_64-x86_64-with-glibc2.34",
+    "hostname": "della-i23g3",
+    "torch_version": "2.11.0+cu130",
+    "cuda_available": true,
+    "cuda_version": "13.0",
+    "cudnn_version": 91900,
+    "gpu_count": 1,
+    "gpu_names": [
+      "NVIDIA H200"
+    ]
+  },
+  "notes": "\u00a79.1 first architecture-aligned spectral-only experiment. Trainable real-valued L_S-layer circulant spectral filter (per-layer learnable Fourier-mode coefficients) on matched stationary circulant ICL regression. Architecture-aligned support for theorem-B matched-stationary mechanisms; NOT an exact theorem proof. Qualitative gate, not algebraic.",
+  "status": "completed",
+  "finished_utc": "2026-04-13T21:24:09.084252+00:00",
+  "wall_clock_seconds": 177.53919434547424,
+  "compute_proxy": 172.62333777200547,
+  "measured_compute": null,
+  "per_step_wall_clock": {
+    "n_steps": 16,
+    "mean": 10.786558331368724,
+    "median": 10.141768039989984,
+    "total": 172.58493330189958
+  },
+  "error": null,
+  "extras": {
+    "nan_count": 0,
+    "decay_violations": [],
+    "transfer_violations": [],
+    "mean_finals_per_LS": {
+      "1": 0.5187424615989453,
+      "2": 0.3140820908378662,
+      "4": 0.17458748050383677,
+      "8": 0.11709705960180797
+    },
+    "depth_floor_ratio_obs": 4.430021243598639
+  }
+}

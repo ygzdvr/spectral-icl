@@ -1,0 +1,32 @@
+{
+  "run_id": "run_arch_spectral_linear_stationary-20260413T225448Z-544fbf6f",
+  "script_stem": "run_arch_spectral_linear_stationary",
+  "phase": "architectures",
+  "root": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/architectures/run_arch_spectral_linear_stationary/run_arch_spectral_linear_stationary-20260413T225448Z-544fbf6f",
+  "started_utc": "2026-04-13T22:54:48.074951+00:00",
+  "seeds": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "git_commit": "59e482e",
+  "git_dirty": true,
+  "env": {
+    "python_version": "3.14.3",
+    "python_full_version": "3.14.3 (main, Mar 20 2026, 00:34:32) [Clang 22.1.1 ]",
+    "python_executable": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/.venv/bin/python",
+    "platform": "Linux-5.14.0-570.96.1.el9_6.x86_64-x86_64-with-glibc2.34",
+    "hostname": "della-i22g2",
+    "torch_version": "2.11.0+cu130",
+    "cuda_available": true,
+    "cuda_version": "13.0",
+    "cudnn_version": 91900,
+    "gpu_count": 1,
+    "gpu_names": [
+      "NVIDIA H200"
+    ]
+  },
+  "notes": "\u00a79.1 first architecture-aligned spectral-only experiment. Trainable real-valued L_S-layer circulant spectral filter (per-layer learnable Fourier-mode coefficients) on matched stationary circulant ICL regression. Architecture-aligned support for theorem-B matched-stationary mechanisms; NOT an exact theorem proof. Qualitative gate, not algebraic.",
+  "status": "started"
+}

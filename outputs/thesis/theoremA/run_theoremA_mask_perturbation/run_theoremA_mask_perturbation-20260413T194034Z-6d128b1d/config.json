@@ -1,0 +1,50 @@
+{
+  "configs": [
+    [
+      32,
+      32,
+      8,
+      4
+    ],
+    [
+      64,
+      32,
+      8,
+      4
+    ]
+  ],
+  "theta_list": [
+    0.0,
+    1e-05,
+    0.0001,
+    0.001,
+    0.005,
+    0.01,
+    0.05,
+    0.1,
+    0.2
+  ],
+  "seed_list": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "pattern_seed": 42,
+  "pattern_seed_B": 137,
+  "perturb_modes": [
+    "A_only",
+    "B_only"
+  ],
+  "Sigma_kind": "isotropic",
+  "Omega_kind": "isotropic",
+  "Gamma_kind": "identity",
+  "label_norm": "sqrt_D",
+  "sigma": 0.0,
+  "B": 1,
+  "machine_eps_tol": 1e-10,
+  "bound_numerical_slack": 1e-12,
+  "headline_config_idx": 1,
+  "dtype": "float64",
+  "device": "cuda"
+}

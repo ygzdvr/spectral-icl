@@ -1,0 +1,34 @@
+{
+  "D": 32,
+  "P": 32,
+  "K": 8,
+  "symbol_kind": "power_law",
+  "power_law_nu": 0.5,
+  "task_spec_nu_beta": 1.0,
+  "L_S_list": [
+    1,
+    2,
+    4,
+    8
+  ],
+  "init_scale": 0.0,
+  "train_steps": 3000,
+  "batch_contexts": 64,
+  "learning_rate": 0.05,
+  "optimizer": "adam",
+  "weight_decay": 0.0,
+  "log_every": 25,
+  "label_norm": "sqrt_P",
+  "seed_list": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "decay_fraction": 0.4,
+  "depth_floor_ratio": 5.0,
+  "transfer_max_median": 0.8,
+  "final_loss_window": 20,
+  "dtype": "float64",
+  "device": "cuda"
+}

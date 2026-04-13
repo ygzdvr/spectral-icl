@@ -1,0 +1,51 @@
+{
+  "run_id": "run_theoremA_semiseparable-20260413T201529Z-61f65d3e",
+  "script_stem": "run_theoremA_semiseparable",
+  "phase": "theoremA",
+  "root": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremA/run_theoremA_semiseparable/run_theoremA_semiseparable-20260413T201529Z-61f65d3e",
+  "started_utc": "2026-04-13T20:15:29.162200+00:00",
+  "seeds": [
+    0,
+    0,
+    1,
+    2,
+    3
+  ],
+  "git_commit": "59e482e",
+  "git_dirty": true,
+  "env": {
+    "python_version": "3.14.3",
+    "python_full_version": "3.14.3 (main, Mar 20 2026, 00:34:32) [Clang 22.1.1 ]",
+    "python_executable": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/.venv/bin/python",
+    "platform": "Linux-5.14.0-570.96.1.el9_6.x86_64-x86_64-with-glibc2.34",
+    "hostname": "della-i22g2",
+    "torch_version": "2.11.0+cu130",
+    "cuda_available": true,
+    "cuda_version": "13.0",
+    "cudnn_version": 91900,
+    "gpu_count": 1,
+    "gpu_names": [
+      "NVIDIA H200"
+    ]
+  },
+  "notes": "A3 (primary): explicit semiseparable / SSD realization vs reduced (A_S, B_S) theorem object, machine-precision acceptance. A4 (secondary): negative controls (circular conv, non-GD mask) showing exact reduced-\u0393 behavior is not universal. Operator-level only.",
+  "status": "completed",
+  "finished_utc": "2026-04-13T20:15:36.633380+00:00",
+  "wall_clock_seconds": 7.471306324005127,
+  "compute_proxy": 3.5490956492722034,
+  "measured_compute": null,
+  "per_step_wall_clock": {
+    "n_steps": 196,
+    "mean": 0.018068119990449324,
+    "median": 0.0014581470750272274,
+    "total": 3.5413515181280673
+  },
+  "error": null,
+  "extras": {
+    "a3_worst_SSD_vs_AB": 1.6245542923724581e-15,
+    "a3_worst_SSD_vs_full": 2.027992716546957e-15,
+    "a3_worst_AB_vs_full": 6.570027582092749e-16,
+    "a4_min_NC1_deviation": 1.195044320940574,
+    "a4_min_NC2_deviation": 2.0
+  }
+}

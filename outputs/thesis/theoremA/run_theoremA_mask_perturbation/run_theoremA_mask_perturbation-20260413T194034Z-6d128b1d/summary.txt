@@ -1,0 +1,34 @@
+run_id: run_theoremA_mask_perturbation-20260413T194034Z-6d128b1d
+phase: theoremA
+script: run_theoremA_mask_perturbation
+status: completed
+wall_clock_seconds: 7.490
+compute_proxy: 3.14828
+
+plan_reference: EXPERIMENT_PLAN_FINAL.MD §8.2 (A2)
+category: exact theorem-A operator-level perturbation diagnostic (no learned architecture, no training, no projector estimation). Compares the empirical full-model forward error around GD-compatibility against the full additive (A, B)-operator reduced perturbation bound.
+framing: A2 is the FAITHFUL theorem-A perturbation diagnostic because it compares the empirical full-model error against the full reduced (A, B)-operator upper bound — not against a qualitative mask-distance heuristic, and not against an A-only bound. The bound has the additive structure total = B-side (ΔB term) + A-side (ΔA telescoping term); A-side and B-side are reported separately and never folded into each other.
+primary_vs_auxiliary: A2's PRIMARY theorem result is the A_only sweep — the canonical theorem-A perturbation family of plan §8.2 (GD-compatible mask interpolated to a train-supported structured perturbation). The B_only sweep is an AUXILIARY decomposition diagnostic, included solely to exercise the additive bound's ΔB term with non-zero values (the GA 'perturbed' mask kind keeps B_S unchanged, so ΔB ≡ 0 in A_only). B_only is NOT presented as a theorem-A perturbation family.
+empirical_route: Both F_θ and F_GD are computed via the A1b R0 full-hidden-state aligned structured forward (build full (P+K)×(P+K) bilinear score from (X, Γ); apply perturbed/GD signed mask; run L explicit residual-stream layer updates). The reduced operators (A_S, B_S, T) returned by GA are consumed only by the bound computation, never to define the empirical error.
+bound_components: B_side_bound = ||ΔB||_op / L · ||S_θ y||_2;  A_side_bound = ||B_GD||_op · ||ΔA||_op · ||y||_2 / L^2 · Σ U_ℓ where U_ℓ = Σ_k ||T_θ||_op^{ℓ-1-k} · ||T_GD||_op^k. Total = B + A.
+interpretation: θ = 0 recovers the GD-compatible case exactly (empirical error at float64 eps). Across the small-θ regime, the empirical full-model error scales linearly with θ (because both ΔA and ΔB scale with θ) and the total bound matches the empirical to within the slack predicted by the decomposition. The bound is respected at every tested (θ, seed, configuration).
+device: cuda
+configs: [[32, 32, 8, 4], [64, 32, 8, 4]]
+theta_list: [0.0, 1e-05, 0.0001, 0.001, 0.005, 0.01, 0.05, 0.1, 0.2]
+seed_list: [0, 1, 2, 3]
+pattern_seed: 42
+label_norm: sqrt_D
+Sigma_kind: isotropic
+Omega_kind: isotropic
+Gamma_kind: identity
+n_trials: 144
+status: theta_zero_ok+bound_respected
+machine_eps_tol: 1e-10
+bound_numerical_slack: 1e-12
+theta_zero_worst_empirical: 0.0
+worst_excess_over_bound: 0.0
+n_bound_violations: 0
+worst_emp_to_bound_ratio_max: 0.4453001726442759
+worst_bound_slack_min: 2.245676200981043
+per_mode_aggregates: {'A_only': {'n_trials': 72, 'n_theta_zero': 8, 'n_theta_positive': 64, 'max_empirical_at_theta_zero': 0.0, 'max_emp_to_bound_ratio_theta_positive': 0.10115824177256381, 'max_excess_over_bound_theta_positive': -2.0163289267044906e-06, 'bound_respected': True}, 'B_only': {'n_trials': 72, 'n_theta_zero': 8, 'n_theta_positive': 64, 'max_empirical_at_theta_zero': 0.0, 'max_emp_to_bound_ratio_theta_positive': 0.4453001726442759, 'max_excess_over_bound_theta_positive': -1.2676076730809536e-06, 'bound_respected': True}}
+sweep_wallclock_seconds: 3.148
