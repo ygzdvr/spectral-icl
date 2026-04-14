@@ -1,0 +1,45 @@
+run_id: run_arch_spectral_ood-20260414T190833Z-347d55c6
+phase: architectures
+script: run_arch_spectral_ood
+status: completed
+wall_clock_seconds: 1388.338
+compute_proxy: 1368.52
+
+plan_reference: EXPERIMENT_PLAN_FINAL.MD §9.1 (architecture-aligned spectral-only suite); theorem reference: thesis/theorem_b.txt Corollary 'Out-of-distribution brittleness under stationary symbol shift' (cor:theoremB_ood, Corollary 5)
+phase: Phase IV — architecture-aligned validation layer
+category: architecture-aligned analogue of theorem-B B3. Trainable tied-weight circulant spectral filter on matched stationary circulant ICL regression, evaluated on symbol-native OOD shift families 1 (structural interpolation) and 2 (frequency permutation). Corollary-5 asymptotic overlay. NOT an exact theorem verification.
+framing: This script is architecture-aligned support for theorem-B B3. The spectral filter is a trainable realistic model (as opposed to the operator-level reduced recursion in B3). The OOD shifts are symbol-native — no generic covariance rotations. Fixed Fourier basis throughout. Tied weights match theorem-B's single circulant Q.
+architecture: Tied-weight real-valued L_S-layer circulant spectral filter (single γ ∈ ℝ^D shared across all layers; D = P = 32; K = 8). Per-forward score S(γ) computed once; L_S residual updates with the signed-mask × bilinear-score operator.
+task: G1 matched stationary training (power_law ν = 0.5, teacher νβ = 1.0; label_norm = sqrt_D; batch = 64; Adam lr = 0.05; 30000 steps); then B3 OOD evaluation under family 1 (structural flat interpolation) and family 2 (frequency permutation, 8 perm seeds) at 12 α values.
+interpretation: α = 0 matched baseline recovery: OK; material brittleness at α = 1.00 (ratio ≥ 1.25): below threshold. Family-1 stays in the Corollary-5 attenuation regime (max_k |1 − s_te,k/s_tr,k| = 0.620 < 1 at α = 1); family-2 at α = 1 activates the amplification regime on 18 modes across the 8 permutation seeds. The Corollary-5 analytical overlay (black dashed) gives the asymptotic OOD loss at the converged optimum Q⋆ = L·T⁻¹; the trained architecture's B3 loss uses the finite-time γ(T). Quantitative agreement between the two is not expected because γ(T) ≠ γ⋆ in finite time; qualitative pattern agreement (monotonic direction, regime distinction between families) is the architecture-aligned signal.
+device: cuda
+geometry: {'D': 32, 'P': 32, 'K': 8, 'batch_contexts': 64, 'train_steps': 30000, 'log_every': 25}
+L_S_list: [1, 2, 4, 8]
+seed_list: [0, 1, 2, 3]
+tied_weights: True
+n_train_cells: 16
+optimizer: adam
+learning_rate: 0.05
+label_norm: sqrt_D
+symbol_kind: power_law
+power_law_nu: 0.5
+task_spec_nu_beta: 1.0
+status: no_nan_ok+baseline_ok+brittle_FAIL+regime_ok+corollary5_ok
+matched_baseline_tol: 0.15
+brittleness_alpha: 1.0
+brittleness_ratio_min: 1.25
+nan_count: 0
+matched_L_ood_by_LS: {'1': 0.5267862537453932, '2': 0.37618817187211545, '4': 0.2589713951214023, '8': 0.21111134924263864}
+max_dev_f1_at_alpha1: 0.6196750528437955
+n_modes_amplify_f2_at_alpha1: 18
+brittle_records_at_alpha_brittle: [{'L_S': 1, 'f1_ratio_at_alpha_brittle': 1.0247111034005625, 'f2_ratio_at_alpha_brittle': 0.9596979202443323}, {'L_S': 2, 'f1_ratio_at_alpha_brittle': 1.1153424578054634, 'f2_ratio_at_alpha_brittle': 1.0145334112096265}, {'L_S': 4, 'f1_ratio_at_alpha_brittle': 1.1752905407231091, 'f2_ratio_at_alpha_brittle': 1.0550827458259564}, {'L_S': 8, 'f1_ratio_at_alpha_brittle': 1.1307818262076101, 'f2_ratio_at_alpha_brittle': 0.9685264862133903}]
+fam1_empirical_loss_at_alpha_brittle: {'1': 0.5398037233316906, '2': 0.41957864021318936, '4': 0.30436663100405087, '8': 0.23872087702974348}
+fam1_theory_loss_at_alpha_brittle: {'1': 0.15157618256847918, '2': 0.039820721369609416, '4': 0.004129743214360724, '8': 6.740911804762691e-05}
+corollary5_family1_attenuation_slope_ok: True
+corollary5_family1_theory_slope_ok: True
+convergence_median_abs_T_by_LS: {'1': 0.7069182464114496, '2': 0.5705415537738564, '4': 0.29598971246729266, '8': 0.10008559796588794}
+normalized_brittleness_at_alpha_brittle: {'family1': {'1': 1.0247111034005625, '2': 1.1153424578054634, '4': 1.1752905407231091, '8': 1.1307818262076101}, 'family2': {'1': 0.9596979202443323, '2': 1.0145334112096265, '4': 1.0550827458259564, '8': 0.9685264862133903}, 'regime_gap_at_min_LS': -0.06501318315623017, 'regime_gap_at_max_LS': -0.16225533999421982}
+eval_protocol_comparison_at_alpha_brittle: {'family1': {'1': {'forward': 0.5398037233316906, 'c5_at_gammaT': 0.4079548709580495, 'B3_formula': 0.28095848613661056, 'c5_asymptotic': 0.15157618256847918}, '2': {'forward': 0.41957864021318936, 'c5_at_gammaT': 0.22544200869125125, 'B3_formula': 0.17679672588191198, 'c5_asymptotic': 0.039820721369609416}, '4': {'forward': 0.30436663100405087, 'c5_at_gammaT': 0.055543688619227115, 'B3_formula': 0.06782264969610852, 'c5_asymptotic': 0.004129743214360724}, '8': {'forward': 0.23872087702974348, 'c5_at_gammaT': 0.010422192202192478, 'B3_formula': 0.021666234192466015, 'c5_asymptotic': 6.740911804762691e-05}}, 'family2_median_over_perm_seeds': {'1': {'forward': 0.505555672132757, 'c5_at_gammaT': 0.3262557004037481, 'B3_formula': 0.269337833255111, 'c5_asymptotic': 0.22894004847532365}, '2': {'forward': 0.3816554692661306, 'c5_at_gammaT': 0.19566184103282505, 'B3_formula': 0.17392040274549456, 'c5_asymptotic': 0.26312342153973783}, '4': {'forward': 0.27323625065506785, 'c5_at_gammaT': 0.056311285281106946, 'B3_formula': 0.06826148552086161, 'c5_asymptotic': 0.5780378722478771}, '8': {'forward': 0.20446693328174068, 'c5_at_gammaT': 0.011516386244059993, 'B3_formula': 0.021793596149357115, 'c5_asymptotic': 3.5207509938086208}}}
+ood_eval_wallclock_seconds: 11.504
+n_ood_eval_contexts: 256
+train_wallclock_seconds: 1368.521

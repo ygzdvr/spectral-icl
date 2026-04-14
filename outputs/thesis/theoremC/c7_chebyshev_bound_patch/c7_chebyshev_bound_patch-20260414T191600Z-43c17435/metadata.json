@@ -1,0 +1,65 @@
+{
+  "run_id": "c7_chebyshev_bound_patch-20260414T191600Z-43c17435",
+  "script_stem": "c7_chebyshev_bound_patch",
+  "phase": "theoremC",
+  "root": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremC/c7_chebyshev_bound_patch/c7_chebyshev_bound_patch-20260414T191600Z-43c17435",
+  "started_utc": "2026-04-14T19:16:00.121687+00:00",
+  "seeds": [
+    0
+  ],
+  "git_commit": "4b132c5",
+  "git_dirty": true,
+  "env": {
+    "python_version": "3.14.3",
+    "python_full_version": "3.14.3 (main, Mar 20 2026, 00:34:32) [Clang 22.1.1 ]",
+    "python_executable": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/.venv/bin/python",
+    "platform": "Linux-5.14.0-570.106.1.el9_6.x86_64-x86_64-with-glibc2.34",
+    "hostname": "della-gpu.princeton.edu",
+    "torch_version": "2.11.0+cu130",
+    "cuda_available": true,
+    "cuda_version": "13.0",
+    "cudnn_version": 91900,
+    "gpu_count": 1,
+    "gpu_names": [
+      "NVIDIA A100-PCIE-40GB"
+    ]
+  },
+  "notes": "C7 Chebyshev-bound patch: recompute per-block \u03c1_b, Mass, and total Cor 3.13 bound; add acceptance gate; emit corrected overlay + tightness figures.",
+  "status": "completed",
+  "finished_utc": "2026-04-14T19:16:05.603858+00:00",
+  "wall_clock_seconds": 5.482646942138672,
+  "compute_proxy": null,
+  "measured_compute": null,
+  "per_step_wall_clock": {
+    "n_steps": 0,
+    "mean": null,
+    "median": null,
+    "total": null
+  },
+  "error": null,
+  "extras": {
+    "canonical_c7_run": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremC/run_theoremC_depth_scaling/run_theoremC_depth_scaling-20260413T164624Z-846d8bc6",
+    "checks": {
+      "chebyshev_bound_general_L_ok": false,
+      "chebyshev_bound_resolved_ok": true,
+      "raw_count_total": 175,
+      "raw_count_violations": 45,
+      "raw_min_slack": -3.400251162742532e-11,
+      "worst_raw_loc": {
+        "m": 2,
+        "kappa": 5.0,
+        "L": 64,
+        "loss": 3.400251163009341e-11,
+        "bound": 2.668084978384695e-21,
+        "slack": -3.400251162742532e-11
+      },
+      "resolved_count_total": 113,
+      "resolved_min_slack": 1.3144977574074972e-08,
+      "max_resolved_ratio": 0.8135767068902968,
+      "failing_above_precision": 0,
+      "failing_above_cells": [],
+      "failing_below_precision": 45
+    },
+    "data_source": "canonical C7 npz: outputs/thesis/theoremC/run_theoremC_depth_scaling/run_theoremC_depth_scaling-20260413T164624Z-846d8bc6/npz/depth_scaling.npz"
+  }
+}

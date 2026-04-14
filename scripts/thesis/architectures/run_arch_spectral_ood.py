@@ -197,6 +197,12 @@ class ArchSpectralOODConfig:
     # ---------------- Seeds -------------------------------------------
     seed_list: tuple[int, ...] = (0, 1, 2, 3)
 
+    # ---------------- OOD evaluation ---------------------------------
+    # Forward-pass OOD evaluation batch size. 256 is 4× training batch
+    # for a ~6% Monte Carlo SE on the mean MSE — enough for qualitative
+    # depth/shift curves.
+    n_ood_eval_contexts: int = 256
+
     # ---------------- OOD shift families ------------------------------
     f1_target_kind: str = "flat"
     f1_target_flat_value: float = 1.0
@@ -212,7 +218,12 @@ class ArchSpectralOODConfig:
     depth_slice_alphas: tuple[float, ...] = (0.5, 1.0)
 
     # ---------------- Acceptance (qualitative) ------------------------
-    matched_baseline_tol: float = 1e-10
+    # matched_baseline_tol is a RELATIVE tolerance on the forward-pass
+    # matched evaluation at α = 0. The forward-pass estimator has
+    # Monte-Carlo SE ∝ 1/√B_eval ≈ 6% at B_eval = 256, so a tight 1e-10
+    # (like the deterministic B3 formula) is not appropriate here.
+    # 0.15 ≈ 3 × MC SE gives a reliable recovery check.
+    matched_baseline_tol: float = 0.15
     brittleness_alpha: float = 1.0
     brittleness_ratio_min: float = 1.25
     final_loss_window: int = 20
@@ -357,6 +368,96 @@ def _ood_loss_corollary5(
     return float((w64 * s_te64 * factor.pow(2 * int(L_S))).sum().item() / float(norm_factor))
 
 
+def _ood_loss_corollary5_at_gammaT(
+    gamma: torch.Tensor,
+    s_te: torch.Tensor,
+    omega: torch.Tensor,
+    L_S: int,
+    norm_factor: float,
+) -> float:
+    """Corollary-5 OOD formula with s_te in the transfer, at finite-time γ(T).
+
+    (1 / norm_factor) · Σ_k ω_k · s_te,k · |1 − γ_k(T) · s_te,k / L_S|^{2 L_S}.
+
+    Analytical prediction of the forward-pass OOD loss at the trained γ when
+    ALL context positions are drawn from the s_te distribution. Should match
+    ``_ood_loss_forward`` in expectation under F-basis Gaussian contexts; any
+    discrepancy is Monte-Carlo noise in the forward-pass estimator.
+    """
+    g = gamma.to(torch.float64)
+    s_te64 = s_te.to(torch.float64)
+    w64 = omega.to(torch.float64)
+    residual = 1.0 - s_te64 * g / int(L_S)
+    return float(
+        (w64 * s_te64 * residual.abs().pow(2 * int(L_S))).sum().item() / float(norm_factor)
+    )
+
+
+def _sample_ood_batch_F_basis(
+    s_te: torch.Tensor,
+    omega: torch.Tensor,
+    P: int,
+    K: int,
+    B: int,
+    norm_factor: float,
+    generator: torch.Generator,
+    dtype: torch.dtype,
+    device: torch.device,
+) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    """Sample B contexts where ALL (P+K) positions use s_te (fully OOD).
+
+    Same structure as ``_sample_batch_F_basis`` but with s_tr replaced by
+    s_te: X̃_{μ, k} ~ N(0, s_te,k), β̃_k ~ N(0, ω_k), y_μ = β̃·x̃_μ /
+    √norm_factor. Returns (X̃, y_train, y_query) of shapes
+    (B, D, P+K), (B, P), (B, K).
+    """
+    D = int(s_te.shape[0])
+    s_sqrt = s_te.to(dtype).sqrt().to(device)
+    om_sqrt = omega.to(dtype).sqrt().to(device)
+    z_x = torch.randn(B, D, P + K, generator=generator, dtype=dtype, device="cpu").to(device)
+    X_tilde = z_x * s_sqrt.view(1, D, 1)
+    z_b = torch.randn(B, D, generator=generator, dtype=dtype, device="cpu").to(device)
+    beta_tilde = z_b * om_sqrt.view(1, D)
+    y_full = torch.einsum("bd,bdf->bf", beta_tilde, X_tilde)
+    y_full = y_full / float(math.sqrt(norm_factor))
+    return X_tilde, y_full[:, :P].contiguous(), y_full[:, P:].contiguous()
+
+
+def _ood_loss_forward(
+    gamma: torch.Tensor,
+    cfg: "ArchSpectralOODConfig",
+    s_te: torch.Tensor,
+    omega: torch.Tensor,
+    L_S: int,
+    norm_factor: float,
+    n_eval: int,
+    generator: torch.Generator,
+    device: torch.device,
+) -> float:
+    """Forward-pass OOD evaluation: build a frozen filter with the stored γ,
+    sample `n_eval` contexts with X̃ drawn from s_te (all positions), run the
+    model forward, return the mean MSE on y_query.
+
+    This is the most defensible OOD evaluation because it makes no formula
+    assumption about the residual factor; the bilinear score is computed
+    from s_te-distributed features, which by construction produces the
+    Corollary-5 transfer (s_te in the residual) in expectation.
+    """
+    dtype = torch.float64 if cfg.dtype == "float64" else torch.float32
+    model = TiedCirculantSpectralFilter(
+        D=cfg.D, P=cfg.P, K=cfg.K, L_S=int(L_S), dtype=dtype,
+    ).to(device)
+    with torch.no_grad():
+        model.gamma.data = gamma.to(dtype).to(device)
+        X_tilde, y_train, y_query = _sample_ood_batch_F_basis(
+            s_te, omega, cfg.P, cfg.K, int(n_eval),
+            norm_factor, generator, dtype, device,
+        )
+        y_pred = model(X_tilde, y_train)
+        loss = ((y_pred - y_query) ** 2).mean()
+    return float(loss.item())
+
+
 # ---------------------------------------------------------------------------
 # Per-L_S matched training (shared across α-evaluation, symbol evaluation)
 # ---------------------------------------------------------------------------
@@ -445,35 +546,73 @@ def _eval_family1(
     s_tr: torch.Tensor,
     omega: torch.Tensor,
     gamma_by_LS_seed: dict[tuple[int, int], torch.Tensor],
+    device: torch.device,
 ) -> dict[str, Any]:
+    """Evaluate family-1 OOD under THREE protocols per (L_S, seed, α):
+
+    * ``forward`` — forward-pass on contexts with X̃ ~ s_te (PRIMARY).
+    * ``c5_at_gammaT`` — analytical formula with γ(T) and s_te in residual
+      (cross-check: should match ``forward`` up to MC noise).
+    * ``B3`` — B3 formula with γ(T) and s_tr in residual (secondary,
+      "partial OOD" — only the outer ω·s_te re-weighting shifts).
+
+    Also computes ``c5_asymptotic`` at Q⋆ = L·T⁻¹ (operator reference,
+    independent of γ(T)).
+    """
     norm_factor = (
         float(cfg.D) if cfg.label_norm == "sqrt_D" else float(cfg.P)
     )
     s_flat = symbol_flat(int(cfg.D), float(cfg.f1_target_flat_value))
-    # L_ood per (L_S, seed, α)
-    losses: dict[int, np.ndarray] = {}
-    c5: dict[int, np.ndarray] = {}
+
+    forward_by_LS: dict[int, np.ndarray] = {}
+    c5_gammaT_by_LS: dict[int, np.ndarray] = {}
+    B3_by_LS: dict[int, np.ndarray] = {}
+    c5_asymp_by_LS: dict[int, np.ndarray] = {}
+
     for L_S in cfg.L_S_list:
-        per_seed_alpha = np.zeros(
+        per_seed_forward = np.zeros(
             (len(cfg.seed_list), len(cfg.f1_alphas)), dtype=np.float64
         )
-        c5_per_alpha = np.zeros(len(cfg.f1_alphas), dtype=np.float64)
+        per_seed_c5T = np.zeros_like(per_seed_forward)
+        per_seed_B3 = np.zeros_like(per_seed_forward)
+        c5_asymp = np.zeros(len(cfg.f1_alphas), dtype=np.float64)
         for a_i, alpha in enumerate(cfg.f1_alphas):
             s_te = symbol_interpolate(s_tr, s_flat, float(alpha))
-            c5_per_alpha[a_i] = _ood_loss_corollary5(
+            c5_asymp[a_i] = _ood_loss_corollary5(
                 s_tr, s_te, omega, int(L_S), norm_factor,
             )
             for s_i, seed in enumerate(cfg.seed_list):
                 g = gamma_by_LS_seed[(int(L_S), int(seed))]
-                per_seed_alpha[s_i, a_i] = _ood_loss_B3(
+                # B3 partial-OOD formula (existing).
+                per_seed_B3[s_i, a_i] = _ood_loss_B3(
                     g, s_tr, s_te, omega, int(L_S), norm_factor,
                 )
-        losses[int(L_S)] = per_seed_alpha
-        c5[int(L_S)] = c5_per_alpha
+                # Corollary 5 at finite-time γ(T).
+                per_seed_c5T[s_i, a_i] = _ood_loss_corollary5_at_gammaT(
+                    g, s_te, omega, int(L_S), norm_factor,
+                )
+                # Forward-pass empirical OOD.
+                gen = torch.Generator(device="cpu")
+                gen.manual_seed(
+                    7001
+                    + int(seed) * 91
+                    + int(L_S) * 19
+                    + a_i * 3
+                )
+                per_seed_forward[s_i, a_i] = _ood_loss_forward(
+                    g, cfg, s_te, omega, int(L_S), norm_factor,
+                    int(cfg.n_ood_eval_contexts), gen, device,
+                )
+        forward_by_LS[int(L_S)] = per_seed_forward
+        c5_gammaT_by_LS[int(L_S)] = per_seed_c5T
+        B3_by_LS[int(L_S)] = per_seed_B3
+        c5_asymp_by_LS[int(L_S)] = c5_asymp
     return {
         "s_other": s_flat,
-        "losses_per_seed_alpha_by_LS": losses,
-        "corollary5_by_LS": c5,
+        "forward_by_LS": forward_by_LS,
+        "c5_at_gammaT_by_LS": c5_gammaT_by_LS,
+        "B3_by_LS": B3_by_LS,
+        "c5_asymptotic_by_LS": c5_asymp_by_LS,
     }
 
 
@@ -482,43 +621,68 @@ def _eval_family2(
     s_tr: torch.Tensor,
     omega: torch.Tensor,
     gamma_by_LS_seed: dict[tuple[int, int], torch.Tensor],
+    device: torch.device,
 ) -> dict[str, Any]:
+    """Family-2 permutation OOD under three protocols per
+    (L_S, train_seed, perm_seed, α). Structure parallels _eval_family1."""
     norm_factor = (
         float(cfg.D) if cfg.label_norm == "sqrt_D" else float(cfg.P)
     )
     s_perm_by_seed = {
         int(s): frequency_permutation(s_tr, seed=int(s)) for s in cfg.f2_perm_seeds
     }
-    # losses[(L_S)] has shape (train_seed, perm_seed, α).
-    losses: dict[int, np.ndarray] = {}
-    c5: dict[int, np.ndarray] = {}  # shape (perm_seed, α)
+    forward_by_LS: dict[int, np.ndarray] = {}
+    c5_gammaT_by_LS: dict[int, np.ndarray] = {}
+    B3_by_LS: dict[int, np.ndarray] = {}
+    c5_asymp_by_LS: dict[int, np.ndarray] = {}  # (perm_seed, α), γ-independent
+
     for L_S in cfg.L_S_list:
-        per_seed = np.zeros(
+        per_forward = np.zeros(
             (len(cfg.seed_list), len(cfg.f2_perm_seeds), len(cfg.f2_alphas)),
             dtype=np.float64,
         )
-        c5_arr = np.zeros(
-            (len(cfg.f2_perm_seeds), len(cfg.f2_alphas)),
-            dtype=np.float64,
+        per_c5T = np.zeros_like(per_forward)
+        per_B3 = np.zeros_like(per_forward)
+        c5_asymp = np.zeros(
+            (len(cfg.f2_perm_seeds), len(cfg.f2_alphas)), dtype=np.float64,
         )
         for p_i, p_seed in enumerate(cfg.f2_perm_seeds):
             s_perm = s_perm_by_seed[int(p_seed)]
             for a_i, alpha in enumerate(cfg.f2_alphas):
                 s_te = symbol_interpolate(s_tr, s_perm, float(alpha))
-                c5_arr[p_i, a_i] = _ood_loss_corollary5(
+                c5_asymp[p_i, a_i] = _ood_loss_corollary5(
                     s_tr, s_te, omega, int(L_S), norm_factor,
                 )
                 for t_i, train_seed in enumerate(cfg.seed_list):
                     g = gamma_by_LS_seed[(int(L_S), int(train_seed))]
-                    per_seed[t_i, p_i, a_i] = _ood_loss_B3(
+                    per_B3[t_i, p_i, a_i] = _ood_loss_B3(
                         g, s_tr, s_te, omega, int(L_S), norm_factor,
                     )
-        losses[int(L_S)] = per_seed
-        c5[int(L_S)] = c5_arr
+                    per_c5T[t_i, p_i, a_i] = _ood_loss_corollary5_at_gammaT(
+                        g, s_te, omega, int(L_S), norm_factor,
+                    )
+                    gen = torch.Generator(device="cpu")
+                    gen.manual_seed(
+                        9001
+                        + int(train_seed) * 91
+                        + int(L_S) * 19
+                        + int(p_seed) * 7
+                        + a_i * 3
+                    )
+                    per_forward[t_i, p_i, a_i] = _ood_loss_forward(
+                        g, cfg, s_te, omega, int(L_S), norm_factor,
+                        int(cfg.n_ood_eval_contexts), gen, device,
+                    )
+        forward_by_LS[int(L_S)] = per_forward
+        c5_gammaT_by_LS[int(L_S)] = per_c5T
+        B3_by_LS[int(L_S)] = per_B3
+        c5_asymp_by_LS[int(L_S)] = c5_asymp
     return {
         "s_perm_by_seed": s_perm_by_seed,
-        "losses_by_LS": losses,
-        "corollary5_by_LS": c5,
+        "forward_by_LS": forward_by_LS,
+        "c5_at_gammaT_by_LS": c5_gammaT_by_LS,
+        "B3_by_LS": B3_by_LS,
+        "c5_asymptotic_by_LS": c5_asymp_by_LS,
     }
 
 
@@ -546,9 +710,9 @@ def _plot_ood_loss_vs_alpha(
     L_colors = sequential_colors(len(cfg.L_S_list), palette="rocket")
     fig, (axL, axR) = plt.subplots(1, 2, figsize=(11.5, 4.6))
 
-    # Family 1 — architecture curves + per-L_S matched baseline line.
+    # Family 1 — forward-pass architecture curves + per-L_S matched baseline.
     for color, L_S in zip(L_colors, cfg.L_S_list):
-        per_seed = f1["losses_per_seed_alpha_by_LS"][int(L_S)]
+        per_seed = f1["forward_by_LS"][int(L_S)]
         mean = per_seed.mean(axis=0)
         if per_seed.shape[0] > 1:
             se = per_seed.std(axis=0, ddof=1) / float(np.sqrt(per_seed.shape[0]))
@@ -579,9 +743,9 @@ def _plot_ood_loss_vs_alpha(
     )
     axL.legend(fontsize=8, loc="best", frameon=True, ncol=1)
 
-    # Family 2 — architecture curves (median over perm seeds) + matched baseline.
+    # Family 2 — forward-pass architecture (median over perm seeds) + matched baseline.
     for color, L_S in zip(L_colors, cfg.L_S_list):
-        per_tr = f2["losses_by_LS"][int(L_S)]
+        per_tr = f2["forward_by_LS"][int(L_S)]
         med_over_perm = np.median(per_tr, axis=1)
         mean = med_over_perm.mean(axis=0)
         if med_over_perm.shape[0] > 1:
@@ -615,7 +779,7 @@ def _plot_ood_loss_vs_alpha(
 
     fig.suptitle(
         "§9.1 architecture-aligned spectral OOD brittleness "
-        "(tied-weight filter, theorem-B B3 analogue)",
+        "(forward-pass; X̃ sampled from s_te; tied-weight filter)",
         fontsize=11,
     )
     fig.tight_layout(rect=(0, 0, 1, 0.95))
@@ -638,8 +802,7 @@ def _plot_normalized_brittleness(
     fig, (axL, axR) = plt.subplots(1, 2, figsize=(11.5, 4.6), sharey=False)
 
     for color, L_S in zip(L_colors, cfg.L_S_list):
-        per_seed = f1["losses_per_seed_alpha_by_LS"][int(L_S)]  # (n_seed, α)
-        # matched denominator is the seed-specific α = 0 point.
+        per_seed = f1["forward_by_LS"][int(L_S)]  # (n_seed, α)
         denom = per_seed[:, 0:1]
         ratio = per_seed / np.maximum(denom, 1e-30)
         mean = ratio.mean(axis=0)
@@ -668,7 +831,7 @@ def _plot_normalized_brittleness(
     axL.legend(fontsize=8, loc="best", frameon=True)
 
     for color, L_S in zip(L_colors, cfg.L_S_list):
-        per_tr = f2["losses_by_LS"][int(L_S)]  # (train_seed, perm_seed, α)
+        per_tr = f2["forward_by_LS"][int(L_S)]
         med_over_perm = np.median(per_tr, axis=1)
         denom = med_over_perm[:, 0:1]
         ratio = med_over_perm / np.maximum(denom, 1e-30)
@@ -699,7 +862,7 @@ def _plot_normalized_brittleness(
 
     fig.suptitle(
         "§9.1 HEADLINE: normalized OOD brittleness vs shift α  "
-        "(tied-weight filter; finite-T architecture evaluation)",
+        "(forward-pass evaluation; tied-weight filter)",
         fontsize=11,
     )
     fig.tight_layout(rect=(0, 0, 1, 0.95))
@@ -737,8 +900,8 @@ def _plot_depth_sensitivity(
         means: list[float] = []
         ses: list[float] = []
         for L_S in cfg.L_S_list:
-            per_seed = f1["losses_per_seed_alpha_by_LS"][int(L_S)]
-            matched_per_seed = per_seed[:, 0]              # α = 0 per seed
+            per_seed = f1["forward_by_LS"][int(L_S)]
+            matched_per_seed = per_seed[:, 0]
             ood_per_seed = per_seed[:, a_i1]
             ratio = ood_per_seed / np.maximum(matched_per_seed, 1e-30)
             means.append(float(ratio.mean()))
@@ -757,7 +920,7 @@ def _plot_depth_sensitivity(
         means: list[float] = []
         ses: list[float] = []
         for L_S in cfg.L_S_list:
-            per_tr = f2["losses_by_LS"][int(L_S)]           # (train_seed, perm_seed, α)
+            per_tr = f2["forward_by_LS"][int(L_S)]
             matched_per_seed = np.median(per_tr[:, :, 0], axis=1)
             ood_per_seed = np.median(per_tr[:, :, a_i2], axis=1)
             ratio = ood_per_seed / np.maximum(matched_per_seed, 1e-30)
@@ -823,7 +986,7 @@ def _plot_corollary5_operator_reference(
     fig, (axL, axR) = plt.subplots(1, 2, figsize=(11.5, 4.6))
 
     for color, L_S in zip(L_colors, cfg.L_S_list):
-        c5 = f1["corollary5_by_LS"][int(L_S)]
+        c5 = f1["c5_asymptotic_by_LS"][int(L_S)]
         axL.plot(
             cfg.f1_alphas, np.maximum(c5, 1e-40),
             color=color, lw=1.4, marker="o", ms=4.0,
@@ -841,7 +1004,7 @@ def _plot_corollary5_operator_reference(
     axL.legend(fontsize=8, loc="best", frameon=True)
 
     for color, L_S in zip(L_colors, cfg.L_S_list):
-        c5_arr = f2["corollary5_by_LS"][int(L_S)]          # (perm_seed, α)
+        c5_arr = f2["c5_asymptotic_by_LS"][int(L_S)]          # (perm_seed, α)
         med = np.median(c5_arr, axis=0)
         q25 = np.quantile(c5_arr, 0.25, axis=0)
         q75 = np.quantile(c5_arr, 0.75, axis=0)
@@ -875,6 +1038,89 @@ def _plot_corollary5_operator_reference(
     )
     fig.tight_layout(rect=(0, 0, 1, 0.95))
     save_both(fig, run_dir, "corollary5_operator_reference")
+    plt.close(fig)
+
+
+def _plot_evaluation_comparison(
+    cfg: ArchSpectralOODConfig,
+    f1: dict[str, Any],
+    f2: dict[str, Any],
+    run_dir: ThesisRunDir,
+) -> None:
+    """Three-protocol comparison at the largest L_S for each family.
+
+    Shows forward-pass OOD (primary, solid colored), Corollary-5 at γ(T)
+    (analytical cross-check, dashed colored), and B3-formula partial OOD
+    (secondary, dotted colored). Forward and C5-at-γ(T) should closely
+    overlap (both put s_te in the residual); B3 should be strictly
+    smaller (only outer re-weighting).
+    """
+    import matplotlib.pyplot as plt
+
+    L_colors = sequential_colors(len(cfg.L_S_list), palette="rocket")
+    fig, (axL, axR) = plt.subplots(1, 2, figsize=(11.5, 4.6))
+
+    for color, L_S in zip(L_colors, cfg.L_S_list):
+        fwd = f1["forward_by_LS"][int(L_S)].mean(axis=0)
+        c5T = f1["c5_at_gammaT_by_LS"][int(L_S)].mean(axis=0)
+        B3 = f1["B3_by_LS"][int(L_S)].mean(axis=0)
+        axL.plot(
+            cfg.f1_alphas, np.maximum(fwd, 1e-30),
+            color=color, lw=1.5, marker="o", ms=3.5,
+            label=rf"$L_S = {L_S}$ forward" if L_S == cfg.L_S_list[0]
+            else rf"$L_S = {L_S}$",
+        )
+        axL.plot(
+            cfg.f1_alphas, np.maximum(c5T, 1e-30),
+            color=color, lw=1.0, ls="--",
+        )
+        axL.plot(
+            cfg.f1_alphas, np.maximum(B3, 1e-30),
+            color=color, lw=1.0, ls=":",
+        )
+    axL.set_xlabel(r"shift $\alpha$")
+    axL.set_ylabel(r"OOD loss")
+    axL.set_yscale("log")
+    axL.set_title(
+        "Family 1:  forward (solid) vs C5 @ γ(T) (dashed) vs B3 (dotted)",
+        fontsize=10,
+    )
+    axL.legend(fontsize=7, loc="best", frameon=True, ncol=1)
+
+    for color, L_S in zip(L_colors, cfg.L_S_list):
+        fwd = np.median(f2["forward_by_LS"][int(L_S)], axis=1).mean(axis=0)
+        c5T = np.median(f2["c5_at_gammaT_by_LS"][int(L_S)], axis=1).mean(axis=0)
+        B3 = np.median(f2["B3_by_LS"][int(L_S)], axis=1).mean(axis=0)
+        axR.plot(
+            cfg.f2_alphas, np.maximum(fwd, 1e-30),
+            color=color, lw=1.5, marker="o", ms=3.5,
+            label=rf"$L_S = {L_S}$ forward" if L_S == cfg.L_S_list[0]
+            else rf"$L_S = {L_S}$",
+        )
+        axR.plot(
+            cfg.f2_alphas, np.maximum(c5T, 1e-30),
+            color=color, lw=1.0, ls="--",
+        )
+        axR.plot(
+            cfg.f2_alphas, np.maximum(B3, 1e-30),
+            color=color, lw=1.0, ls=":",
+        )
+    axR.set_xlabel(r"shift $\alpha$")
+    axR.set_ylabel(r"OOD loss")
+    axR.set_yscale("log")
+    axR.set_title(
+        "Family 2:  forward (solid) vs C5 @ γ(T) (dashed) vs B3 (dotted)",
+        fontsize=10,
+    )
+    axR.legend(fontsize=7, loc="best", frameon=True, ncol=1)
+
+    fig.suptitle(
+        "Evaluation-protocol comparison: forward-pass (primary), "
+        "Corollary-5 at γ(T) (analytical cross-check), B3 formula (secondary)",
+        fontsize=10,
+    )
+    fig.tight_layout(rect=(0, 0, 1, 0.95))
+    save_both(fig, run_dir, "evaluation_comparison")
     plt.close(fig)
 
 
@@ -1133,59 +1379,74 @@ def main() -> int:
                 per_seed_medians.append(float(T.median().item()))
             median_abs_T_by_LS[int(L_S)] = float(np.mean(per_seed_medians))
 
-        # ---------------- Matched baseline per L_S (α=0 sanity) --------
+        # ---------------- Family-1 and family-2 OOD sweeps -------------
+        # Forward-pass, Corollary-5-at-γ(T), and B3 formulas all computed
+        # per (L_S, seed, α) (+ perm_seed for family 2).
+        t_eval0 = time.perf_counter()
+        f1 = _eval_family1(cfg, s_tr, omega, gamma_by_LS_seed, device)
+        f2 = _eval_family2(cfg, s_tr, omega, gamma_by_LS_seed, device)
+        eval_wall = time.perf_counter() - t_eval0
+        print(f"[arch-§9.1-OOD] OOD evaluation (all three protocols) took {eval_wall:.2f} s")
+
+        # ---------------- Matched baseline per L_S (α=0, forward) ------
         # At α = 0 family-1 and family-2 both give s_te = s_tr, so the
-        # B3 formula collapses to the matched stationary loss at γ(T).
+        # forward-pass evaluation is the matched stationary loss. Use the
+        # forward-pass value (protocol-consistent with the primary figures).
         matched_L_ood_by_LS: dict[int, float] = {}
         for L_S in cfg.L_S_list:
-            seed_vals = []
-            for seed in cfg.seed_list:
-                g = gamma_by_LS_seed[(int(L_S), int(seed))]
-                seed_vals.append(
-                    _ood_loss_B3(g, s_tr, s_tr, omega, int(L_S), norm_factor)
-                )
-            matched_L_ood_by_LS[int(L_S)] = float(np.mean(seed_vals))
-
-        # ---------------- Family-1 and family-2 OOD sweeps -------------
-        f1 = _eval_family1(cfg, s_tr, omega, gamma_by_LS_seed)
-        f2 = _eval_family2(cfg, s_tr, omega, gamma_by_LS_seed)
+            matched_L_ood_by_LS[int(L_S)] = float(
+                f1["forward_by_LS"][int(L_S)][:, 0].mean()
+            )
 
         # ---------------- Acceptance gates -----------------------------
+        # Primary protocol: forward-pass (X̃ ~ s_te). Gates check the
+        # forward-pass arrays; B3-formula values remain available as
+        # secondary comparators.
+        a_brittle = float(cfg.brittleness_alpha)
+        f1_ai = int(np.argmin(np.abs(np.asarray(cfg.f1_alphas) - a_brittle)))
+        f2_ai = int(np.argmin(np.abs(np.asarray(cfg.f2_alphas) - a_brittle)))
+
         # (A) Matched baseline recovery at α = 0.
+        # Family 1 and family 2 at α = 0 both sample X̃ ~ s_tr (identity).
+        # The forward-pass MC estimate has non-zero variance from the 256
+        # eval contexts, so the tolerance is Monte-Carlo-scale, not float
+        # eps. We require |f1(α=0) − f2(α=0)| ≤ matched_baseline_tol on
+        # the seed-averaged values.
         baseline_violations: list[dict[str, Any]] = []
         for L_S in cfg.L_S_list:
             matched = matched_L_ood_by_LS[int(L_S)]
-            f1_at_zero = f1["losses_per_seed_alpha_by_LS"][int(L_S)][:, 0].mean()
-            f1_err = abs(float(f1_at_zero) - matched)
-            f2_at_zero = np.median(
-                f2["losses_by_LS"][int(L_S)][:, :, 0], axis=1
-            ).mean()
-            f2_err = abs(float(f2_at_zero) - matched)
+            f1_at_zero = float(
+                f1["forward_by_LS"][int(L_S)][:, 0].mean()
+            )
+            f2_at_zero = float(
+                np.median(f2["forward_by_LS"][int(L_S)][:, :, 0], axis=1).mean()
+            )
+            # Both should equal the seed-averaged matched forward loss; the
+            # tolerance here is scaled to the matched value itself to
+            # accommodate Monte-Carlo variance.
+            relative_scale = max(matched, 1e-30)
+            f1_err = abs(f1_at_zero - matched) / relative_scale
+            f2_err = abs(f2_at_zero - matched) / relative_scale
             if max(f1_err, f2_err) > cfg.matched_baseline_tol:
                 baseline_violations.append({
                     "L_S": int(L_S),
                     "matched": matched,
-                    "f1_at_0": float(f1_at_zero),
-                    "f2_at_0": float(f2_at_zero),
-                    "f1_err": f1_err,
-                    "f2_err": f2_err,
+                    "f1_at_0": f1_at_zero,
+                    "f2_at_0": f2_at_zero,
+                    "f1_rel_err": f1_err,
+                    "f2_rel_err": f2_err,
                 })
         baseline_ok = not baseline_violations
 
-        # (B) Material brittleness at α = brittleness_alpha.
-        a_brittle = float(cfg.brittleness_alpha)
-        f1_ai = int(np.argmin(np.abs(np.asarray(cfg.f1_alphas) - a_brittle)))
-        f2_ai = int(np.argmin(np.abs(np.asarray(cfg.f2_alphas) - a_brittle)))
+        # (B) Material brittleness at α = brittleness_alpha (forward).
         brittle_any = False
         brittle_records: list[dict[str, Any]] = []
         for L_S in cfg.L_S_list:
             matched = matched_L_ood_by_LS[int(L_S)]
-            f1_val = float(
-                f1["losses_per_seed_alpha_by_LS"][int(L_S)][:, f1_ai].mean()
-            )
+            f1_val = float(f1["forward_by_LS"][int(L_S)][:, f1_ai].mean())
             f1_ratio = f1_val / max(matched, 1e-30)
             f2_val = float(
-                np.median(f2["losses_by_LS"][int(L_S)][:, :, f2_ai], axis=1).mean()
+                np.median(f2["forward_by_LS"][int(L_S)][:, :, f2_ai], axis=1).mean()
             )
             f2_ratio = f2_val / max(matched, 1e-30)
             if f1_ratio >= cfg.brittleness_ratio_min or f2_ratio >= cfg.brittleness_ratio_min:
@@ -1201,14 +1462,15 @@ def main() -> int:
         regime_ok = (max_dev_f1 < 1.0) and (n_amp_f2_alpha1 > 0)
 
         # (D) Corollary-5 qualitative tracking (family 1 attenuation):
-        # slope_of_mean_L_ood across L_S at α = 1.0 should be negative
-        # for family 1 (architecture and theory both). Empirical + theory.
+        # forward-pass absolute loss at α = 1 should be monotonically
+        # decreasing with L_S (matches the asymptotic Corollary-5
+        # direction).
         fam1_empirical_ai1 = [
-            float(f1["losses_per_seed_alpha_by_LS"][int(L_S)][:, f1_ai].mean())
+            float(f1["forward_by_LS"][int(L_S)][:, f1_ai].mean())
             for L_S in cfg.L_S_list
         ]
         fam1_theory_ai1 = [
-            float(f1["corollary5_by_LS"][int(L_S)][f1_ai])
+            float(f1["c5_asymptotic_by_LS"][int(L_S)][f1_ai])
             for L_S in cfg.L_S_list
         ]
         fam1_emp_decreasing = all(
@@ -1242,6 +1504,7 @@ def main() -> int:
         )
         _plot_depth_sensitivity(cfg, f1, f2, run)
         _plot_corollary5_operator_reference(cfg, f1, f2, run)
+        _plot_evaluation_comparison(cfg, f1, f2, run)
         # Pick the first permutation seed for the family-2 symbol viz.
         viz_perm = frequency_permutation(
             s_tr, seed=int(cfg.symbol_samples_family2_seed)
@@ -1270,10 +1533,16 @@ def main() -> int:
             "n_modes_amplify_f2_at_alpha1": int(n_amp_f2_alpha1),
         }
         for L_S in cfg.L_S_list:
-            npz_payload[f"f1_losses_L{L_S}"] = f1["losses_per_seed_alpha_by_LS"][int(L_S)]
-            npz_payload[f"f1_corollary5_L{L_S}"] = f1["corollary5_by_LS"][int(L_S)]
-            npz_payload[f"f2_losses_L{L_S}"] = f2["losses_by_LS"][int(L_S)]
-            npz_payload[f"f2_corollary5_L{L_S}"] = f2["corollary5_by_LS"][int(L_S)]
+            # Family 1 (shape (n_seed, α))
+            npz_payload[f"f1_forward_L{L_S}"] = f1["forward_by_LS"][int(L_S)]
+            npz_payload[f"f1_c5_at_gammaT_L{L_S}"] = f1["c5_at_gammaT_by_LS"][int(L_S)]
+            npz_payload[f"f1_B3_L{L_S}"] = f1["B3_by_LS"][int(L_S)]
+            npz_payload[f"f1_c5_asymptotic_L{L_S}"] = f1["c5_asymptotic_by_LS"][int(L_S)]
+            # Family 2 (shape (train_seed, perm_seed, α))
+            npz_payload[f"f2_forward_L{L_S}"] = f2["forward_by_LS"][int(L_S)]
+            npz_payload[f"f2_c5_at_gammaT_L{L_S}"] = f2["c5_at_gammaT_by_LS"][int(L_S)]
+            npz_payload[f"f2_B3_L{L_S}"] = f2["B3_by_LS"][int(L_S)]
+            npz_payload[f"f2_c5_asymptotic_L{L_S}"] = f2["c5_asymptotic_by_LS"][int(L_S)]
             for seed in cfg.seed_list:
                 npz_payload[f"gamma_L{L_S}_seed{seed}"] = (
                     gamma_by_LS_seed[(int(L_S), int(seed))].numpy()
@@ -1352,10 +1621,11 @@ def main() -> int:
                 for L in cfg.L_S_list
             )
         )
-        # Family-1 vs family-2 regime-distinction diagnostic at α = 1.
+        # Family-1 vs family-2 regime-distinction diagnostic at α = 1
+        # (forward-pass protocol, matching the primary figures).
         fam1_ratio_by_L = {
             L: float(
-                f1["losses_per_seed_alpha_by_LS"][int(L)][:, f1_ai].mean()
+                f1["forward_by_LS"][int(L)][:, f1_ai].mean()
                 / max(matched_L_ood_by_LS[int(L)], 1e-30)
             )
             for L in cfg.L_S_list
@@ -1363,18 +1633,47 @@ def main() -> int:
         fam2_ratio_by_L = {
             L: float(
                 np.median(
-                    f2["losses_by_LS"][int(L)][:, :, f2_ai], axis=1
+                    f2["forward_by_LS"][int(L)][:, :, f2_ai], axis=1
                 ).mean() / max(matched_L_ood_by_LS[int(L)], 1e-30)
             )
             for L in cfg.L_S_list
         }
         print(
-            "   normalized brittleness at α = 1 per L_S:  "
+            "   normalized brittleness at α = 1 per L_S (forward-pass):  "
             + ", ".join(
                 f"L_S={L}: f1={fam1_ratio_by_L[L]:.3f} f2={fam2_ratio_by_L[L]:.3f}"
                 for L in cfg.L_S_list
             )
         )
+        print("   side-by-side evaluation-protocol comparison at α = 1:")
+        print("     family 1:")
+        for L in cfg.L_S_list:
+            fwd = float(f1["forward_by_LS"][int(L)][:, f1_ai].mean())
+            c5T = float(f1["c5_at_gammaT_by_LS"][int(L)][:, f1_ai].mean())
+            B3 = float(f1["B3_by_LS"][int(L)][:, f1_ai].mean())
+            c5A = float(f1["c5_asymptotic_by_LS"][int(L)][f1_ai])
+            print(
+                f"       L_S = {L:>2d}  forward = {fwd:.3e}  "
+                f"C5@γ(T) = {c5T:.3e}  B3 formula = {B3:.3e}  "
+                f"C5 asymptotic = {c5A:.3e}"
+            )
+        print("     family 2 (median over perm seeds):")
+        for L in cfg.L_S_list:
+            fwd = float(
+                np.median(f2["forward_by_LS"][int(L)][:, :, f2_ai], axis=1).mean()
+            )
+            c5T = float(
+                np.median(f2["c5_at_gammaT_by_LS"][int(L)][:, :, f2_ai], axis=1).mean()
+            )
+            B3 = float(
+                np.median(f2["B3_by_LS"][int(L)][:, :, f2_ai], axis=1).mean()
+            )
+            c5A = float(np.median(f2["c5_asymptotic_by_LS"][int(L)][:, f2_ai]))
+            print(
+                f"       L_S = {L:>2d}  forward = {fwd:.3e}  "
+                f"C5@γ(T) = {c5T:.3e}  B3 formula = {B3:.3e}  "
+                f"C5 asymptotic = {c5A:.3e}"
+            )
         max_LS = max(cfg.L_S_list)
         min_LS = min(cfg.L_S_list)
         regime_gap_at_max_LS = (
@@ -1523,6 +1822,44 @@ def main() -> int:
                 "regime_gap_at_min_LS": float(regime_gap_at_min_LS),
                 "regime_gap_at_max_LS": float(regime_gap_at_max_LS),
             },
+            "eval_protocol_comparison_at_alpha_brittle": {
+                "family1": {
+                    str(L): {
+                        "forward": float(
+                            f1["forward_by_LS"][int(L)][:, f1_ai].mean()
+                        ),
+                        "c5_at_gammaT": float(
+                            f1["c5_at_gammaT_by_LS"][int(L)][:, f1_ai].mean()
+                        ),
+                        "B3_formula": float(
+                            f1["B3_by_LS"][int(L)][:, f1_ai].mean()
+                        ),
+                        "c5_asymptotic": float(
+                            f1["c5_asymptotic_by_LS"][int(L)][f1_ai]
+                        ),
+                    }
+                    for L in cfg.L_S_list
+                },
+                "family2_median_over_perm_seeds": {
+                    str(L): {
+                        "forward": float(
+                            np.median(f2["forward_by_LS"][int(L)][:, :, f2_ai], axis=1).mean()
+                        ),
+                        "c5_at_gammaT": float(
+                            np.median(f2["c5_at_gammaT_by_LS"][int(L)][:, :, f2_ai], axis=1).mean()
+                        ),
+                        "B3_formula": float(
+                            np.median(f2["B3_by_LS"][int(L)][:, :, f2_ai], axis=1).mean()
+                        ),
+                        "c5_asymptotic": float(
+                            np.median(f2["c5_asymptotic_by_LS"][int(L)][:, f2_ai])
+                        ),
+                    }
+                    for L in cfg.L_S_list
+                },
+            },
+            "ood_eval_wallclock_seconds": round(float(eval_wall), 3),
+            "n_ood_eval_contexts": int(cfg.n_ood_eval_contexts),
             "train_wallclock_seconds": round(float(train_wall), 3),
         })
 

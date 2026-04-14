@@ -26,6 +26,7 @@
     2,
     3
   ],
+  "n_ood_eval_contexts": 256,
   "f1_target_kind": "flat",
   "f1_target_flat_value": 1.0,
   "f1_alphas": [
@@ -70,7 +71,7 @@
     0.5,
     1.0
   ],
-  "matched_baseline_tol": 1e-10,
+  "matched_baseline_tol": 0.15,
   "brittleness_alpha": 1.0,
   "brittleness_ratio_min": 1.25,
   "final_loss_window": 20,
