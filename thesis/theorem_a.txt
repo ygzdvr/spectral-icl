@@ -1,0 +1,843 @@
+
+This section proves the finite-dimensional algebraic reduction that is used 
+throughout the rest of the thesis.
+Unlike the later scaling-law theorems, no asymptotic limit will be studied in this
+chapter here.
+
+The purpose of this chapter is to prove Theorem~\ref{thm:theoremA_exact_SGamma}.
+It identifies the precise quantity that a linear structured sequence
+mixer learns in an in-context regression task.
+The theorem uses the preliminaries from
+Chapter~\ref{ch:math_preliminaries}.
+The proof Theorem~\ref{thm:theoremA_exact_SGamma} is the structured-mixer version of the
+reduced-$\Gamma$ construction introduced in Chapter \ref{ch:problem}, but stated in a
+form that cleanly separates the token-side operator from the feature-side preconditioner.
+
+\section{Model, partitions, and structured masks}\label{sec:theoremA_model_partitions_structured_masks}
+
+As mentioned in Chapter \ref{ch:problem} and Chapter \ref{ch:math_preliminaries}, we work with $T=P+K$ tokens.
+The first $P$ tokens are labeled training tokens and the last $K$ tokens are
+query tokens. As introduced in Chapter \ref{sec:problem_formulation_task} the input data are
+\(
+X=[x_1,\dots,x_P]\in\mathbb R^{D\times P},
+\)
+and
+\(
+X_\star=[x_{P+1},\dots,x_{P+K}]\in\mathbb R^{D\times K},
+\)
+and the training labels are collected in
+\(
+y=(y_1,\dots,y_P)^\top\in\mathbb R^P.
+\)
+The query labels are masked and hence set to zero in the input stream.
+
+Let $S\in\mathbb R^{T\times T}$ be a token-space operator.
+The structured linear sequence model considered in this chapter is the
+residual update
+\begin{equation}
+\label{eq:theoremA_model_matrix}
+H^{\ell+1}
+=
+H^{\ell}
++
+\frac{1}{LP}
+\Bigl(S\circ\bigl(Q^{\ell}(K^{\ell})^\top\bigr)\Bigr)V^{\ell},
+\qquad
+\ell=0,1,\dots,L-1,
+\end{equation}
+with
+\(
+Q^{\ell}=H^{\ell}W_q,
+\)
+\(
+K^{\ell}=H^{\ell}W_k,
+\)
+and
+\(
+V^{\ell}=H^{\ell}W_v,
+\)
+where $H^{\ell}\in\mathbb R^{T\times N}$ stores one row per token.
+The initial hidden state is defined as
+\begin{equation}
+\label{eq:theoremA_initial_condition}
+H^0=
+\begin{bmatrix}
+(W_xx_1+y_1w_y)^\top\\
+\vdots\\
+(W_xx_P+y_Pw_y)^\top\\
+(W_xx_{P+1})^\top\\
+\vdots\\
+(W_xx_{P+K})^\top
+\end{bmatrix}
+\in\mathbb R^{T\times N},
+\end{equation}
+so the query tokens carry feature information but no label information at depth
+zero.
+The prediction on token $\mu$ is read out by
+\(
+f_\mu := w_o^\top h_\mu^L,
+\)
+where $h_\mu^\ell$ is the $\mu$th row of $H^\ell$.
+
+The token operator $S$ will later be taken to be Toeplitz, circulant,
+semiseparable, or a structured masked attention operator.
+For the algebraic reduction itself, only the block structure of $S$ matters.
+Now we formally define the train supported structured mixer, and GD-compatible mixer
+previously introduced in Chapter \ref{sec:problem_formulation_structured_mixer}
+
+\begin{definition}[Train-supported structured mixer]
+\label{def:train_supported_mixer}
+A token operator $S\in\mathbb R^{T\times T}$ is called
+\emph{train-supported} if the query columns vanish, i.e.
+\begin{equation}
+\label{eq:train_supported_blocks}
+S_{\mathcal T\mathcal Q}=0,
+\qquad
+S_{\mathcal Q\mathcal Q}=0.
+\end{equation}
+Equivalently,
+\[
+S=
+\begin{bmatrix}
+S_{\mathcal T\mathcal T} & 0\\
+S_{\mathcal Q\mathcal T} & 0
+\end{bmatrix}.
+\]
+Thus only training tokens act as sources in the residual update.
+\end{definition}
+
+\begin{definition}[GD-compatible mixer]
+\label{def:gd_compatible_mixer}
+A train-supported mixer $S\in\mathbb R^{T\times T}$ is called
+\emph{GD-compatible} if
+\begin{equation}
+\label{eq:gd_compatible_blocks}
+S_{\mathcal T\mathcal T}=-\mathbf 1_P\mathbf 1_P^\top,
+\qquad
+S_{\mathcal Q\mathcal T}=\mathbf 1_K\mathbf 1_P^\top.
+\end{equation}
+Equivalently, if $u\in\mathbb R^T$ is supported on $\mathcal T$, then
+\[
+(Su)_\mu=
+\begin{cases}
+-\sum_{\nu\in\mathcal T}u_\nu,&\mu\in\mathcal T,\\[4pt]
+\ \sum_{\nu\in\mathcal T}u_\nu,&\mu\in\mathcal Q.
+\end{cases}
+\]
+%This is exactly the signed train/query aggregation implemented by the linear
+%attention mask used in \cite{bordelon2026scaling}.
+\end{definition}
+
+\section{Assumptions and feature-space operator}
+
+The reduction theorem in Theorem~\ref{thm:theoremA_exact_SGamma} requires
+the usual orthogonal decomposition between the feature channel and the label
+channel. The following assumptions are therefore necessary.
+%since they make the invariant subspace exact and remove all mixed terms.
+
+\begin{assumption}[Channel separation and alignment]
+\label{ass:theoremA_alignment}
+The weights satisfy the following conditions.
+
+First, the read-in and read-out directions are aligned, i.e.
+$w_o=w_y$, $\|w_y\|_2=1$, and $W_x^\top w_y=0$.
+
+Second, the value channel is closed, i.e. there exists a scalar
+$\alpha_v\in\mathbb R$ such that $W_vW_x=0$ and $W_vw_y=\alpha_v w_y$.
+
+Third, the key and query maps depend only on the feature channel, i.e.
+$W_kw_y=0$ and $W_qw_y=0$.
+\end{assumption}
+
+Under Assumption~\ref{ass:theoremA_alignment} we define the induced
+feature-space operator
+\begin{equation}
+\label{eq:theoremA_gamma_definition}
+\Gamma := \alpha_v\, W_x^\top W_q^\top W_k W_x\in\mathbb R^{D\times D}.
+\end{equation}
+The order of $W_q$ and $W_k$ in \eqref{eq:theoremA_gamma_definition} is chosen
+so that the bilinear form appearing in the recursion is exactly
+$x_\mu^\top\Gamma x_\nu$.
+No symmetry of $\Gamma$ is assumed.
+
+\section{Exact invariant-subspace reduction}
+
+We first prove that the hidden states remain in a two-channel subspace, 
+(1) a fixed feature component $W_xx_\mu$ and (2) a scalar label component along $w_y$.
+%This is the essential analogue of the reduced-$\Gamma$ closure from
+%Appendix~B of \cite{bordelon2026scaling}.
+
+\begin{lemma}[Closure of the hidden-state ansatz]
+\label{lem:theoremA_hidden_closure}
+Assume \ref{ass:theoremA_alignment}.
+Then for every depth $\ell\in\{0,1,\dots,L\}$ there exist scalars
+$\Delta_\mu^\ell\in\mathbb R$ such that
+\begin{equation}
+\label{eq:theoremA_hidden_ansatz}
+h_\mu^\ell = W_xx_\mu + \Delta_\mu^\ell w_y,
+\qquad \mu\in[T].
+\end{equation}
+Moreover,
+\begin{equation}
+\label{eq:theoremA_scalar_recurrence_general}
+\Delta_\mu^{\ell+1}
+=
+\Delta_\mu^{\ell}
++
+\frac{1}{LP}
+\sum_{\nu=1}^{T}
+S_{\mu\nu}\,x_\mu^\top\Gamma x_\nu\,\Delta_\nu^{\ell},
+\qquad \mu\in[T],
+\end{equation}
+with initial values
+\begin{equation}
+\label{eq:theoremA_initial_delta}
+\Delta_\mu^0=
+\begin{cases}
+y_\mu,&\mu\in\mathcal T,\\
+0,&\mu\in\mathcal Q.
+\end{cases}
+\end{equation}
+\end{lemma}
+
+\begin{proof}[Proof deferred to Appendix~\ref{sec:appendix_theoremA_proofs}]
+    ~
+\end{proof}
+
+Lemma~\ref{lem:theoremA_hidden_closure} is the core algebraic step.
+Lemma~\ref{lem:theoremA_hidden_closure}, allows us to rewrite the structured sequence
+model as a scalar-valued noncommutative iteration using by token-space operator
+and a feature-space bilinear form.
+bilinear form.
+
+\section{Reduced $(S,\Gamma)$ dynamics}
+\label{sec:theoremA_final_form}
+
+This brings us to the main proof of this chapter. In this chapter we will first prove an exact
+reduced $(S,\Gamma)$ theorem for a train-supported structured mixer. Then we will recover the
+usual reduced-$\Gamma$ predictor as the GD-compatible special case. And only then prove that
+the GD-compatible mixer belongs to an explicitsemiseparable/SSD structured-mixer family.
+%This ordering isolates the algebraic reduction from the architectural realization question.
+%It also keeps the theorem maximally close to the masking mechanics and reduced model of Bordelon--Letey--Pehlevan, whose signed train/query mask is the load-bearing ingredient in the original reduced-$\Gamma$ derivation \cite[Appendix~B]{bordelon2026scaling}. 
+
+\begin{theorem}[Exact reduced $(S,\Gamma)$ theorem for train-supported structured mixers]
+\label{thm:theoremA_exact_SGamma}
+Assume the alignment and channel-separation hypotheses of
+Assumption~\ref{ass:theoremA_alignment}.
+Let $S\in\mathbb R^{T\times T}$ be a train-supported structured mixer as in
+Definition~\ref{def:train_supported_mixer}. Define the induced sample-space operators
+\begin{equation}
+\label{eq:theoremA_final_A_def}
+A_S(X,\Gamma)
+:=
+\frac{1}{P}\Bigl(S_{\mathcal T\mathcal T}\circ(X^\top\Gamma X)\Bigr)
+\in\mathbb R^{P\times P},
+\end{equation}
+and
+\begin{equation}
+\label{eq:theoremA_final_B_def}
+B_S(X_\star,X,\Gamma)
+:=
+\frac{1}{P}\Bigl(S_{\mathcal Q\mathcal T}\circ(X_\star^\top\Gamma X)\Bigr)
+\in\mathbb R^{K\times P}.
+\end{equation}
+Let
+\(
+r^\ell:=(\Delta_1^\ell,\dots,\Delta_P^\ell)^\top\in\mathbb R^P
+\)
+be the vector of label-channel coefficients on the $P$ training tokens, as in
+Lemma~\ref{lem:theoremA_hidden_closure}.
+Then the structured residual model admits the exact reduced representation
+\begin{equation}
+\label{eq:theoremA_final_training_recursion}
+r^{\ell+1}
+=
+\Bigl(I+L^{-1}A_S(X,\Gamma)\Bigr)r^\ell,
+\qquad
+r^0=y,
+\end{equation}
+so that
+\begin{equation}
+\label{eq:theoremA_final_training_closed}
+r^\ell
+=
+\Bigl(I+L^{-1}A_S(X,\Gamma)\Bigr)^\ell y.
+\end{equation}
+Moreover, the vector of query predictions
+\[
+F(X_\star;X,y):=(f_{P+1},\dots,f_{P+K})^\top\in\mathbb R^K
+\]
+satisfies
+\begin{equation}
+\label{eq:theoremA_final_query_formula}
+F(X_\star;X,y)
+=
+\frac{1}{L}
+B_S(X_\star,X,\Gamma)
+\sum_{\ell=0}^{L-1}
+\Bigl(I+L^{-1}A_S(X,\Gamma)\Bigr)^\ell y.
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+By Lemma~\ref{lem:theoremA_hidden_closure}, the hidden state remains in the
+invariant two-channel form
+\(
+h_\mu^\ell=W_xx_\mu+\Delta_\mu^\ell w_y,
+\)
+and the scalar coefficients obey
+\begin{equation}
+\label{eq:theoremA_final_scalar_recursion}
+\Delta_\mu^{\ell+1}
+=
+\Delta_\mu^\ell
++
+\frac{1}{LP}
+\sum_{\nu=1}^{T}
+S_{\mu\nu}\,x_\mu^\top\Gamma x_\nu\,\Delta_\nu^\ell.
+\end{equation}
+Since $S$ is train-supported, its query columns vanish such that
+\(
+S_{\mathcal T\mathcal Q}=0,
+\)
+and
+\(
+S_{\mathcal Q\mathcal Q}=0.
+\)
+Hence the sum in \eqref{eq:theoremA_final_scalar_recursion} reduces to
+training indices $\nu\in\mathcal T$.
+For $\mu\in\mathcal T$ we obtain
+\[
+\Delta_\mu^{\ell+1}
+=
+\Delta_\mu^\ell
++
+\frac{1}{LP}\sum_{\nu=1}^{P}
+S_{\mu\nu}\,x_\mu^\top\Gamma x_\nu\,\Delta_\nu^\ell.
+\]
+By definition of $A_S(X,\Gamma)$ this is exactly
+\[
+\Delta_\mu^{\ell+1}
+=
+\Delta_\mu^\ell
++
+\frac{1}{L}
+\sum_{\nu=1}^{P}
+\bigl[A_S(X,\Gamma)\bigr]_{\mu\nu}\,\Delta_\nu^\ell.
+\]
+Stacking over $\mu\in\mathcal T$ yields
+\eqref{eq:theoremA_final_training_recursion}, and iterating gives
+\eqref{eq:theoremA_final_training_closed}.
+
+Now let $q\in\mathcal Q$.
+Again using train-support,
+\[
+\Delta_q^{\ell+1}
+=
+\Delta_q^\ell
++
+\frac{1}{LP}\sum_{\nu=1}^{P}
+S_{q\nu}\,x_q^\top\Gamma x_\nu\,\Delta_\nu^\ell.
+\]
+Because the query tokens are initialized with zero label channel,
+$\Delta_q^0=0$.
+Summing the recursion from $\ell=0$ to $L-1$ gives
+\[
+\Delta_q^{L}
+=
+\frac{1}{L}
+\sum_{m=0}^{L-1}
+\sum_{\nu=1}^{P}
+\bigl[B_S(X_\star,X,\Gamma)\bigr]_{q-P,\nu}\,\Delta_\nu^m.
+\]
+Substituting \eqref{eq:theoremA_final_training_closed} and stacking the
+$K$ query coordinates proves \eqref{eq:theoremA_final_query_formula}.
+\end{proof}
+
+\begin{corollary}[GD-compatible recovery of the reduced-$\Gamma$ predictor]
+\label{cor:theoremA_GD_recovery}
+Assume the hypotheses of Theorem~\ref{thm:theoremA_exact_SGamma} and suppose in
+addition that $S$ is GD-compatible, i.e.
+\[
+S_{\mathcal T\mathcal T}=-\mathbf 1_P\mathbf 1_P^\top,
+\qquad
+S_{\mathcal Q\mathcal T}=\mathbf 1_K\mathbf 1_P^\top.
+\]
+Then
+\begin{equation}
+\label{eq:theoremA_final_GD_training}
+r^{\ell+1}
+=
+\Bigl(I-\frac{1}{LP}X^\top\Gamma X\Bigr)r^\ell,
+\qquad
+r^0=y,
+\end{equation}
+so that
+\begin{equation}
+\label{eq:theoremA_final_GD_training_closed}
+r^\ell
+=
+\Bigl(I-\frac{1}{LP}X^\top\Gamma X\Bigr)^\ell y.
+\end{equation}
+The query prediction vector is
+\begin{equation}
+\label{eq:theoremA_final_GD_sample_side}
+F(X_\star;X,y)
+=
+\frac{1}{LP}
+X_\star^\top\Gamma X
+\sum_{\ell=0}^{L-1}
+\Bigl(I-\frac{1}{LP}X^\top\Gamma X\Bigr)^\ell y.
+\end{equation}
+Equivalently, with $\widehat\Sigma=P^{-1}XX^\top$,
+\begin{equation}
+\label{eq:theoremA_final_GD_feature_side}
+F(X_\star;X,y)
+=
+\frac{1}{LP}
+X_\star^\top\Gamma
+\sum_{\ell=0}^{L-1}
+\bigl(I-L^{-1}\widehat\Sigma\Gamma\bigr)^\ell
+Xy.
+\end{equation}
+For a single query $x_\star\in\mathbb R^D$, this becomes
+\begin{equation}
+\label{eq:theoremA_final_single_query}
+f(x_\star)
+=
+\frac{1}{LP}
+x_\star^\top\Gamma
+\sum_{\ell=0}^{L-1}
+\bigl(I-L^{-1}\widehat\Sigma\Gamma\bigr)^\ell
+Xy.
+\end{equation}
+\end{corollary}
+
+\begin{proof}
+Under GD-compatibility,
+\[
+A_S(X,\Gamma)
+=
+\frac{1}{P}\Bigl(( -\mathbf 1_P\mathbf 1_P^\top )\circ(X^\top\Gamma X)\Bigr)
+=
+-\frac{1}{P}X^\top\Gamma X,
+\]
+and similarly
+\[
+B_S(X_\star,X,\Gamma)
+=
+\frac{1}{P}\Bigl((\mathbf 1_K\mathbf 1_P^\top)\circ(X_\star^\top\Gamma X)\Bigr)
+=
+\frac{1}{P}X_\star^\top\Gamma X.
+\]
+Substituting these identities into
+\eqref{eq:theoremA_final_training_recursion}--\eqref{eq:theoremA_final_query_formula}
+gives \eqref{eq:theoremA_final_GD_training}--\eqref{eq:theoremA_final_GD_sample_side}.
+The feature-side form \eqref{eq:theoremA_final_GD_feature_side} follows from
+Proposition~\ref{prop:spectral_transfer}, exactly as in the proof of the
+sample/feature transfer for the original reduced-$\Gamma$ model.
+\end{proof}
+
+\begin{definition}[Full semiseparable matrix of order $r$]
+\label{def:full_semiseparable}
+A matrix $S\in\mathbb R^{T\times T}$ is called \emph{full semiseparable of
+order $r$} if there exist vectors
+\[
+u_i,v_i,\tilde u_i,\tilde v_i\in\mathbb R^r,
+\qquad d_i\in\mathbb R,
+\qquad 1\le i\le T,
+\]
+such that
+\begin{equation}
+\label{eq:full_semiseparable_definition}
+S_{ij}
+=
+\begin{cases}
+u_i^\top v_j, & i>j,\\[2pt]
+d_i, & i=j,\\[2pt]
+\tilde u_i^\top\tilde v_j, & i<j.
+\end{cases}
+\end{equation}
+Equivalently, every strictly lower-triangular submatrix and every strictly
+upper-triangular submatrix has rank at most $r$.
+This is the finite-dimensional semiseparable class that underlies structured
+state-space duality and structured masked-attention parameterizations
+\cite{dao2024ssd}.
+\end{definition}
+
+\begin{proposition}[Exact SSD realization of the GD-compatible mixer]
+\label{prop:theoremA_SSD_realization}
+Define the GD-compatible token mixer
+\begin{equation}
+\label{eq:theoremA_MGD_definition}
+M^{\mathrm{GD}}
+:=
+\begin{bmatrix}
+-\mathbf 1_P\mathbf 1_P^\top & 0\\
+\mathbf 1_K\mathbf 1_P^\top & 0
+\end{bmatrix}
+\in\mathbb R^{(P+K)\times(P+K)}.
+\end{equation}
+Let
+\begin{equation}
+\label{eq:theoremA_st_vectors}
+s:=
+\begin{bmatrix}
+-\mathbf 1_P\\
+\mathbf 1_K
+\end{bmatrix}
+\in\mathbb R^{T},
+\qquad
+t:=
+\begin{bmatrix}
+\mathbf 1_P\\
+0_K
+\end{bmatrix}
+\in\mathbb R^{T}.
+\end{equation}
+Then the following hold.
+\begin{enumerate}
+    \item \textbf{Rank-one factorization:}
+    \begin{equation}
+    \label{eq:theoremA_rank_one_factorization}
+    M^{\mathrm{GD}} = s t^\top.
+    \end{equation}
+    In particular, $\operatorname{rank}(M^{\mathrm{GD}})=1$.
+
+    \item \textbf{Exact semiseparable/SSD representation:}
+    $M^{\mathrm{GD}}$ is full semiseparable of order $1$.
+    More precisely, \eqref{eq:full_semiseparable_definition} holds with scalar
+    generators
+    \begin{equation}
+    \label{eq:theoremA_semiseparable_generators}
+    u_i=\tilde u_i=s_i,
+    \qquad
+    v_j=\tilde v_j=t_j,
+    \qquad
+    d_i=s_i t_i.
+    \end{equation}
+
+    \item \textbf{Structured masked-attention form:}
+    if one regards $s_\mu$ and $t_\nu$ as token-side query and key generators,
+    then
+    \begin{equation}
+    \label{eq:theoremA_structured_masked_attention_form}
+    M^{\mathrm{GD}}_{\mu\nu}=s_\mu t_\nu,
+    \qquad 1\le \mu,\nu\le T,
+    \end{equation}
+    so the GD-compatible mixer is an element of the rank-one
+    structured masked-attention/SSD subfamily.
+\end{enumerate}
+Consequently, choosing $S=M^{\mathrm{GD}}$ in
+Corollary~\ref{cor:theoremA_GD_recovery} yields the standard reduced-$\Gamma$
+predictor exactly.
+\end{proposition}
+
+\begin{proof}
+We prove the three assertions in order.
+
+\smallskip
+\noindent
+\emph{Step 1: entrywise verification of the rank-one factorization.}
+For $\mu\in\mathcal T$ and $\nu\in\mathcal T$ we have $s_\mu=-1$ and
+$t_\nu=1$, hence
+\[
+(s t^\top)_{\mu\nu}=s_\mu t_\nu=-1.
+\]
+For $\mu\in\mathcal Q$ and $\nu\in\mathcal T$ we have $s_\mu=1$ and
+$t_\nu=1$, hence
+\[
+(s t^\top)_{\mu\nu}=1.
+\]
+Finally, if $\nu\in\mathcal Q$ then $t_\nu=0$, so
+\[
+(s t^\top)_{\mu\nu}=0
+\qquad\text{for every }\mu\in[T].
+\]
+These three cases reproduce exactly the block matrix
+\eqref{eq:theoremA_MGD_definition}.
+Therefore \eqref{eq:theoremA_rank_one_factorization} holds.
+Since a nonzero outer product has rank one, it follows that
+$\operatorname{rank}(M^{\mathrm{GD}})=1$.
+
+\smallskip
+\noindent
+\emph{Step 2: semiseparable representation.}
+We use Definition~\ref{def:full_semiseparable} with $r=1$.
+Because \eqref{eq:theoremA_rank_one_factorization} holds for \emph{all}
+indices $i,j$, we may take the same scalar generators on both triangular parts:
+\[
+u_i=\tilde u_i=s_i,
+\qquad
+v_j=\tilde v_j=t_j,
+\qquad
+d_i=s_it_i.
+\]
+Then for $i>j$,
+\[
+u_i^\top v_j = s_i t_j = M^{\mathrm{GD}}_{ij};
+\]
+for $i<j$,
+\[
+\tilde u_i^\top\tilde v_j = s_i t_j = M^{\mathrm{GD}}_{ij};
+\]
+and for $i=j$,
+\[
+d_i=s_it_i=M^{\mathrm{GD}}_{ii}.
+\]
+Thus \eqref{eq:full_semiseparable_definition} is satisfied with $r=1$.
+Hence $M^{\mathrm{GD}}$ is full semiseparable of order $1$.
+
+\smallskip
+\noindent
+\emph{Step 3: structured masked-attention interpretation.}
+Equation~\eqref{eq:theoremA_rank_one_factorization} is already of the form
+\[
+M^{\mathrm{GD}}_{\mu\nu}=a_\mu b_\nu
+\]
+with token-side generators $a_\mu=s_\mu$ and $b_\nu=t_\nu$.
+This is precisely a rank-one structured masked-attention operator.
+Because full order-one semiseparable matrices are a special case of the
+semiseparable/SSD structured-mixer class, the proposition gives an exact SSD
+realization of the GD-compatible mixer.
+
+The final sentence now follows immediately from
+Corollary~\ref{cor:theoremA_GD_recovery}: setting $S=M^{\mathrm{GD}}$ gives
+back the standard reduced-$\Gamma$ predictor.
+\end{proof}
+
+\begin{remark}[Why the proposition is stated for full semiseparable structure]
+\label{rem:theoremA_full_vs_causal_ssd}
+The matrix $M^{\mathrm{GD}}$ is \emph{not} lower triangular on the training
+block, so it is generally not representable as a \emph{single} one-pass causal
+lower-semiseparable scan in the sense of
+Lemma~\ref{lem:ssd_prefix}.
+That obstruction is real and should not be hidden.
+The proposition therefore places the GD-compatible mixer in the
+\emph{full semiseparable / structured masked-attention} family, where the
+representation is exact.
+If one wishes to realize the same operator by strictly causal scans, one needs a
+factorization into multiple passes or an augmented token template.
+This stronger implementation statement is not needed for Theorem~A itself.
+\end{remark}
+
+
+\begin{proposition}[Necessity of GD-compatibility on the train-supported subspace]
+\label{prop:theoremA_necessity}
+Assume \ref{ass:theoremA_alignment} and let $S$ be train-supported.
+Suppose that for every $L\ge 1$, every $D\ge \max\{P,K\}$, every
+$X\in\mathbb R^{D\times P}$, every $X_\star\in\mathbb R^{D\times K}$,
+every $y\in\mathbb R^P$, and every $\Gamma\in\mathbb R^{D\times D}$, the
+resulting reduced model coincides with the standard sample-side reduced-$\Gamma$
+predictor, namely
+\[
+r^{\ell+1}=
+\Bigl(I-\frac{1}{LP}X^\top\Gamma X\Bigr)r^\ell,
+\qquad
+F(X_\star;X,y)
+=
+\frac{1}{LP}
+X_\star^\top\Gamma X
+\sum_{\ell=0}^{L-1}
+\Bigl(I-\frac{1}{LP}X^\top\Gamma X\Bigr)^\ell y.
+\]
+Then $S$ is GD-compatible.
+\end{proposition}
+
+\begin{proof}
+By Theorem~\ref{thm:theoremA_exact_SGamma}, the training-side reduced
+operator is always
+\[
+A_S(X,\Gamma)=\frac{1}{P}\bigl(S_{\mathcal T\mathcal T}\circ(X^\top\Gamma X)\bigr).
+\]
+By hypothesis this must equal $-P^{-1}X^\top\Gamma X$ for every $X$ and every
+$\Gamma$.
+Therefore
+\begin{equation}
+\label{eq:theoremA_necessity_training}
+S_{\mathcal T\mathcal T}\circ(X^\top\Gamma X)=-(X^\top\Gamma X)
+\qquad\text{for all }X,\Gamma.
+\end{equation}
+Choose $D=P$ and $X=I_P$.
+Then \eqref{eq:theoremA_necessity_training} becomes
+\[
+S_{\mathcal T\mathcal T}\circ\Gamma=-\Gamma
+\qquad\text{for all }\Gamma\in\mathbb R^{P\times P}.
+\]
+Taking $\Gamma=E_{ij}$, the matrix unit with a single $1$ in position $(i,j)$,
+shows that
+\[
+(S_{\mathcal T\mathcal T})_{ij}=-1
+\qquad\text{for every }i,j\in[P].
+\]
+Thus
+\[
+S_{\mathcal T\mathcal T}=-\mathbf 1_P\mathbf 1_P^\top.
+\]
+
+For the query block, Theorem~\ref{thm:theoremA_exact_SGamma} gives
+\[
+B_S(X_\star,X,\Gamma)=\frac{1}{P}\bigl(S_{\mathcal Q\mathcal T}\circ(X_\star^\top\Gamma X)\bigr).
+\]
+The hypothesis says that this equals $P^{-1}X_\star^\top\Gamma X$ for all
+$X_\star,X,\Gamma$.
+Hence
+\begin{equation}
+\label{eq:theoremA_necessity_query}
+S_{\mathcal Q\mathcal T}\circ(X_\star^\top\Gamma X)=X_\star^\top\Gamma X
+\qquad\text{for all }X_\star,X,\Gamma.
+\end{equation}
+Now choose $D=P+K$,
+\[
+X=
+\begin{bmatrix}
+I_P\\
+0
+\end{bmatrix}
+\in\mathbb R^{(P+K)\times P},
+\qquad
+X_\star=
+\begin{bmatrix}
+0\\
+I_K
+\end{bmatrix}
+\in\mathbb R^{(P+K)\times K}.
+\]
+Then $X_\star^\top\Gamma X$ is exactly the lower-left $K\times P$ block of
+$\Gamma$.
+Since this block may be chosen arbitrarily, \eqref{eq:theoremA_necessity_query}
+shows that
+\[
+S_{\mathcal Q\mathcal T}\circ M = M
+\qquad\text{for all }M\in\mathbb R^{K\times P}.
+\]
+Taking $M=E_{ij}$ proves that every entry of $S_{\mathcal Q\mathcal T}$ equals
+$1$.
+Therefore
+\[
+S_{\mathcal Q\mathcal T}=\mathbf 1_K\mathbf 1_P^\top.
+\]
+Since $S$ was assumed train-supported, we already have
+$S_{\mathcal T\mathcal Q}=S_{\mathcal Q\mathcal Q}=0$.
+Thus $S$ is GD-compatible.
+\end{proof}
+
+Combining Corollary~\ref{cor:theoremA_GD_recovery} with
+Proposition~\ref{prop:theoremA_necessity}, we obtain the precise mathematical
+content of the slogan
+\emph{``the reduced-$\Gamma$ predictor is exactly the forward-pass algorithm
+implemented by a structured mixer if and only if its token-side action matches
+signed train/query aggregation.''}
+
+\subsection{Stationary and semiseparable structural consequences}
+
+Theorem~\ref{thm:theoremA_exact_SGamma} is algebraic and makes no use of
+stationarity.
+Nevertheless, its exact reduced operator already reveals why Toeplitz,
+circulant, and semiseparable mixers are the right structured families for the
+later theorems.
+The reduced training operator is the Hadamard product of the token mixer and the
+sample-side bilinear kernel $X^\top\Gamma X$.
+The next proposition records the corresponding closure properties.
+
+\begin{proposition}[Closure of Toeplitz, circulant, and semiseparable structure under the reduction]
+\label{prop:theoremA_structure_closure}
+Let $K_\Gamma(X):=X^\top\Gamma X\in\mathbb R^{P\times P}$.
+\begin{enumerate}
+    \item If $S_{\mathcal T\mathcal T}$ and $K_\Gamma(X)$ are Toeplitz, then
+    $A_S(X,\Gamma)$ is Toeplitz.
+
+    \item If $S_{\mathcal T\mathcal T}$ and $K_\Gamma(X)$ are circulant, then
+    $A_S(X,\Gamma)$ is circulant.
+
+    \item If $S_{\mathcal T\mathcal T}$ is lower $r_1$-semiseparable and
+    $K_\Gamma(X)$ is lower $r_2$-semiseparable, then
+    $A_S(X,\Gamma)$ is lower $r_1r_2$-semiseparable.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+For the first statement, write
+\[
+(S_{\mathcal T\mathcal T})_{ij}=s_{i-j},
+\qquad
+(K_\Gamma(X))_{ij}=k_{i-j}.
+\]
+Then
+\[
+(A_S(X,\Gamma))_{ij}
+=
+\frac{1}{P}s_{i-j}k_{i-j},
+\]
+which depends only on $i-j$.
+Hence $A_S(X,\Gamma)$ is Toeplitz.
+
+The circulant statement is identical, except that the diagonal index is taken
+modulo $P$.
+
+For the semiseparable statement, write for $i>j$
+\[
+(S_{\mathcal T\mathcal T})_{ij}=u_i^\top v_j,
+\qquad
+(K_\Gamma(X))_{ij}=a_i^\top b_j,
+\]
+with $u_i,v_j\in\mathbb R^{r_1}$ and $a_i,b_j\in\mathbb R^{r_2}$.
+Then for $i>j$,
+\[
+(A_S(X,\Gamma))_{ij}
+=
+\frac{1}{P}(u_i^\top v_j)(a_i^\top b_j)
+=
+\frac{1}{P}(u_i\otimes a_i)^\top(v_j\otimes b_j).
+\]
+Since $u_i\otimes a_i$ and $v_j\otimes b_j$ lie in
+$\mathbb R^{r_1r_2}$, the strictly lower-triangular part has rank at most
+$r_1r_2$ on every submatrix.
+Thus $A_S(X,\Gamma)$ is lower $r_1r_2$-semiseparable.
+\end{proof}
+
+Proposition~\ref{prop:theoremA_structure_closure} is the exact finite-depth
+entry point for the later spectral and SSD analyses.
+In the stationary setting of Theorem~B, it explains why the reduced operator
+inherits Toeplitz or circulant structure once the bilinear kernel
+$X^\top\Gamma X$ becomes stationary along token index.
+In the semiseparable/SSD setting, it identifies the precise sense in which the
+reduction preserves low-complexity token structure.
+
+\subsection{Remarks for later chapters}
+
+\begin{remark}[What Theorem~A does and does not prove]
+\label{rem:theoremA_scope}
+Theorem~\ref{thm:theoremA_exact_SGamma} proves an exact reduction from a
+linear structured sequence model to a reduced $(S,\Gamma)$ model, and it
+characterizes exactly when the usual reduced-$\Gamma$ predictor is recovered.
+It does \emph{not} by itself prove that every semiseparable or circulant
+architecture is GD-compatible.
+That is a separate architectural realization question.
+The theorem isolates the exact algebraic condition that must be checked on the
+token-side operator.
+\end{remark}
+
+\begin{remark}[Untied layers]
+\label{rem:theoremA_untied_layers}
+If the triples $(W_q^\ell,W_k^\ell,W_v^\ell)$ are allowed to vary with $\ell$
+but satisfy Assumption~\ref{ass:theoremA_alignment} layerwise, then the same
+proof yields layer-dependent feature operators
+\[
+\Gamma_\ell := \alpha_v^{(\ell)} W_x^\top (W_q^\ell)^\top W_k^\ell W_x
+\]
+and a non-autonomous reduced model
+\[
+r^{\ell+1}
+=
+\Bigl(I+\frac{1}{L}A_S(X,\Gamma_\ell)\Bigr)r^\ell,
+\qquad
+F(X_\star;X,y)
+=
+\frac{1}{L}
+\sum_{m=0}^{L-1}
+B_S(X_\star,X,\Gamma_m)r^m.
+\]
+Thus the tied case proved above is the autonomous special case relevant for the
+main line of the thesis.
+\end{remark}

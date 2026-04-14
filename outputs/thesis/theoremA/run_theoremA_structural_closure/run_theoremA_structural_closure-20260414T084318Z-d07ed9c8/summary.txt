@@ -1,0 +1,36 @@
+run_id: run_theoremA_structural_closure-20260414T084318Z-d07ed9c8
+phase: theoremA
+script: run_theoremA_structural_closure
+status: completed
+wall_clock_seconds: 8.818
+compute_proxy: 4.82418
+
+plan_reference: EXPERIMENT_PLAN_FINAL.MD §8 (theorem-A exact tier, structural closure + untied-layer Remark 2)
+framing: Validates the remaining theorem-chapter objects not covered by A1/A1b/A2/A3/A4/A1-general: Proposition 2 (rank-1 factorization + semiseparable representation of M_GD), Proposition 5 (structural closure: Toeplitz, circulant, and semiseparable-rank multiplicativity of the Hadamard reduction A_S = (1/P)(S_TT ⊙ X^⊤ Γ X)), and Remark 2 (untied-layer non-autonomous reduced model). Deterministic matrix-identity tier; no training, no architecture, no statistics.
+category: exact theorem-A matrix-level structural identity validation.
+interpretation: All gates are algebraic identities up to float64 precision. The Fourier identity for a Hadamard product of two circulants is a circular convolution of their DFT eigenvalues with a 1/P² factor — NOT the elementwise product of DFT eigenvalues (which holds for the matrix product of circulants and is separately recorded as a diagnostic that intentionally fails).
+acceptance_framing: prop2_tol = 1e-14; toeplitz_tol = 1e-12; circulant_tol = 1e-12 (applies to off-circulant Fourier, spatial projection, and the Hadamard convolution identity); semiseparable σ_{r+1}/σ_1 tol = 1e-10; kronecker_tol = 1e-12; untied_tol = 1e-10.
+status: prop2_rank1=ok prop2_gen=ok prop5_toep=ok prop5_circ=ok prop5_semisep=ok prop5_kron=ok remark2_untied=ok
+prop2_rank1_pass: True
+prop2_generators_pass: True
+prop5_toeplitz_pass: True
+prop5_circulant_pass: True
+prop5_semiseparable_pass: True
+prop5_kronecker_pass: True
+remark2_untied_pass: True
+worst_p1_rank1_err: 0.0
+worst_p1_sigma2_rel: 4.270618898434661e-17
+worst_p1_generator_err: 0.0
+worst_p2_off_toeplitz_rel: 7.975548616976081e-16
+worst_p3_off_circulant_fourier_rel: 9.03146879412561e-15
+worst_p3_fourier_convolution_err: 1.4710125545792418e-16
+worst_p4_main_sigma_r_plus1_rel: 2.352373698502979e-16
+worst_p4_kronecker_rel_err: 0.0
+worst_p5_untied_err: 5.499276086105911e-16
+n_cells_p1: 12
+n_cells_p2: 8
+n_cells_p3: 4
+n_cells_p4: 24
+n_cells_p5: 12
+device: cuda
+sweep_wallclock_seconds: 4.824

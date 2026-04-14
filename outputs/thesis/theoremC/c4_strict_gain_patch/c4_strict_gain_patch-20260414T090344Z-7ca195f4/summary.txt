@@ -1,0 +1,29 @@
+run_id: c4_strict_gain_patch-20260414T090344Z-7ca195f4
+phase: theoremC
+script: c4_strict_gain_patch
+status: completed
+wall_clock_seconds: 0.445
+
+plan_reference: EXPERIMENT_PLAN_FINAL.MD §7.4 (C4)
+theorem_reference: thesis/theorem_c.txt — Proposition 3.15 (monotonicity, weak direction) + Corollary 3.16 (strict hybrid gain under heterogeneous coarse blocks).
+category: acceptance-record-only patch on existing C4 data. No new sweep, no new figure. Strict positivity of the refinement gap on (m >= 2, kappa > 1) is the Corollary 3.16 direction the original C4 script did not separately log; the complementary check confirms zero gain on the m = 1 or kappa = 1 region.
+interpretation: Proposition 3.15 (weak direction) was already confirmed by C4's refinement-nonneg_ok gate. This patch records the strict direction: every cell whose coarse block contains at least two active-support eigenvalues (m >= 2 AND kappa > 1) has a strictly positive refinement gap, so a dyadically-finer commutant class strictly improves on the coarse class there. The complementary cells (singleton-partition rows or homogeneous-block columns) have zero gain to float eps, because the coarse and refined classes coincide (m = 1) or both achieve zero loss (kappa = 1).
+data_source: canonical C4 npz: outputs/thesis/theoremC/run_theoremC_phase_diagram/run_theoremC_phase_diagram-20260413T090447Z-a95a1cc9/npz/phase_diagram.npz
+D: 64
+m_list: [1, 2, 4, 8, 16, 32]
+kappa_list: [1.0, 1.2, 1.5, 2.0, 3.0, 5.0, 10.0]
+L_list: [1, 2, 4, 8, 16]
+strict_tol: 1e-15
+zero_tol: 1e-09
+strict_refinement_gain_ok: False
+min_strict_gap: -5.2372630487944275e-12
+count_positive: 133
+count_total: 150
+min_loc: {'m': 2, 'kappa': 1.5, 'L': 16, 'L_coarse': 7.2829605408637e-12, 'L_fine': 1.2520223589658128e-11}
+zero_region_ok: True
+zero_worst_abs_gap: 4.087112421489504e-12
+zero_count_total: 60
+zero_worst_loc: {'m': 2, 'kappa': 1.0, 'L': 16, 'gap': -4.087112421489504e-12}
+all_ok: False
+status: strict_fail+zero_ok
+patch_summary_path: /scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremC/c4_strict_gain_patch/c4_strict_gain_patch-20260414T090344Z-7ca195f4/c4_strict_gain_patch_summary.txt

@@ -1,0 +1,57 @@
+{
+  "note": "Supplementary gates computed from the canonical v2 npz, replacing the loss-space depth-floor-ratio gates. The new gates measure proximity to the matched-stationary target in transfer-function space (the correct metric for the theorem-B depth-irrelevance claim) and undo the 2L_S loss amplification via a power-normalized collapse check.",
+  "canonical_run_id": "run_arch_spectral_depth_irrelevance2-20260414T020532Z-a2e5f4c8",
+  "canonical_artifact_npz": "npz/arch_spectral_depth_irrelevance_v2.npz",
+  "retired_gates": [
+    "ratio(\u03b1_max) \u2264 2.0\u00d7 (loss-space)",
+    "ratio(\u03b1) monotone decreasing (loss-space)",
+    "ratio(\u03b1_max) \u2264 0.80 \u00d7 ratio(\u03b1_min) (loss-space)"
+  ],
+  "new_gates": {
+    "A_transfer_convergence_at_alpha_max": {
+      "threshold_max_median_abs_T": 0.4,
+      "observed_worst_over_L_S": 0.2651948974618364,
+      "status": "OK",
+      "per_L_S": {
+        "1": 0.2651948974618364,
+        "2": 0.03187657955233013,
+        "4": 0.0006084994499290705,
+        "8": 4.1407724484587186e-06
+      }
+    },
+    "B_transfer_improves_with_alpha": {
+      "requires": "median |T_k|(\u03b1=8) < median |T_k|(\u03b1=1) for every L_S",
+      "status": "OK",
+      "per_L_S_alpha_1_to_alpha_8": {
+        "1": {
+          "alpha_1": 0.7342777073159475,
+          "alpha_8": 0.2651948974618364
+        },
+        "2": {
+          "alpha_1": 0.6012450145901409,
+          "alpha_8": 0.03187657955233013
+        },
+        "4": {
+          "alpha_1": 0.32224660470957145,
+          "alpha_8": 0.0006084994499290705
+        },
+        "8": {
+          "alpha_1": 0.1282443234413293,
+          "alpha_8": 4.1407724484587186e-06
+        }
+      }
+    },
+    "C_power_normalized_loss_collapse_at_alpha_max": {
+      "threshold_max_over_min_across_L_S": 5.0,
+      "observed_max_over_min": 1.484955765548633,
+      "observed_per_L_S_at_alpha_max": {
+        "1": 0.3738791386898248,
+        "2": 0.4249652184510035,
+        "4": 0.47706304592294035,
+        "8": 0.5551939826158123
+      },
+      "status": "OK"
+    }
+  },
+  "all_supplementary_gates_ok": true
+}

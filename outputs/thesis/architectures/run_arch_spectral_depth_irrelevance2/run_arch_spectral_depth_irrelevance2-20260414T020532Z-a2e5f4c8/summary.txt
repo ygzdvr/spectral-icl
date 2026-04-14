@@ -1,0 +1,42 @@
+run_id: run_arch_spectral_depth_irrelevance2-20260414T020532Z-a2e5f4c8
+phase: architectures
+script: run_arch_spectral_depth_irrelevance2
+status: completed
+wall_clock_seconds: 2536.179
+compute_proxy: 2528.91
+
+plan_reference: EXPERIMENT_PLAN_FINAL.MD §9.1 (architecture-aligned spectral-only suite); theorem reference: thesis/theorem_b.txt Corollary 'Modewise gradient-flow dynamics and long-context depth irrelevance' (cor:theoremB_modewise_ode)
+phase: Phase IV — architecture-aligned validation layer
+category: §9.1 v2 tied-weight architecture-aligned support for theorem-B depth irrelevance. Long-context (sqrt_D) normalization; α = P/D sweep at fixed D = 32; transfer-function alignment figure.
+framing: This experiment is architecture-aligned support for theorem-B depth irrelevance in the tied-weight setting. It does not re-prove theorem B. It tests whether the depth gap shrinks as α = P/D increases when parameter count is held fixed across depth.
+architecture: Single tied γ ∈ ℝ^D shared across all L_S layers; parameter count = D independent of L_S; score matrix precomputed once per forward pass (tied γ → same S at every layer).
+task: G1 matched stationary circulant ICL regression; power_law symbol ν = 0.5, teacher νβ = 1.0; label_norm = sqrt_D; batch = 64 contexts, fresh sampling per step.
+interpretation: Depth-floor ratio at α = 1.0 is 2.771; at α = 8.0 is 1715.094. Monotone decreasing in α: no. Material (≥20% relative) reduction at α_max: no. Stretch target (ratio ≤ 2.0): not achieved. Transfer alignment at α_max (max median |T_k| over L_S): 0.266 (gate ≤ 0.40: OK). Interpretation: the depth gap shrinks as α grows because the per-batch sample-space operator concentrates (noise ∝ 1/√P), reducing the finite-batch interaction with the (2L_S − 1) gradient exponent near the matched optimum.
+device: cuda
+geometry: {'D': 32, 'P_list': [32, 64, 128, 256], 'K': 8, 'alphas': [1.0, 2.0, 4.0, 8.0], 'batch_contexts': 64, 'train_steps': 10000, 'log_every': 25}
+L_S_list: [1, 2, 4, 8]
+seed_list: [0, 1, 2, 3]
+n_runs: 64
+optimizer: adam
+learning_rate: 0.05
+label_norm: sqrt_D
+symbol_kind: power_law
+power_law_nu: 0.5
+task_spec_nu_beta: 1.0
+status: no_nan_ok+decay_ok+monotone_FAIL+material_FAIL+transfer_ok
+decay_fraction: 0.5
+alpha_material_reduction_threshold: 0.8
+alpha_stretch_ratio: 2.0
+transfer_max_median_alpha_max: 0.4
+nan_count: 0
+n_decay_violations: 0
+depth_floor_ratio_by_alpha: {'1.000': 2.7709884542215475, '2.000': 10.118545813935679, '4.000': 122.47721460255997, '8.000': 1715.0937636952447}
+ratio_at_min_alpha: 2.7709884542215475
+ratio_at_max_alpha: 1715.0937636952447
+monotone_decreasing_ok: False
+material_reduction_ok: False
+stretch_target_achieved: False
+transfer_alignment_ok: True
+median_abs_T_at_max_alpha: {'1': 0.26611950967562337, '2': 0.03724152422705418, '4': 0.0006347348569715764, '8': 5.86987511193754e-06}
+mean_finals_per_P_LS: {'32': {'1': 0.5247745557150603, '2': 0.3833338990957482, '4': 0.2562770417319047, '8': 0.18938171861220726}, '64': {'1': 0.3665894453755312, '2': 0.2050986729620015, '4': 0.09361780268438138, '8': 0.03622945946152154}, '128': {'1': 0.2376687637342688, '2': 0.09265489369517026, '4': 0.020698475690269433, '8': 0.0019405141152622288}, '256': {'1': 0.1397879054479781, '2': 0.032615619948839936, '4': 0.0026847036599658963, '8': 8.150452669526296e-05}}
+sweep_wallclock_seconds: 2528.913

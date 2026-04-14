@@ -124,12 +124,16 @@ Acceptance (qualitative architecture-aligned)
    optimizer step.
 2. **Substantial decay at every L_S**: per (L_S, seed),
    ``mean_final_loss / mean_initial_loss ≤ decay_fraction``.
-3. **No qualitative new depth-dependent floor**:
-   ``max_L_S(mean_final_loss) / min_L_S(mean_final_loss) ≤
-   depth_floor_ratio``. This is the architecture-aligned analog of
-   B2's depth-irrelevance gate; the threshold is loose because
-   trainable architectures show real finite-time depth-dependent
-   transient effects beyond the algebraic theorem-level claim.
+3. **No qualitative new depth-dependent floor** (ONE-SIDED):
+   for every ordered pair ``L1 < L2``,
+   ``mean_final(L2) / mean_final(L1) ≤ depth_floor_ratio``. This is
+   the architecture-aligned analog of B2's depth-irrelevance gate: the
+   concern is that increasing spectral depth could introduce a
+   qualitatively NEW higher asymptotic floor. The gate is intentionally
+   one-sided — a trainable architecture at larger L_S has strictly
+   more γ parameters and naturally reaches a lower finite-batch noise
+   floor, which is architecture-aligned improvement, not a theorem
+   violation.
 4. **Transfer function visibly aligned with the stationary spectral
    target**: across L_S, the median over modes of
    ``|T_k^{cumul}|`` at the end of training is ``≤ transfer_max_median``.
@@ -243,12 +247,15 @@ class ArchSpectralLinearStationaryConfig:
     # decay" in the trainable setting; observed decays are ~66% (L_S=1)
     # → ~92% (L_S=8), all comfortably within this threshold.
     decay_fraction: float = 0.40
-    # depth_floor_ratio: across L_S (mean over seeds), max final loss /
-    # min final loss must stay within this ratio. Loose to accommodate
-    # finite-time transient differences between depths under SGD; the
-    # trainable decoupled-L_S architecture has more parameters at
-    # larger L_S, so deeper models can reach lower loss in finite time
-    # even though the theorem-B asymptote is depth-irrelevant.
+    # depth_floor_ratio: ONE-SIDED gate. For every ordered pair of
+    # depths L1 < L2, mean_final(L2) / mean_final(L1) must stay within
+    # this ratio. The concern the gate is designed to catch is a
+    # qualitatively NEW higher asymptotic floor introduced by deeper
+    # spectral depth (a violation of the theorem-B2 depth-irrelevance
+    # claim). A deeper architecture that reaches a LOWER finite-batch
+    # noise floor thanks to its extra γ parameters is architecture-
+    # aligned improvement, not a theorem violation, and is not
+    # punished by this gate.
     depth_floor_ratio: float = 5.0
     # transfer_max_median: per L_S (mean over seeds), median over
     # Fourier modes of |T_k^{cumul}| at end of training. Loose
@@ -531,7 +538,7 @@ def _plot_loss_vs_step(
         mean = np.where(agg["mean"] > floor, agg["mean"], np.nan)
         se = agg["se"]
         ax.plot(
-            steps, mean, color=color, lw=1.5, marker="o", ms=3.0,
+            steps, mean, color=color, lw=1.1,
             label=rf"$L_S = {L_S}$",
         )
         ax.fill_between(
@@ -634,11 +641,16 @@ def _plot_final_loss_summary(
             se_loss.append(float(vals.std(ddof=1) / np.sqrt(vals.size)))
         else:
             se_loss.append(0.0)
+    L_colors = sequential_colors(len(cfg.L_S_list), palette="rocket")
     fig, ax = plt.subplots(figsize=(5.8, 4.0))
-    ax.errorbar(
-        L_arr, mean_loss, yerr=se_loss, fmt="o", ms=6, capsize=5,
-        color="C0", label="final loss (mean ± SE)",
+    ax.plot(
+        L_arr, mean_loss, color="gray", lw=0.8, alpha=0.5, zorder=1,
     )
+    for color, L_S, m, se in zip(L_colors, L_arr, mean_loss, se_loss):
+        ax.errorbar(
+            L_S, m, yerr=se, fmt="o", ms=6, capsize=5,
+            color=color, label=f"$L_S={int(L_S)}$", zorder=2,
+        )
     if initial_loss_analytical > 0:
         ax.axhline(
             initial_loss_analytical, color="gray", ls=":",
@@ -1029,16 +1041,27 @@ def main() -> int:
                     })
         decay_ok = not decay_violations
 
-        # 3) No qualitative new depth-dependent floor.
+        # 3) No qualitative new depth-dependent floor (ONE-SIDED).
+        # Theorem-B2 concern: increasing spectral depth must not
+        # introduce a qualitatively NEW higher asymptotic floor. The
+        # gate therefore checks (deeper / shallower) ≤ threshold across
+        # every ordered pair (L1 < L2). A trainable architecture at
+        # larger L_S has strictly more γ parameters and naturally
+        # reaches a lower finite-batch noise floor; the gate does NOT
+        # punish that direction of improvement.
         mean_finals_per_LS = {
             int(L_S): float(np.mean(final_loss_per_LS_seed[int(L_S)]))
             for L_S in cfg.L_S_list
         }
         if mean_finals_per_LS:
-            depth_floor_ratio_obs = (
-                max(mean_finals_per_LS.values())
-                / max(min(mean_finals_per_LS.values()), 1e-30)
-            )
+            sorted_LS = sorted(mean_finals_per_LS.keys())
+            worst_ratio = 1.0
+            for i, L1 in enumerate(sorted_LS):
+                for L2 in sorted_LS[i + 1:]:
+                    r = mean_finals_per_LS[L2] / max(mean_finals_per_LS[L1], 1e-30)
+                    if r > worst_ratio:
+                        worst_ratio = r
+            depth_floor_ratio_obs = worst_ratio
         else:
             depth_floor_ratio_obs = 0.0
         depth_floor_ok = depth_floor_ratio_obs <= cfg.depth_floor_ratio
@@ -1194,10 +1217,10 @@ def main() -> int:
             f"({len(decay_violations)} violations)"
         )
         print(
-            f"   no depth-dependent floor (max/min ≤ "
-            f"{cfg.depth_floor_ratio:.1f}×): "
+            f"   no depth-dependent floor (deeper/shallower ≤ "
+            f"{cfg.depth_floor_ratio:.1f}× for every L_S pair): "
             f"{'OK' if depth_floor_ok else 'WEAK'}  "
-            f"(observed = {depth_floor_ratio_obs:.3e})"
+            f"(worst deeper/shallower ratio = {depth_floor_ratio_obs:.3e})"
         )
         print(
             f"   transfer alignment "

@@ -1,0 +1,62 @@
+{
+  "run_id": "run_theoremA_structural_closure-20260414T084318Z-d07ed9c8",
+  "script_stem": "run_theoremA_structural_closure",
+  "phase": "theoremA",
+  "root": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremA/run_theoremA_structural_closure/run_theoremA_structural_closure-20260414T084318Z-d07ed9c8",
+  "started_utc": "2026-04-14T08:43:18.240541+00:00",
+  "seeds": [
+    0,
+    7,
+    13,
+    101,
+    2024
+  ],
+  "git_commit": "f2aa5a0",
+  "git_dirty": true,
+  "env": {
+    "python_version": "3.14.3",
+    "python_full_version": "3.14.3 (main, Mar 20 2026, 00:34:32) [Clang 22.1.1 ]",
+    "python_executable": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/.venv/bin/python",
+    "platform": "Linux-5.14.0-570.106.1.el9_6.x86_64-x86_64-with-glibc2.34",
+    "hostname": "della-i19g2",
+    "torch_version": "2.11.0+cu130",
+    "cuda_available": true,
+    "cuda_version": "13.0",
+    "cudnn_version": 91900,
+    "gpu_count": 1,
+    "gpu_names": [
+      "NVIDIA H200"
+    ]
+  },
+  "notes": "A-structural: validates Proposition 2 (rank-1 factorization and semiseparable rep of M_GD), Proposition 5 (Toeplitz / circulant / semiseparable closure of the Hadamard reduction), and Remark 2 (untied-layer non-autonomous reduced model). Deterministic matrix-identity tier; no training.",
+  "status": "completed",
+  "finished_utc": "2026-04-14T08:43:27.057967+00:00",
+  "wall_clock_seconds": 8.817780494689941,
+  "compute_proxy": 4.824175454999931,
+  "measured_compute": null,
+  "per_step_wall_clock": {
+    "n_steps": 0,
+    "mean": null,
+    "median": null,
+    "total": null
+  },
+  "error": null,
+  "extras": {
+    "worst_p1_rank1_err": 0.0,
+    "worst_p1_sigma2_rel": 4.270618898434661e-17,
+    "worst_p1_generator_err": 0.0,
+    "worst_p2_off_toeplitz_rel": 7.975548616976081e-16,
+    "worst_p3_off_circulant_fourier_rel": 9.03146879412561e-15,
+    "worst_p3_fourier_conv_err": 1.4710125545792418e-16,
+    "worst_p4_sigma_r_plus1_rel": 2.352373698502979e-16,
+    "worst_p4_kronecker_rel_err": 0.0,
+    "worst_p5_untied_err": 5.499276086105911e-16,
+    "prop2_rank1_pass": true,
+    "prop2_generators_pass": true,
+    "prop5_toeplitz_pass": true,
+    "prop5_circulant_pass": true,
+    "prop5_semiseparable_pass": true,
+    "prop5_kronecker_pass": true,
+    "remark2_untied_pass": true
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "run_id": "run_arch_spectral_ood-20260414T083103Z-1ccfbc0b",
+  "script_stem": "run_arch_spectral_ood",
+  "phase": "architectures",
+  "root": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/architectures/run_arch_spectral_ood/run_arch_spectral_ood-20260414T083103Z-1ccfbc0b",
+  "started_utc": "2026-04-14T08:31:03.514621+00:00",
+  "seeds": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "git_commit": "f2aa5a0",
+  "git_dirty": true,
+  "env": {
+    "python_version": "3.14.3",
+    "python_full_version": "3.14.3 (main, Mar 20 2026, 00:34:32) [Clang 22.1.1 ]",
+    "python_executable": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/.venv/bin/python",
+    "platform": "Linux-5.14.0-570.96.1.el9_6.x86_64-x86_64-with-glibc2.34",
+    "hostname": "della-i19g1",
+    "torch_version": "2.11.0+cu130",
+    "cuda_available": true,
+    "cuda_version": "13.0",
+    "cudnn_version": 91900,
+    "gpu_count": 1,
+    "gpu_names": [
+      "NVIDIA H200"
+    ]
+  },
+  "notes": "\u00a79.1 architecture-aligned spectral OOD experiment (theorem-B B3 analogue, tied-weight trainable circulant filter, two symbol-native shift families, Corollary-5 asymptotic overlay).",
+  "status": "completed",
+  "finished_utc": "2026-04-14T08:53:32.424775+00:00",
+  "wall_clock_seconds": 1348.9104642868042,
+  "compute_proxy": 1342.9348257710226,
+  "measured_compute": null,
+  "per_step_wall_clock": {
+    "n_steps": 16,
+    "mean": 83.93298258259892,
+    "median": 84.71050338959321,
+    "total": 1342.9277213215828
+  },
+  "error": null,
+  "extras": {
+    "nan_count": 0,
+    "baseline_violations": [],
+    "brittle_records": [
+      {
+        "L_S": 1,
+        "f1_ratio_at_alpha_brittle": 1.0712403629053744,
+        "f2_ratio_at_alpha_brittle": 1.0269330612069942
+      },
+      {
+        "L_S": 2,
+        "f1_ratio_at_alpha_brittle": 1.2511868607378698,
+        "f2_ratio_at_alpha_brittle": 1.230831179954926
+      },
+      {
+        "L_S": 4,
+        "f1_ratio_at_alpha_brittle": 1.373271920122499,
+        "f2_ratio_at_alpha_brittle": 1.382157460843445
+      },
+      {
+        "L_S": 8,
+        "f1_ratio_at_alpha_brittle": 1.4542371482422383,
+        "f2_ratio_at_alpha_brittle": 1.4627856799039274
+      }
+    ],
+    "max_dev_f1_at_alpha1": 0.6196750528437955,
+    "n_modes_amplify_f2_at_alpha1": 18,
+    "matched_L_ood_by_LS": {
+      "1": 0.26227399178145827,
+      "2": 0.14130321491519549,
+      "4": 0.04938763306982828,
+      "8": 0.014898693943181392
+    },
+    "train_wallclock_seconds": 1342.9348257710226,
+    "status": "all_ok"
+  }
+}

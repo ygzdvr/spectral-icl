@@ -1,0 +1,30 @@
+run_id: run_theoremB_circulant_modes-20260414T030842Z-42a9b5d7
+phase: theoremB
+script: run_theoremB_circulant_modes
+status: completed
+wall_clock_seconds: 64.878
+compute_proxy: 58.7544
+
+plan_reference: EXPERIMENT_PLAN_FINAL.MD §6.2 (B1)
+theorem_object: exact finite-P residual/query recursion in layer index ell; NOT optimization-time gamma_k(t) dynamics
+primary_theorem: rhat_k^ell = (1 - lambda_k/L)^ell * yhat_k; h_{L,k} = lambda*_k * phi_L(lambda_k) [general], = 1 - (1 - lambda_k/L)^L [matched]
+sample_space_fourier_basis: F_P = unitary DFT (P-dimensional sample-space); NOT feature-space eigenbasis
+deterministic_label: y = e_0; yhat_k = 1/sqrt(P) for all k
+category: theorem-B exact finite-P circulant mode closure
+device: cpu
+n_trials: 72
+n_match_modes: 2
+bridge_to_b2: False
+acceptance_tolerance: 1e-10
+n_failures: 0
+status: closure_ok
+max_residual_mode_rel_err: 1.2531642390456454e-14
+max_residual_mode_abs_err: 7.216449660063518e-15
+max_transfer_rel_err: 4.2429190806429074e-11
+max_transfer_abs_err: 1.206904576278589e-10
+max_train_offdiag_fourier_energy: 0.0
+max_query_offdiag_fourier_energy: 0.0
+max_rhat_imag_component: 6.116634976294222e-15
+max_fhat_imag_component: 6.116634976294222e-15
+sweep_wallclock_seconds: 58.754
+terminology_note: residual_contraction c_{L,k} = (1-lambda_k/L)^L is stored in c_L and plotted in Fig 5 as 'terminal residual contraction'. It is NOT the transfer function h_{L,k}.

@@ -1,0 +1,62 @@
+[
+  {
+    "P": 16,
+    "L": 1,
+    "symbol_kind": "flat",
+    "match_mode": "matched",
+    "residual_mode_rel_err": 1.4956505242976026e-15,
+    "residual_mode_abs_err": 3.7391263107440066e-16,
+    "transfer_rel_err": 1.5543122344752192e-15,
+    "transfer_abs_err": 1.5543122344752192e-15,
+    "train_offdiag_fourier_energy": 0.0,
+    "query_offdiag_fourier_energy": 0.0,
+    "transfer_err_l2": 3.8218127502839276e-15,
+    "rhat_imag_max": 6.206091613237156e-16,
+    "fhat_imag_max": 6.206091613237156e-16
+  },
+  {
+    "P": 16,
+    "L": 1,
+    "symbol_kind": "flat",
+    "match_mode": "mismatched",
+    "residual_mode_rel_err": 1.4956505242976026e-15,
+    "residual_mode_abs_err": 3.7391263107440066e-16,
+    "transfer_rel_err": 6.417955936590222e-16,
+    "transfer_abs_err": 3.552713678800501e-15,
+    "train_offdiag_fourier_energy": 0.0,
+    "query_offdiag_fourier_energy": 0.0,
+    "transfer_err_l2": 6.407812110413204e-15,
+    "rhat_imag_max": 6.206091613237156e-16,
+    "fhat_imag_max": 1.5057399771478686e-15
+  },
+  {
+    "P": 16,
+    "L": 2,
+    "symbol_kind": "flat",
+    "match_mode": "matched",
+    "residual_mode_rel_err": 7.494005416219807e-16,
+    "residual_mode_abs_err": 1.8735013540549517e-16,
+    "transfer_rel_err": 1.0362081563168128e-15,
+    "transfer_abs_err": 7.771561172376096e-16,
+    "train_offdiag_fourier_energy": 0.0,
+    "query_offdiag_fourier_energy": 0.0,
+    "transfer_err_l2": 1.922962686383564e-15,
+    "rhat_imag_max": 3.1030458066185795e-16,
+    "fhat_imag_max": 3.10304580661858e-16
+  },
+  {
+    "P": 16,
+    "L": 2,
+    "symbol_kind": "flat",
+    "match_mode": "mismatched",
+    "residual_mode_rel_err": 7.494005416219807e-16,
+    "residual_mode_abs_err": 1.8735013540549517e-16,
+    "transfer_rel_err": 4.278637291060148e-16,
+    "transfer_abs_err": 1.7763568394002505e-15,
+    "train_offdiag_fourier_energy": 0.0,
+    "query_offdiag_fourier_energy": 0.0,
+    "transfer_err_l2": 4.027619984008522e-15,
+    "rhat_imag_max": 3.1030458066185795e-16,
+    "fhat_imag_max": 8.014422459012849e-16
+  }
+]

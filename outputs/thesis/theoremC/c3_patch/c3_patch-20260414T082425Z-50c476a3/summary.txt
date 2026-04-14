@@ -1,0 +1,24 @@
+run_id: c3_patch-20260414T082425Z-50c476a3
+phase: theoremC
+script: c3_patch
+status: completed
+wall_clock_seconds: 21.123
+compute_proxy: 14.315
+
+plan_reference: EXPERIMENT_PLAN_FINAL.MD §7.3 (C3)
+theorem_reference: thesis/theorem_c.txt — Corollary 3.12 (finite-depth heterogeneity criterion); Corollary 3.13 (condition-number diagnostic ρ_b = (κ_b − 1)/(κ_b + 1) and block bound (Σ ω·λ)·ρ_b^{2L}).
+category: operator-level exact theorem-C patch — no learned architecture. Supersedes the C3 line plot for the obstruction-vs-κ figure and adds three acceptance items not in the original C3 script.
+interpretation: The original C3 closed-form vs L-BFGS agreement and κ = 1 degeneracy checks are retained. The patch adds: (a) the singleton forward direction of Cor 3.12 (L★ ≡ 0 at m = 1 for every κ), (b) the backward direction (L★ > 0 for every m > 1 and κ > 1), and (c) validity of the Cor 3.13 Chebyshev upper bound (exact ≤ (Σ ω·λ)·ρ² for every (m, κ)). The corrected obstruction-vs-κ figure omits singleton blocks from the log plot — plotting L★ ≡ 0 on a log axis is ill-defined — and overlays the Chebyshev bound as dashed lines of matching color for every remaining m.
+device: cpu
+D: 64
+partition_m_list: [1, 2, 4, 8, 16, 32]
+kappa_list: [1.0, 1.1, 1.2, 1.5, 2.0, 3.0, 5.0, 10.0]
+n_trials: 48
+status: cf_ok+zero_ok+singleton_zero_ok+hetero_nonzero_ok+chebyshev_ok
+checks: {'cf_ok': True, 'rel_err_worst': 1.4215073139417858e-13, 'q_err_worst': 8.881784197001252e-16, 'zero_ok': True, 'zero_obstruction_worst': 0.0, 'mono_ok': False, 'monotonicity_violations': 2, 'singleton_zero_all_kappa_ok': True, 'singleton_zero_worst': 0.0, 'heterogeneous_nonzero_ok': True, 'heterogeneous_min': 0.051366444379496556, 'heterogeneous_count': 35, 'chebyshev_bound_valid_ok': True, 'chebyshev_slack_min': 0.0, 'chebyshev_ratio_max': 0.9798810465800405, 'all_ok': True}
+closed_form_tol: 1e-08
+q_tol: 1e-06
+zero_tol: 1e-10
+positive_tol: 1e-15
+sweep_wallclock_seconds: 14.315
+supplement_summary_path: /scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremC/c3_patch/c3_patch-20260414T082425Z-50c476a3/c3_patch_summary.txt

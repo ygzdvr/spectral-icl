@@ -1,0 +1,92 @@
+{
+  "run_id": "run_arch_spectral_depth_irrelevance2-20260414T020532Z-a2e5f4c8",
+  "script_stem": "run_arch_spectral_depth_irrelevance2",
+  "phase": "architectures",
+  "root": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/architectures/run_arch_spectral_depth_irrelevance2/run_arch_spectral_depth_irrelevance2-20260414T020532Z-a2e5f4c8",
+  "started_utc": "2026-04-14T02:05:32.848172+00:00",
+  "seeds": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "git_commit": "f2aa5a0",
+  "git_dirty": true,
+  "env": {
+    "python_version": "3.14.3",
+    "python_full_version": "3.14.3 (main, Mar 20 2026, 00:34:32) [Clang 22.1.1 ]",
+    "python_executable": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/.venv/bin/python",
+    "platform": "Linux-5.14.0-570.106.1.el9_6.x86_64-x86_64-with-glibc2.34",
+    "hostname": "della-i23g3",
+    "torch_version": "2.11.0+cu130",
+    "cuda_available": true,
+    "cuda_version": "13.0",
+    "cudnn_version": 91900,
+    "gpu_count": 1,
+    "gpu_names": [
+      "NVIDIA H200"
+    ]
+  },
+  "notes": "\u00a79.1 v2 architecture-aligned depth-irrelevance experiment (tied weights, \u03b1 = P/D sweep, sqrt_D normalization, transfer-alignment figure). Supersedes v1 (run_arch_spectral_depth_irrelevance.py) which used sqrt_P.",
+  "status": "completed",
+  "finished_utc": "2026-04-14T02:47:49.026436+00:00",
+  "wall_clock_seconds": 2536.1785066127777,
+  "compute_proxy": 2528.9126639530004,
+  "measured_compute": null,
+  "per_step_wall_clock": {
+    "n_steps": 64,
+    "mean": 39.513939849438884,
+    "median": 36.81344597399584,
+    "total": 2528.8921503640886
+  },
+  "error": null,
+  "extras": {
+    "nan_count": 0,
+    "decay_violations": [],
+    "depth_floor_ratio_by_alpha": {
+      "1.000": 2.7709884542215475,
+      "2.000": 10.118545813935679,
+      "4.000": 122.47721460255997,
+      "8.000": 1715.0937636952447
+    },
+    "ratio_at_min_alpha": 2.7709884542215475,
+    "ratio_at_max_alpha": 1715.0937636952447,
+    "monotone_decreasing_ok": false,
+    "material_reduction_ok": false,
+    "stretch_target_achieved": false,
+    "transfer_alignment_ok": true,
+    "median_abs_T_at_max_alpha": {
+      "1": 0.26611950967562337,
+      "2": 0.03724152422705418,
+      "4": 0.0006347348569715764,
+      "8": 5.86987511193754e-06
+    },
+    "mean_finals_per_P_LS": {
+      "32": {
+        "1": 0.5247745557150603,
+        "2": 0.3833338990957482,
+        "4": 0.2562770417319047,
+        "8": 0.18938171861220726
+      },
+      "64": {
+        "1": 0.3665894453755312,
+        "2": 0.2050986729620015,
+        "4": 0.09361780268438138,
+        "8": 0.03622945946152154
+      },
+      "128": {
+        "1": 0.2376687637342688,
+        "2": 0.09265489369517026,
+        "4": 0.020698475690269433,
+        "8": 0.0019405141152622288
+      },
+      "256": {
+        "1": 0.1397879054479781,
+        "2": 0.032615619948839936,
+        "4": 0.0026847036599658963,
+        "8": 8.150452669526296e-05
+      }
+    },
+    "status": "no_nan_ok+decay_ok+monotone_FAIL+material_FAIL+transfer_ok"
+  }
+}

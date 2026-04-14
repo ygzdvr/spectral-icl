@@ -1,0 +1,524 @@
+% -----------------------------------------------------------------------------
+% Theorem B: stationary spectral closure in the circulant regime
+% -----------------------------------------------------------------------------
+
+This chapter develops the stationary spectral analogue of the fixed-structure
+(FS) regime of \citet{bordelon2026scaling}.
+The essential point is that Theorem~\ref{thm:theoremA_exact_SGamma} has already
+reduced the structured mixer to an exact sample-space operator in the form
+\[
+A_S(X,\Gamma)=P^{-1}\bigl(S_{\mathcal T\mathcal T}\circ(X^\top\Gamma X)\bigr).
+\]
+Therefore the correct spectral object to diagonalize is not the raw
+feature-space matrix~\(\Gamma\). It is rather the reduced sample-space operator
+induced by Theorem~\ref{thm:theoremA_exact_SGamma}.
+
+In the GD-compatible case this reduced operator is exactly
+\(
+-P^{-1}X^\top\Gamma X,
+\)
+which is the sample-space counterpart of the preconditioned in-context gradient
+step in the original reduced-$\Gamma$ theory
+\citep{bordelon2026scaling}.
+
+To keep the theorem exact, we first work in a periodic finite-window setting,
+so that the relevant stationary operators are {circulant} and hence are
+exactly diagonalized by the discrete Fourier transform.
+Only after the exact finite-\(P\) statement do we pass to a population
+stationary closure theorem and then extract the modewise gradient-flow,
+out-of-distribution, and finite-rank spectral corollaries.
+\section{Fourier and Circulant Preliminaries}
+We begin by outlining the algebraic structure that will be used in this chapter
+proofs. The main point is that circulant matrices are exactly the operators that
+commute with the cyclic shift, and therefore are exactly the matrices
+diagonalized by the discrete Fourier basis.
+Throughout this chapter we index sample-space coordinates by
+\(\{0,1,\dots,P-1\}\), so that the unitary discrete Fourier transform
+\(F_P\in\mathbb C^{P\times P}\) has entries
+\[
+[F_P]_{ab}=P^{-1/2}e^{-2\pi iab/P},
+\qquad 0\le a,b\le P-1.
+\]
+We denote by \(\Pi_P\in\mathbb R^{P\times P}\) the cyclic shift matrix
+\[
+\Pi_P e_j = e_{j+1 \;\mathrm{mod}\; P}.
+\]
+As usual, a matrix is circulant if and only if it commutes with~\(\Pi_P\)
+\citep{gray2006toeplitz,horn2012matrix}.
+
+\begin{lemma}[Cyclic-shift commutant characterization of circulant matrices]
+\label{lem:theoremB_cyclic_shift_commutant}
+Let \(C\in\mathbb C^{P\times P}\).
+The following are equivalent.
+\begin{enumerate}
+    \item \(C\Pi_P=\Pi_P C\).
+    \item There exist coefficients \(c_0,\dots,c_{P-1}\in\mathbb C\) such that
+    \[
+    C=\sum_{m=0}^{P-1} c_m\Pi_P^m.
+    \]
+    \item There exist eigenvalues \(\widehat c_0,\dots,\widehat c_{P-1}\in\mathbb C\)
+    such that
+    \[
+    C=F_P^*\,\mathrm{diag}(\widehat c_0,\dots,\widehat c_{P-1})\,F_P.
+    \]
+\end{enumerate}
+In particular, the commutant of the cyclic shift is exactly the circulant
+algebra
+\[
+\mathrm{Circ}_P := \{C\in\mathbb C^{P\times P}: C\Pi_P=\Pi_P C\}.
+\]
+\end{lemma}
+
+\begin{proof}[Proof deferred to Appendix~\ref{sec:appendix_theoremB_proofs}]
+~
+\end{proof}
+\section{Exact Finite-Window Circulant Diagonalization}
+We next show that, in the finite-window setting, circulant reduced operators
+force the exact training and prediction dynamics to decouple mode by mode in
+Fourier coordinates. The proof simply diagonalizes the reduced operators from
+Theorem~A and reads off the resulting scalar recursions.
+\begin{proposition}[Exact finite-\(P\) circulant diagonalization of the reduced dynamics]
+\label{prop:theoremB_finiteP_circulant}
+Assume the hypotheses of
+Corollary~\ref{cor:theoremA_GD_recovery}.
+Let the query window have the same length as the training window, so that
+\(K=P\), and let \(X_\star\in\mathbb R^{D\times P}\) denote the query block.
+Define the reduced training and query operators
+\begin{equation}
+\label{eq:theoremB_G_def}
+G_\Gamma(X):=\frac{1}{P}X^\top\Gamma X\in\mathbb R^{P\times P},
+\qquad
+G_\Gamma^{\star}(X_\star,X):=\frac{1}{P}X_\star^\top\Gamma X\in\mathbb R^{P\times P}.
+\end{equation}
+Assume that both \(G_\Gamma(X)\) and \(G_\Gamma^{\star}(X_\star,X)\) are
+circulant.
+Write their Fourier diagonalizations as
+\begin{equation}
+\label{eq:theoremB_G_fourier}
+G_\Gamma(X)=F_P^*\,\mathrm{diag}(\lambda_0,\dots,\lambda_{P-1})\,F_P,
+\qquad
+G_\Gamma^{\star}(X_\star,X)=F_P^*\,\mathrm{diag}(\lambda_0^{\star},\dots,\lambda_{P-1}^{\star})\,F_P.
+\end{equation}
+Then the exact reduced dynamics from Corollary~\ref{cor:theoremA_GD_recovery}
+become
+\begin{equation}
+\label{eq:theoremB_training_recursion_operator}
+r^{\ell+1}=
+\Bigl(I-\frac{1}{L}G_\Gamma(X)\Bigr)r^{\ell},
+\qquad
+r^0=y,
+\end{equation}
+and the full-window query prediction is
+\begin{equation}
+\label{eq:theoremB_query_operator_formula}
+F(X_\star;X,y)
+=
+\frac{1}{L}G_\Gamma^{\star}(X_\star,X)
+\sum_{\ell=0}^{L-1}
+\Bigl(I-\frac{1}{L}G_\Gamma(X)\Bigr)^{\ell}y.
+\end{equation}
+Passing to Fourier coordinates \( \widehat r^{\ell}:=F_P r^{\ell} \), 
+\(\widehat y:=F_P y\), and \(\widehat f:=F_P F(X_\star;X,y)\) we obtain the exact modewise recursions
+\begin{equation}
+\label{eq:theoremB_mode_training}
+\widehat r_k^{\,\ell+1}
+=
+\Bigl(1-\frac{\lambda_k}{L}\Bigr)\widehat r_k^{\,\ell},
+\qquad
+\widehat r_k^{\,0}=\widehat y_k,
+\end{equation}
+so that
+\begin{equation}
+\label{eq:theoremB_mode_training_closed}
+\widehat r_k^{\,\ell}
+=
+\Bigl(1-\frac{\lambda_k}{L}\Bigr)^{\ell}\widehat y_k,
+\end{equation}
+and
+\begin{equation}
+\label{eq:theoremB_mode_prediction}
+\widehat f_k
+=
+\frac{\lambda_k^{\star}}{L}
+\sum_{\ell=0}^{L-1}
+\Bigl(1-\frac{\lambda_k}{L}\Bigr)^{\ell}\widehat y_k.
+\end{equation}
+Equivalently,
+\begin{equation}
+\label{eq:theoremB_transfer_function_general}
+\widehat f_k = h_{L,k}\,\widehat y_k,
+\qquad
+h_{L,k}:=\lambda_k^{\star}\,\phi_L(\lambda_k),
+\end{equation}
+where
+\begin{equation}
+\label{eq:theoremB_phi_def}
+\phi_L(z):=
+\begin{cases}
+\dfrac{1-(1-z/L)^L}{z}, & z\neq 0,\\[8pt]
+1, & z=0.
+\end{cases}
+\end{equation}
+In particular, if \(\lambda_k\neq 0\), then
+\begin{equation}
+\label{eq:theoremB_transfer_function_simplified}
+h_{L,k}
+=
+\frac{\lambda_k^{\star}}{\lambda_k}
+\Bigl[1-\Bigl(1-\frac{\lambda_k}{L}\Bigr)^L\Bigr].
+\end{equation}
+If, moreover, \(G_\Gamma^{\star}(X_\star,X)=G_\Gamma(X)\), then
+\begin{equation}
+\label{eq:theoremB_matched_transfer}
+h_{L,k}=1-\Bigl(1-\frac{\lambda_k}{L}\Bigr)^L.
+\end{equation}
+\end{proposition}
+
+\begin{proof}[Proof deferred to Appendix~\ref{sec:appendix_theoremB_proofs}]
+~
+\end{proof}
+\section{Population Stationary Spectral Closure}
+We now pass from the exact finite-\(P\) statement to the stationary populations.
+The goal is to show that cyclic-shift symmetry makes the loss invariant,
+keeps gradient flow inside the circulant algebra, and yields
+Fourier-mode decomposition of the loss.
+\begin{theorem}[Population stationary spectral closure theorem]
+\label{thm:theoremB_stationary_closure}
+Let \(\mathrm{Circ}_P\subset \mathbb C^{P\times P}\) denote the circulant
+algebra from Lemma~\ref{lem:theoremB_cyclic_shift_commutant}.
+Let
+\[
+T=F_P^*\,\mathrm{diag}(\lambda_0,\dots,\lambda_{P-1})\,F_P,
+\qquad
+\Omega=F_P^*\,\mathrm{diag}(\omega_0,\dots,\omega_{P-1})\,F_P,
+\]
+with \(T=T^*\succeq 0\) and \(\Omega=\Omega^*\succeq 0\).
+Interpret \(T\) as the stationary training operator and \(\Omega\) as the
+stationary task covariance in the sample-space Fourier basis.
+For a reduced sample-space preconditioner \(Q\in\mathbb C^{P\times P}\), define
+its depth-\(L\) stationary loss by
+\begin{equation}
+\label{eq:theoremB_population_loss}
+\mathcal E_L(Q)
+:=
+\frac{1}{P}\,
+\mathrm{Tr}\!\left[
+\Omega
+\Bigl(\Bigl(I-\frac{1}{L}QT\Bigr)^L\Bigr)^*
+T
+\Bigl(I-\frac{1}{L}QT\Bigr)^L
+\right].
+\end{equation}
+Then the following hold.
+\begin{enumerate}
+    \item The population loss is invariant under cyclic shifts of \(Q\). For
+    every integer \(m\),
+    \begin{equation}
+    \label{eq:theoremB_shift_invariance}
+    \mathcal E_L(\Pi_P^m Q\Pi_P^{-m})=\mathcal E_L(Q).
+    \end{equation}
+
+    \item Gradient flow on the reduced operator preserves the circulant class.
+    Consider gradient flow on the reduced operator,
+    \begin{equation}
+    \label{eq:theoremB_population_gf}
+    \dot Q(t)=-\nabla \mathcal E_L(Q(t)).
+    \end{equation}
+    If \(Q(0)\in \mathrm{Circ}_P\), then \(Q(t)\in \mathrm{Circ}_P\) for all
+    times at which the solution exists.
+
+    \item Along such a trajectory, the population loss decomposes exactly
+    across Fourier modes. Consequently there exist Fourier symbols
+    \(\gamma_0(t),\dots,\gamma_{P-1}(t)\in\mathbb C\) such that
+    \begin{equation}
+    \label{eq:theoremB_Q_diagonal}
+    Q(t)=F_P^*\,\mathrm{diag}(\gamma_0(t),\dots,\gamma_{P-1}(t))\,F_P.
+    \end{equation}
+    For such a trajectory the population loss decouples exactly as
+    \begin{equation}
+    \label{eq:theoremB_population_loss_modes}
+    \mathcal E_L(Q(t))
+    =
+    \frac{1}{P}\sum_{k=0}^{P-1}
+    \omega_k\lambda_k
+    \left|1-\frac{\lambda_k\gamma_k(t)}{L}\right|^{2L}.
+    \end{equation}
+\end{enumerate}
+Thus the stationary spectral regime is the exact Fourier-mode of the
+fixed-basis FS regime. This means that gradient flow remains in the diagonal spectral class and
+the loss separates into independent scalar contributions mode by mode.
+\end{theorem}
+
+\begin{proof}
+We prove the three statements in order.
+
+Because \(T\) and \(\Omega\) are circulant, they commute with the cyclic shift as
+\( \Pi_P T\Pi_P^{-1}=T\) and \(\Pi_P \Omega \Pi_P^{-1}=\Omega\).
+Let \(Q_m:=\Pi_P^m Q\Pi_P^{-m}\).
+Then
+\[
+I-\frac{1}{L}Q_m T
+=
+I-\frac{1}{L}\Pi_P^m Q\Pi_P^{-m}T
+=
+\Pi_P^m\Bigl(I-\frac{1}{L}QT\Bigr)\Pi_P^{-m},
+\]
+because \(T\) commutes with \(\Pi_P\).
+Raising to the \(L\)-th power and taking the adjoint gives
+\begin{equation}\label{eq:lth-power}
+\Bigl(\Bigl(I-\frac{1}{L}Q_m T\Bigr)^L\Bigr)^*
+=
+\Pi_P^m\Bigl(\Bigl(I-\frac{1}{L}QT\Bigr)^L\Bigr)^*\Pi_P^{-m}.
+\end{equation}
+Substituting \eqref{eq:lth-power} into \eqref{eq:theoremB_population_loss} and using cyclicity of
+trace,
+\begin{align*}
+\mathcal E_L(Q_m)
+&=
+\frac{1}{P}
+\mathrm{Tr}\!\left[
+\Omega
+\Pi_P^m\Bigl(\Bigl(I-\frac{1}{L}QT\Bigr)^L\Bigr)^*\Pi_P^{-m}
+T
+\Pi_P^m\Bigl(I-\frac{1}{L}QT\Bigr)^L\Pi_P^{-m}
+\right] \\
+&=
+\frac{1}{P}
+\mathrm{Tr}\!\left[
+\Pi_P^{-m}\Omega\Pi_P^m
+\Bigl(\Bigl(I-\frac{1}{L}QT\Bigr)^L\Bigr)^*
+\Pi_P^{-m}T\Pi_P^m
+\Bigl(I-\frac{1}{L}QT\Bigr)^L
+\right] \\
+&=
+\frac{1}{P}
+\mathrm{Tr}\!\left[
+\Omega
+\Bigl(\Bigl(I-\frac{1}{L}QT\Bigr)^L\Bigr)^*
+T
+\Bigl(I-\frac{1}{L}QT\Bigr)^L
+\right]
+=
+\mathcal E_L(Q).
+\end{align*}
+This proves \eqref{eq:theoremB_shift_invariance}.
+
+To prove \eqref{eq:theoremB_population_gf} we view \(\mathbb C^{P\times P}\) as a real inner-product space with Frobenius
+inner product \(\langle A,B\rangle:=\Re\,\mathrm{Tr}(A^*B)\).
+The cyclic group \(\mathbb Z/P\mathbb Z\) acts orthogonally on this space by
+conjugation \( Q\mapsto \Pi_P^m Q\Pi_P^{-m}\).
+
+By the proof of \eqref{eq:theoremB_shift_invariance}, the loss \(\mathcal E_L\) is invariant under this action.
+Therefore Proposition~\ref{prop:symmetry_gradient_flow} applies and implies
+that gradient flow preserves the fixed-point set of the action.
+By Lemma~\ref{lem:theoremB_cyclic_shift_commutant}, that fixed-point set is
+exactly the circulant algebra~\(\mathrm{Circ}_P\).
+Hence if \(Q(0)\in \mathrm{Circ}_P\), then
+\(Q(t)\in \mathrm{Circ}_P\) for all~\(t\) proving \eqref{eq:theoremB_population_gf}.
+
+Finally, we prove \eqref{eq:theoremB_population_loss_modes}. Since \(Q(t)\), \(T\), and \(\Omega\) are all circulant, they are
+simultaneously diagonalized by~\(F_P\):
+\[
+Q(t)=F_P^*\,\mathrm{diag}(\gamma_0(t),\dots,\gamma_{P-1}(t))\,F_P,
+\]
+with the diagonalizations of \(T\) and \(\Omega\) already given in the theorem
+statement.
+Therefore
+\[
+QT = F_P^*\,\mathrm{diag}(\gamma_0\lambda_0,\dots,\gamma_{P-1}\lambda_{P-1})\,F_P,
+\]
+and hence
+\[
+\Bigl(I-\frac{1}{L}QT\Bigr)^L
+=
+F_P^*\,\mathrm{diag}\!\left(\Bigl(1-\frac{\lambda_0\gamma_0}{L}\Bigr)^L,
+\dots,
+\Bigl(1-\frac{\lambda_{P-1}\gamma_{P-1}}{L}\Bigr)^L\right)F_P.
+\]
+Substituting these diagonalizations into
+\eqref{eq:theoremB_population_loss} and using the unitary invariance of trace,
+we get
+\begin{align*}
+\mathcal E_L(Q(t))
+&=
+\frac{1}{P}
+\sum_{k=0}^{P-1}
+\omega_k\,
+\overline{\Bigl(1-\frac{\lambda_k\gamma_k(t)}{L}\Bigr)^L}
+\,\lambda_k\,
+\Bigl(1-\frac{\lambda_k\gamma_k(t)}{L}\Bigr)^L \\
+&=
+\frac{1}{P}
+\sum_{k=0}^{P-1}
+\omega_k\lambda_k
+\left|1-\frac{\lambda_k\gamma_k(t)}{L}\right|^{2L},
+\end{align*}
+which is exactly \eqref{eq:theoremB_population_loss_modes}.
+This completes the proof.
+\end{proof}
+\section{Modewise Dynamics and Depth Irrelevance}
+Having reduced the stationary loss to independent Fourier modes, we can now
+study the learning dynamics one scalar coordinate at a time. The proof derives
+the modewise gradient-flow ODE, shows the relevant interval is forward
+invariant, and identifies the exact stationary minimizer on the support of
+\(T\).
+\begin{corollary}[Modewise gradient-flow dynamics and long-context depth irrelevance]
+\label{cor:theoremB_modewise_ode}
+Assume the hypotheses of
+Theorem~\ref{thm:theoremB_stationary_closure}, and suppose in addition that
+\(Q(t)\) evolves by the gradient flow
+\eqref{eq:theoremB_population_gf} from the zero initialization
+\(Q(0)=0\), restricted to the self-adjoint circulant subspace
+\(\mathrm{Circ}_P\cap\{Q:Q=Q^*\}\).
+Then the Fourier coefficients
+\(\gamma_k(t)\) in \eqref{eq:theoremB_Q_diagonal} satisfy the decoupled scalar
+ODEs
+\begin{equation}
+\label{eq:theoremB_modewise_ode}
+\dot \gamma_k(t)
+=
+\frac{2}{P}\,\omega_k\lambda_k^2
+\Bigl(1-\frac{\lambda_k\gamma_k(t)}{L}\Bigr)^{2L-1},
+\qquad
+\gamma_k(0)=0,
+\end{equation}
+for every mode \(k\) such that \(\lambda_k>0\).
+In particular, for each such mode,
+\begin{equation}
+\label{eq:theoremB_modewise_interval}
+0\le \gamma_k(t)\le \frac{L}{\lambda_k}
+\qquad \text{for all } t\ge 0,
+\end{equation}
+and the unique minimizer of the stationary loss on the support of~\(T\) is
+\begin{equation}
+\label{eq:theoremB_optimal_Q}
+Q^{\star}=L\,T^{\dagger},
+\end{equation}
+where \(T^{\dagger}\) is the Moore--Penrose pseudoinverse.
+If \(T\) is invertible, then \(Q^{\star}=LT^{-1}\) and
+\begin{equation}
+\label{eq:theoremB_zero_loss}
+\inf_Q \mathcal E_L(Q)=0.
+\end{equation}
+Thus, in the stationary fixed-basis regime, depth is not intrinsically necessary
+once the correct inverse filter can be stored in the weights, just like
+the FS phenomenon in the original reduced-$\Gamma$ theory
+\citet{bordelon2026scaling}.
+\end{corollary}
+
+\begin{proof}[Proof deferred to Appendix~\ref{sec:appendix_theoremB_proofs}]
+~
+\end{proof}
+\section{Generalization and Spectral Capacity Limits}
+Finally we study to two consequences of modewise stationary model. First, we
+study how a trained inverse filter behaves under a shift in the test-time
+stationary symbol. Second, we study the irreducible error that remains when only
+finitely many spectral modes can be controlled.
+\subsection{Out-of-Distribution Generalization}
+We first analyze robustness to test-time changes in the stationary operator.
+The main point is that a filter that is optimal for the training symbol can be
+highly brittle when the test symbol changes mode by mode.
+\begin{corollary}[Out-of-distribution brittleness under stationary symbol shift]
+\label{cor:theoremB_ood}
+Assume the hypotheses of
+Corollary~\ref{cor:theoremB_modewise_ode} and suppose that the training
+stationary operator \(T\) is invertible, so that the fully trained stationary
+solution is \(Q^{\star}=LT^{-1}\).
+Let \(T'\in\mathrm{Circ}_P\) and \(\Omega'\in\mathrm{Circ}_P\) be a test-time
+stationary operator and task covariance, with diagonalizations
+\(T'=F_P^*\,\mathrm{diag}(\lambda_0',\dots,\lambda_{P-1}')\,F_P, \) and \(\Omega'=F_P^*\,\mathrm{diag}(\omega_0',\dots,\omega_{P-1}')\,F_P\).
+Then the out-of-distribution stationary loss of the trained model is
+\begin{equation}
+\label{eq:theoremB_ood_matrix}
+\mathcal E_{\mathrm{OOD}}
+=
+\frac{1}{P}\,
+\mathrm{Tr}\!\left[
+\Omega'
+\Bigl(\Bigl(I-T^{-1}T'\Bigr)^L\Bigr)^*
+T'
+\Bigl(I-T^{-1}T'\Bigr)^L
+\right].
+\end{equation}
+Equivalently, in Fourier coordinates,
+\begin{equation}
+\label{eq:theoremB_ood_modes}
+\mathcal E_{\mathrm{OOD}}
+=
+\frac{1}{P}\sum_{k=0}^{P-1}
+\omega_k'\lambda_k'
+\left|1-\frac{\lambda_k'}{\lambda_k}\right|^{2L}.
+\end{equation}
+Thus, even though the stationary solution stores an exact inverse filter for the
+training symbol, it is brittle to test-time changes in that symbol, which is similar
+to the FS brittleness phenomenon of \citet{bordelon2026scaling}.
+\end{corollary}
+
+\begin{proof}[Proof deferred to Appendix~\ref{sec:appendix_theoremB_proofs}]
+~
+\end{proof}
+\subsection{Spectral Capacity Limits}
+We finallt explore what happens when we impose an explicit spectral capacity constraint
+and ask what portion of the stationary loss can still be removed.
+The proof shows that the accessible
+modes can be fit exactly, so the optimal residual error is precisely the
+uncontrolled spectral tail.
+\begin{corollary}[Finite-\(r\) spectral bottleneck law]
+\label{cor:theoremB_finite_r}
+Assume the hypotheses of
+Corollary~\ref{cor:theoremB_modewise_ode}.
+Relabel the nonzero eigenvalues of \(T\) and the corresponding task weights in
+nonincreasing spectral order such that \( \lambda_1\ge \lambda_2\ge \cdots >0\) and \(\omega_k\ge 0\).
+For an integer \(r\ge 0\), let \(\mathcal Q_r\) denote the class of circulant
+preconditioners whose Fourier symbols are supported on the first \(r\) modes:
+\[
+\mathcal Q_r
+:=
+\left\{
+Q=F_P^*\,\mathrm{diag}(\gamma_1,\dots,\gamma_P)\,F_P:
+\gamma_k=0 \text{ for } k>r
+\right\}.
+\]
+Then the optimal stationary loss under this spectral bottleneck is
+\begin{equation}
+\label{eq:theoremB_exact_r_bottleneck}
+\inf_{Q\in\mathcal Q_r}\mathcal E_L(Q)
+=
+\frac{1}{P}\sum_{k=r+1}^{P}\omega_k\lambda_k.
+\end{equation}
+Consequently, in an infinite spectral limit with tail condition
+\begin{equation}
+\label{eq:theoremB_tail_condition}
+\sum_{k>r}\omega_k\lambda_k \asymp r^{-\nu\beta},
+\end{equation}
+we obtain the width-like stationary spectral scaling law
+\begin{equation}
+\label{eq:theoremB_finite_r_scaling}
+\mathcal E_r^{\star}
+:=
+\inf_{Q\in\mathcal Q_r}\mathcal E_L(Q)
+\asymp r^{-\nu\beta}.
+\end{equation}
+In other words, once the fixed-basis stationary regime is solved exactly on the
+accessible modes, the only irreducible error is the spectral tail outside the
+first \(r\) controllable modes.
+\end{corollary}
+
+\begin{proof}[Proof deferred to Appendix~\ref{sec:appendix_theoremB_proofs}]
+~
+\end{proof}
+Without wrapping up the chapter, we need to make a remark on the
+depth and width in the stationary spectral regime.
+We can see that Corollary~\ref{cor:theoremB_finite_r} isolates the width-like spectral
+bottleneck in the fixed-basis regime.
+At the same time,
+Corollary~\ref{cor:theoremB_modewise_ode} shows that if \emph{all} modes are
+learnable, then depth is not intrinsically required asymptotically.
+This means that the model can cache the exact inverse filter.
+Hence the only nontrivial stationary scaling law arises when one imposes an
+additional architectural restriction, such as a spectral rank budget \(r\), a
+band budget, or a restricted family of admissible symbols.
+
+%Fixed basis implies decoupling and eventual depth
+%irrelevance, whereas nontrivial depth laws require either finite context or
+%basis variability across contexts \cite{bordelon2026scaling}.

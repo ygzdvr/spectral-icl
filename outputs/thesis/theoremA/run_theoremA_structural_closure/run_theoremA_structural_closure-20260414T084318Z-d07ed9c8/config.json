@@ -1,0 +1,71 @@
+{
+  "P_list": [
+    8,
+    16,
+    32,
+    64
+  ],
+  "K_list": [
+    4,
+    8,
+    16
+  ],
+  "tau_list": [
+    1.0,
+    3.0
+  ],
+  "semisep_rank_pairs": [
+    [
+      1,
+      1
+    ],
+    [
+      1,
+      2
+    ],
+    [
+      2,
+      1
+    ],
+    [
+      2,
+      2
+    ],
+    [
+      2,
+      3
+    ],
+    [
+      3,
+      2
+    ]
+  ],
+  "n_random_submatrices": 5,
+  "untied_D_list": [
+    16,
+    32
+  ],
+  "untied_P_list": [
+    16,
+    32
+  ],
+  "untied_K_list": [
+    8
+  ],
+  "untied_L_list": [
+    2,
+    4,
+    8
+  ],
+  "untied_B": 2,
+  "include_untied": true,
+  "prop2_tol": 1e-14,
+  "toeplitz_tol": 1e-12,
+  "circulant_tol": 1e-12,
+  "semisep_sv_tol": 1e-10,
+  "kronecker_tol": 1e-12,
+  "untied_tol": 1e-10,
+  "base_seed": 0,
+  "dtype": "float64",
+  "device": "cuda"
+}

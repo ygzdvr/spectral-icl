@@ -1,0 +1,40 @@
+run_id: run_theoremA_general_train_supported-20260414T075258Z-63179a63
+phase: theoremA
+script: run_theoremA_general_train_supported
+status: completed
+wall_clock_seconds: 13.644
+compute_proxy: 7.33158
+
+plan_reference: EXPERIMENT_PLAN_FINAL.MD §8.1 (A1 generalization to full train-supported theorem)
+framing: A1 / A1b validate Theorem 1 and Corollary 1 in the GD-compatible special case only. A1-general extends Theorem-1 verification to ALL train-supported mixers (4 mask kinds: gd_compatible, lower_triangular, random_dense, near_gd at ε ∈ {0.01, 0.1, 0.5}), ALL Γ kinds (identity, random_symmetric, random_nonsymmetric — the latter is the load-bearing W_q/W_k-ordering check), and TWO covariance settings (isotropic, structured k^{-1}/k^{-0.5}).
+category: exact theorem-A operator-level forward-pass equivalence test — Theorem 1 (full generality) and Proposition 3 (necessity of GD-compatibility). Deterministic, no training, no architecture search.
+interpretation: Theorem 1 holds for every train-supported S: R0 (full hidden-state forward), R1 (iterative reduced AB), and R2 (matrix-power reduced AB) must all agree to float64 machine precision. Corollary 1 collapses this to the reduced-Γ predictor R3 only under GD-compatibility. Proposition 3's contrapositive — R3 genuinely fails outside the GD-compatible class — is validated by requiring, for each non-GD mask kind, that max_cells err_R2_R3 ≥ 1e-3 (i.e. there EXISTS at least one witness cell). Per-cell uniformity is not required: Proposition 3's hypothesis is a universal quantifier over (L, D, X, X_⋆, Γ), so the contrapositive only needs one counterexample. At L=1 any mask with S_QT = 1_K 1_P^⊤ gives R2 ≡ R3 regardless of S_TT and is consistent with the theorem. The near-GD interpolation at ε ∈ {0.01, 0.1, 0.5} documents how the reduced-Γ collapse degrades smoothly with mask deviation; this is diagnostic only, not a theorem.
+empirical_route: R0 built from the full (P+K)×(P+K) bilinear score x_μ^⊤ Γ x_ν with Γ applied on the right — never symmetrized — and the general train-supported S assembled as [[S_TT, 0],[S_QT, 0]]. R1 iterates the r-recursion r^{ℓ+1} = (I + L⁻¹A_S) r^ℓ and accumulates Σ T^ℓ y via vector updates. R2 materializes T^ℓ as matrix powers and forms the matrix geometric sum before applying (1/L) B_S. R3 is the feature-space reduced-Γ formula — knows nothing about S.
+acceptance_framing: theorem1_pass: max(err_R0_R1, err_R0_R2, err_R1_R2) ≤ 1e-10 in every cell. corollary1_pass: max(err_R0_R3, err_R2_R3) ≤ 1e-10 in every gd_compatible cell. necessity_pass: for each non-GD mask kind, max_cells err_R2_R3 ≥ 1e-03. The max (not min) is required because Proposition 3's contrapositive only requires SOME (L, D, X, X_⋆, Γ) witness of R2 ≠ R3; at L=1 any mask with S_QT = 1_K 1_P^⊤ gives R2 ≡ R3 regardless of S_TT, and this is consistent with the theorem.
+device: cuda
+n_cells: 3456
+mask_settings: [{'kind': 'gd_compatible', 'epsilon': None}, {'kind': 'lower_triangular', 'epsilon': None}, {'kind': 'random_dense', 'epsilon': None}, {'kind': 'near_gd', 'epsilon': 0.01}, {'kind': 'near_gd', 'epsilon': 0.1}, {'kind': 'near_gd', 'epsilon': 0.5}]
+gamma_kinds: ['identity', 'random_symmetric', 'random_nonsymmetric']
+sigma_kinds: ['isotropic', 'structured']
+D_list: [8, 16, 32, 64]
+P_list: [8, 16, 32]
+K_list: [4, 8]
+L_list: [1, 2, 4, 8]
+B: 2
+label_norm: sqrt_D
+machine_eps_tol: 1e-10
+necessity_threshold: 0.001
+worst_theorem1_err: 3.647089885108594e-15
+worst_R2_R3_gd: 1.7088276107098354e-15
+worst_R0_R3_gd: 1.4258152564781786e-15
+min_R2_R3_non_gd: 3.8582820080927127e-17
+worst_R2_R3_non_gd: 47.56445122921914
+theorem1_pass: True
+corollary1_pass: True
+necessity_pass: True
+near_gd_monotone: {'identity|isotropic': True, 'identity|structured': True, 'random_symmetric|isotropic': True, 'random_symmetric|structured': True, 'random_nonsymmetric|isotropic': True, 'random_nonsymmetric|structured': True}
+per_mask_aggregate: {'gd_compatible': {'n_cells': 576, 'worst_theorem1_err': 1.5929894123305953e-15, 'worst_R2_R3': 1.7088276107098354e-15, 'min_R2_R3': 4.700630227085124e-17, 'median_R2_R3': 3.274640826024663e-16, 'worst_R0_R3': 1.4258152564781786e-15}, 'lower_triangular': {'n_cells': 576, 'worst_theorem1_err': 1.5321679158693472e-15, 'worst_R2_R3': 47.56445122921914, 'min_R2_R3': 3.8582820080927127e-17, 'median_R2_R3': 0.12002770006408334, 'worst_R0_R3': 47.56445122921916}, 'random_dense': {'n_cells': 576, 'worst_theorem1_err': 1.875288808678084e-15, 'worst_R2_R3': 7.753246235170459, 'min_R2_R3': 0.39606200121443197, 'median_R2_R3': 1.5838372049031886, 'worst_R0_R3': 7.75324623517046}, 'near_gd:eps=0.01': {'n_cells': 576, 'worst_theorem1_err': 1.976036940569726e-15, 'worst_R2_R3': 0.06691443149809467, 'min_R2_R3': 0.0015672039668520512, 'median_R2_R3': 0.007004749452769476, 'worst_R0_R3': 0.0669144314980943}, 'near_gd:eps=0.1': {'n_cells': 576, 'worst_theorem1_err': 2.150928608733113e-15, 'worst_R2_R3': 1.009204741725067, 'min_R2_R3': 0.01450280027407313, 'median_R2_R3': 0.07768698489258004, 'worst_R0_R3': 1.0092047417250671}, 'near_gd:eps=0.5': {'n_cells': 576, 'worst_theorem1_err': 3.647089885108594e-15, 'worst_R2_R3': 2.894172522796536, 'min_R2_R3': 0.07225524266290534, 'median_R2_R3': 0.335508701651367, 'worst_R0_R3': 2.8941725227965356}}
+per_gamma_worst_theorem1: {'identity': 1.5321679158693472e-15, 'random_symmetric': 3.647089885108594e-15, 'random_nonsymmetric': 2.150928608733113e-15}
+per_sigma_worst_theorem1: {'isotropic': 3.647089885108594e-15, 'structured': 1.976036940569726e-15}
+status: theorem1=ok corollary1=ok necessity=ok
+sweep_wallclock_seconds: 7.332
