@@ -1,0 +1,53 @@
+Experiment C5 strict-drops patch — per-item acceptance summary
+========================================================================
+Plan ref: EXPERIMENT_PLAN_FINAL.MD §7.5 (C5)
+Theorem ref: thesis/theorem_c.txt — Proposition 3.15 (monotonicity, weak direction), Corollary 3.16 (strict hybrid gain along the refinement ladder).
+Config: D = 64, kappa_list = [1.0, 1.2, 1.5, 2.0, 3.0, 5.0, 10.0], L_list = [1, 4], level_sizes = [64, 32, 16, 8, 4, 2, 1]
+Data source: canonical C5 npz: outputs/thesis/theoremC/run_theoremC_refinement_monotonicity/run_theoremC_refinement_monotonicity-20260413T094019Z-3f84bcd0/npz/refinement_ladder.npz
+
+Check 1 — Corollary 3.16 strict drops at every κ > 1
+  Assertion: strict_drops == total_steps (= 6) for every (κ > 1, L)
+    κ =  1.20  L =  1  strict_drops =  6 /  6   PASS
+    κ =  1.20  L =  4  strict_drops =  5 /  6   FAIL
+    κ =  1.50  L =  1  strict_drops =  6 /  6   PASS
+    κ =  1.50  L =  4  strict_drops =  5 /  6   FAIL
+    κ =  2.00  L =  1  strict_drops =  6 /  6   PASS
+    κ =  2.00  L =  4  strict_drops =  4 /  6   FAIL
+    κ =  3.00  L =  1  strict_drops =  6 /  6   PASS
+    κ =  3.00  L =  4  strict_drops =  6 /  6   PASS
+    κ =  5.00  L =  1  strict_drops =  6 /  6   PASS
+    κ =  5.00  L =  4  strict_drops =  5 /  6   FAIL
+    κ = 10.00  L =  1  strict_drops =  6 /  6   PASS
+    κ = 10.00  L =  4  strict_drops =  6 /  6   PASS
+  → strict_drops_all_kappa_gt1_ok: FAIL
+
+Check 2 — κ = 1 ⇒ no strict drops
+  Assertion (raw): strict_drops == 0 at κ = 1 for every L
+    κ =  1.00  L =  1  strict_drops =  0  max_loss = 0.000e+00   PASS
+    κ =  1.00  L =  4  strict_drops =  2  max_loss = 6.805e-13   FAIL
+  → kappa1_no_strict_drops_ok: FAIL
+  Assertion (resolved): max_loss at κ = 1 < 1.0e-09 (ladder is flat at precision floor)
+    max loss across all levels at κ = 1 = 6.805e-13
+  → kappa1_no_strict_drops_resolved_ok: PASS
+
+Check 3 — resolved diagnostic at L = 4
+  Restriction: κ > 1 steps where both loss_coarser and loss_finer > 1.0e-09
+    resolved_count_total  = 14
+    resolved_count_strict = 14 / 14
+    resolved_min_drop     = 1.271e-09
+    resolved min step     = (j = 4 → 5, κ = 10, L = 4)
+      loss_coarser = 3.6328e-09  loss_finer = 2.3617e-09
+    failing_above_precision = 0  (must be 0 for theorem-level PASS)
+    failing_below_precision = 5  (below 1.0e-09; optimizer noise, not theorem violation)
+    below-precision failing cells (diagnostic):
+      step 4→5  κ = 1.5  L = 4  drop = -1.825e-14  Lc = 5.479e-13  Lf = 5.662e-13
+      step 4→5  κ = 2  L = 4  drop = -1.252e-13  Lc = 4.942e-13  Lf = 6.193e-13
+      step 5→6  κ = 1.2  L = 4  drop = -4.045e-14  Lc = 5.011e-13  Lf = 5.415e-13
+      step 5→6  κ = 2  L = 4  drop = -1.655e-14  Lc = 6.193e-13  Lf = 6.359e-13
+      step 5→6  κ = 5  L = 4  drop = -4.138e-14  Lc = 5.722e-13  Lf = 6.136e-13
+  → strict_drops_resolved_ok: PASS
+
+========================================================================
+Top-line status (raw 1e-15 threshold): FAIL
+Theorem-level status (resolved cells only): PASS
+

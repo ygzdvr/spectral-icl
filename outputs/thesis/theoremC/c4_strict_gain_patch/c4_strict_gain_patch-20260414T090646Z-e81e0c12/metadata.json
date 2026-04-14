@@ -1,0 +1,218 @@
+{
+  "run_id": "c4_strict_gain_patch-20260414T090646Z-e81e0c12",
+  "script_stem": "c4_strict_gain_patch",
+  "phase": "theoremC",
+  "root": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremC/c4_strict_gain_patch/c4_strict_gain_patch-20260414T090646Z-e81e0c12",
+  "started_utc": "2026-04-14T09:06:46.513405+00:00",
+  "seeds": [
+    0
+  ],
+  "git_commit": "00d9493",
+  "git_dirty": true,
+  "env": {
+    "python_version": "3.14.3",
+    "python_full_version": "3.14.3 (main, Mar 20 2026, 00:34:32) [Clang 22.1.1 ]",
+    "python_executable": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/.venv/bin/python",
+    "platform": "Linux-5.14.0-570.94.1.el9_6.x86_64-x86_64-with-glibc2.34",
+    "hostname": "della-gpu.princeton.edu",
+    "torch_version": "2.11.0+cu130",
+    "cuda_available": true,
+    "cuda_version": "13.0",
+    "cudnn_version": 91900,
+    "gpu_count": 1,
+    "gpu_names": [
+      "NVIDIA A100-PCIE-40GB"
+    ]
+  },
+  "notes": "C4 strict-gain patch: acceptance-record fix recording the Corollary 3.16 strict positivity of the refinement gap on (m >= 2, kappa > 1) cells, plus the complementary zero-gain region at m = 1 or kappa = 1.",
+  "status": "completed",
+  "finished_utc": "2026-04-14T09:06:46.902188+00:00",
+  "wall_clock_seconds": 0.38924455642700195,
+  "compute_proxy": null,
+  "measured_compute": null,
+  "per_step_wall_clock": {
+    "n_steps": 0,
+    "mean": null,
+    "median": null,
+    "total": null
+  },
+  "error": null,
+  "extras": {
+    "canonical_c4_run": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremC/run_theoremC_phase_diagram/run_theoremC_phase_diagram-20260413T090447Z-a95a1cc9",
+    "checks": {
+      "strict_refinement_gain_ok": false,
+      "min_strict_gap": -5.2372630487944275e-12,
+      "count_positive": 133,
+      "count_total": 150,
+      "min_loc": {
+        "m": 2,
+        "kappa": 1.5,
+        "L": 16,
+        "L_coarse": 7.2829605408637e-12,
+        "L_fine": 1.2520223589658128e-11
+      },
+      "strict_refinement_gain_resolved_ok": true,
+      "resolved_min_gap": 1.6099867953436706e-09,
+      "resolved_count_positive": 123,
+      "resolved_count_total": 123,
+      "resolved_min_loc": {
+        "m": 8,
+        "kappa": 3.0,
+        "L": 16,
+        "L_coarse": 1.6142884416626472e-09,
+        "L_fine": 4.301646318976607e-12
+      },
+      "failing_below_precision": 17,
+      "failing_above_precision": 0,
+      "failing_below_cells": [
+        {
+          "m": 2,
+          "kappa": 1.2,
+          "L": 8,
+          "gap": -1.5450435846357245e-12,
+          "L_coarse": 2.370477310001559e-12,
+          "L_fine": 3.9155208946372835e-12
+        },
+        {
+          "m": 2,
+          "kappa": 1.2,
+          "L": 16,
+          "gap": -2.9988632314279897e-12,
+          "L_coarse": 7.031616808935473e-12,
+          "L_fine": 1.0030480040363463e-11
+        },
+        {
+          "m": 2,
+          "kappa": 1.5,
+          "L": 16,
+          "gap": -5.2372630487944275e-12,
+          "L_coarse": 7.2829605408637e-12,
+          "L_fine": 1.2520223589658128e-11
+        },
+        {
+          "m": 2,
+          "kappa": 2.0,
+          "L": 16,
+          "gap": -3.0910602365564027e-12,
+          "L_coarse": 9.578234796426361e-12,
+          "L_fine": 1.2669295032982764e-11
+        },
+        {
+          "m": 4,
+          "kappa": 1.2,
+          "L": 8,
+          "gap": -6.563569859457524e-13,
+          "L_coarse": 1.2681004918278753e-12,
+          "L_fine": 1.9244574777736277e-12
+        },
+        {
+          "m": 4,
+          "kappa": 1.2,
+          "L": 16,
+          "gap": -2.2254622378528246e-12,
+          "L_coarse": 2.9471654173296257e-12,
+          "L_fine": 5.17262765518245e-12
+        },
+        {
+          "m": 4,
+          "kappa": 1.5,
+          "L": 16,
+          "gap": -2.1642519186791043e-12,
+          "L_coarse": 3.927828813742329e-12,
+          "L_fine": 6.092080732421433e-12
+        },
+        {
+          "m": 4,
+          "kappa": 2.0,
+          "L": 16,
+          "gap": -3.4284819035345575e-12,
+          "L_coarse": 2.973706171227022e-12,
+          "L_fine": 6.40218807476158e-12
+        },
+        {
+          "m": 8,
+          "kappa": 1.2,
+          "L": 8,
+          "gap": -2.455529006965469e-13,
+          "L_coarse": 8.525458262996005e-13,
+          "L_fine": 1.0980987269961474e-12
+        },
+        {
+          "m": 8,
+          "kappa": 1.2,
+          "L": 16,
+          "gap": -1.0696020230849365e-12,
+          "L_coarse": 1.4916388195491734e-12,
+          "L_fine": 2.56124084263411e-12
+        },
+        {
+          "m": 8,
+          "kappa": 1.5,
+          "L": 16,
+          "gap": -4.968670421278108e-13,
+          "L_coarse": 1.738867334896286e-12,
+          "L_fine": 2.2357343770240967e-12
+        },
+        {
+          "m": 8,
+          "kappa": 2.0,
+          "L": 16,
+          "gap": -2.754097384520253e-13,
+          "L_coarse": 1.8626087252853542e-12,
+          "L_fine": 2.1380184637373795e-12
+        },
+        {
+          "m": 16,
+          "kappa": 1.2,
+          "L": 8,
+          "gap": -7.332192151352281e-15,
+          "L_coarse": 1.1888899244178383e-12,
+          "L_fine": 1.1962221165691906e-12
+        },
+        {
+          "m": 16,
+          "kappa": 1.2,
+          "L": 16,
+          "gap": -6.454570951109788e-14,
+          "L_coarse": 1.2422432222776737e-12,
+          "L_fine": 1.3067889317887716e-12
+        },
+        {
+          "m": 16,
+          "kappa": 2.0,
+          "L": 16,
+          "gap": -1.5733195751664254e-13,
+          "L_coarse": 1.1765103124082577e-12,
+          "L_fine": 1.3338422699249002e-12
+        },
+        {
+          "m": 32,
+          "kappa": 1.5,
+          "L": 16,
+          "gap": -1.8803490618247428e-13,
+          "L_coarse": 1.1057254804043641e-12,
+          "L_fine": 1.2937603865868384e-12
+        },
+        {
+          "m": 32,
+          "kappa": 2.0,
+          "L": 16,
+          "gap": -8.112011311230755e-14,
+          "L_coarse": 1.2925121337878739e-12,
+          "L_fine": 1.3736322469001814e-12
+        }
+      ],
+      "failing_above_cells": [],
+      "zero_region_ok": true,
+      "zero_worst_abs_gap": 4.087112421489504e-12,
+      "zero_count_total": 60,
+      "zero_worst_loc": {
+        "m": 2,
+        "kappa": 1.0,
+        "L": 16,
+        "gap": -4.087112421489504e-12
+      }
+    },
+    "data_source": "canonical C4 npz: outputs/thesis/theoremC/run_theoremC_phase_diagram/run_theoremC_phase_diagram-20260413T090447Z-a95a1cc9/npz/phase_diagram.npz"
+  }
+}

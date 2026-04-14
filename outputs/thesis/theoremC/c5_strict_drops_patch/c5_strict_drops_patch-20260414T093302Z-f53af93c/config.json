@@ -1,13 +1,5 @@
 {
   "D": 64,
-  "m_list": [
-    1,
-    2,
-    4,
-    8,
-    16,
-    32
-  ],
   "kappa_list": [
     1.0,
     1.2,
@@ -19,11 +11,18 @@
   ],
   "L_list": [
     1,
-    2,
-    4,
+    4
+  ],
+  "expected_level_sizes": [
+    64,
+    32,
+    16,
     8,
-    16
+    4,
+    2,
+    1
   ],
   "strict_tol": 1e-15,
-  "zero_tol": 1e-09
+  "optimizer_floor": 1e-09,
+  "L_deeper": 4
 }

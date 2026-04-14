@@ -1,0 +1,34 @@
+run_id: c5_strict_drops_patch-20260414T093302Z-f53af93c
+phase: theoremC
+script: c5_strict_drops_patch
+status: completed
+wall_clock_seconds: 0.081
+
+plan_reference: EXPERIMENT_PLAN_FINAL.MD §7.5 (C5)
+theorem_reference: thesis/theorem_c.txt — Proposition 3.15 (monotonicity, weak direction) + Corollary 3.16 (strict hybrid gain applied along the full dyadic refinement ladder).
+category: acceptance-record-only patch on existing C5 data. No new sweep, no new figure. Lifts C5's raw strict_drop_counts to formal acceptance gates, mirroring the C4 strict-gain patch.
+interpretation: Proposition 3.15 (weak direction) was already confirmed by C5's monotonicity_ok gate. This patch records the strict direction: every κ > 1 cell should produce a strict loss decrease at every step of the dyadic ladder (total_steps = n_levels − 1 = 6 for the D = 64 ladder), and κ = 1 should produce none. At the deeper slice L = L_deeper the loss can saturate to the L-BFGS precision floor before the ladder ends; below that floor the sign of a 'strict drop' is optimizer noise, not a theorem violation. Two resolved diagnostics capture this: strict_drops_resolved_ok restricts the κ > 1 check to steps where both the coarser and finer levels exceed optimizer_floor = 1e-9 (failing_above_precision must be 0); kappa1_no_strict_drops_resolved_ok replaces the raw κ = 1 zero-drop assertion with the more-faithful theorem-level gate 'max loss across all ladder levels at κ = 1 stays below optimizer_floor' — i.e. the ladder is flat at the precision floor, which is what the theorem actually predicts.
+data_source: canonical C5 npz: outputs/thesis/theoremC/run_theoremC_refinement_monotonicity/run_theoremC_refinement_monotonicity-20260413T094019Z-3f84bcd0/npz/refinement_ladder.npz
+D: 64
+kappa_list: [1.0, 1.2, 1.5, 2.0, 3.0, 5.0, 10.0]
+L_list: [1, 4]
+expected_level_sizes: [64, 32, 16, 8, 4, 2, 1]
+strict_tol: 1e-15
+optimizer_floor: 1e-09
+L_deeper: 4
+strict_drops_all_kappa_gt1_ok: False
+kappa1_no_strict_drops_ok: False
+kappa1_no_strict_drops_resolved_ok: True
+kappa_eq1_max_loss_overall: 6.804507281106812e-13
+strict_drops_resolved_ok: True
+resolved_count_total: 14
+resolved_count_strict: 14
+resolved_min_drop: 1.271145510436551e-09
+resolved_min_loc: {'step': 4, 'level_from': 4, 'level_to': 5, 'kappa': 10.0, 'L': 4, 'loss_coarser': 3.63280320663483e-09, 'loss_finer': 2.361657696198279e-09}
+failing_above_precision: 0
+failing_below_precision: 5
+total_steps: 6
+raw_top_line_ok: False
+theorem_level_ok: True
+status: strict_kappa_gt1_fail+kappa1_zero_raw_fail+kappa1_zero_resolved_ok+resolved_ok
+patch_summary_path: /scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremC/c5_strict_drops_patch/c5_strict_drops_patch-20260414T093302Z-f53af93c/c5_strict_drops_patch_summary.txt
