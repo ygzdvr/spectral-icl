@@ -1510,6 +1510,24 @@ def main() -> int:
             f"(P={_si_P}, L={_si_L}, {_si_sym})"
         )
 
+        # ---- Full-matrix circulant preservation (Theorem 3 Claim 2) ----
+        # Non-tautological: run gradient descent on a full P x P symmetric Q
+        # from Q(0)=0 and check Q stays in Circ_P.  One representative config.
+        print("[B2] Running full-matrix circulant preservation check "
+              "(Theorem 3 Claim 2)...")
+        fm_result = _check_circulant_preservation_fullmatrix(
+            cfg, P=32, L=4, symbol_kind="power_law",
+            n_steps=1000, eta_full=1e-3, log_every=20,
+        )
+        fullmatrix_circ_max_viol = fm_result["max_circ_viol"]
+        fullmatrix_circ_ok = fullmatrix_circ_max_viol < cfg.circ_tol
+        print(
+            f"   fullmatrix_circ_ok = {fullmatrix_circ_ok}  "
+            f"max_viol = {fullmatrix_circ_max_viol:.3e}  "
+            f"(P={fm_result['P']}, L={fm_result['L']}, "
+            f"{fm_result['symbol_kind']}, n_steps={fm_result['n_steps']})"
+        )
+
         # ---- Main sweep ----
         trial_specs: list[tuple[int, int, str]] = []
         for P in cfg.P_list:
@@ -1597,6 +1615,7 @@ def main() -> int:
         _plot_operator_target_error(trials, cfg, run)
         equal_tol_spread = _plot_equal_tolerance_collapse(trials, cfg, run)
         _plot_circulant_preservation(trials, cfg, run)
+        _plot_circulant_preservation_fullmatrix(fm_result, cfg, run)
 
         # ---- Acceptance checks ----
 
@@ -1679,6 +1698,7 @@ def main() -> int:
         all_gates_ok = (
             mono_ok and decay_ok and ode_ok and loss_th_ok
             and fwd_inv_ok and circ_ok and shift_inv_ok
+            and fullmatrix_circ_ok
         )
         status = "PASS" if all_gates_ok else "FAIL"
 
@@ -1706,6 +1726,18 @@ def main() -> int:
                                         "tol": cfg.forward_inv_tol},
             "gate_circulant_preservation": {"ok": circ_ok, "max_viol": max_circ_viol,
                                             "tol": cfg.circ_tol},
+            "gate_circulant_preservation_fullmatrix": {
+                "ok": fullmatrix_circ_ok,
+                "max_viol": fullmatrix_circ_max_viol,
+                "tol": cfg.circ_tol,
+                "config": (
+                    f"P={fm_result['P']} L={fm_result['L']} "
+                    f"{fm_result['symbol_kind']} n_steps={fm_result['n_steps']} "
+                    f"eta_full={fm_result['eta_full']}"
+                ),
+            },
+            "fullmatrix_circ_max_violation": fullmatrix_circ_max_viol,
+            "fullmatrix_circ_ok": fullmatrix_circ_ok,
             "discrete_euler_map_rel_err": max_disc_map_rel,
             "gate_shift_invariance": {"ok": shift_inv_ok,
                                       "max_err": max_shift_inv_err,
@@ -1727,6 +1759,7 @@ def main() -> int:
         print(f"   loss theory ok           = {loss_th_ok}  (max_rel={max_loss_th_rel:.3e}  tol={cfg.loss_theory_rel_tol})")
         print(f"   forward invariance ok    = {fwd_inv_ok}  (max_viol={max_fwd_viol:.3e})")
         print(f"   circulant preservation ok= {circ_ok}  (max_viol={max_circ_viol:.2e})")
+        print(f"   fullmatrix circ pres. ok = {fullmatrix_circ_ok}  (max_viol={fullmatrix_circ_max_viol:.3e}  tol={cfg.circ_tol})")
         print(f"   discrete Euler map rel   = {max_disc_map_rel:.2e}  (should be 0.0 exactly)")
         print(f"   shift invariance ok      = {shift_inv_ok}  (max_err={max_shift_inv_err:.3e})")
         print(f"   ALL GATES PASS           = {all_gates_ok}")
