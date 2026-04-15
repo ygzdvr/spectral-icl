@@ -255,6 +255,47 @@ def _ood_loss(
         raise ValueError(f"gamma must be 1D or 2D; got ndim {g.ndim}")
 
 
+def _ood_loss_exact(
+    s_tr: torch.Tensor,
+    s_te: torch.Tensor,
+    omega: torch.Tensor,
+    L: int,
+    eps_support: float = 1e-12,
+) -> float:
+    """Exact Corollary OOD loss at the fully-trained optimum ``Q* = L·T^{-1}``.
+
+    Substituting ``gamma_k* = L / s_tr_k`` into the matched-training /
+    shifted-test residual collapses the per-mode transfer to
+
+        (1 − s_te_k / s_tr_k)^(2L),
+
+    giving the Bordelon fixed-covariance Corollary form
+
+        E_OOD_exact(L) = Σ_k  ω_k · s_te_k · (1 − s_te_k / s_tr_k)^(2L).
+
+    The existing ``_ood_loss`` samples this loss at the *finite-time*
+    reduced-Γ (``γ_k(T)``); this helper samples it at the analytic fully
+    trained optimum and is the direct spectral analogue of what
+    ``dynamics.reduced_gamma_fixed_dynamics.ood_loss_fixed_covariance``
+    computes for covariance rotation.
+
+    Support handling: inactive training modes (``s_tr_k < eps_support``)
+    are skipped — the ratio ``s_te_k / s_tr_k`` is undefined there. In the
+    matched-symbol regime used by B2/B3 these modes also have
+    ``ω_k · s_te_k ≈ 0`` (power-law/multiband tails), so masking is
+    loss-preserving to float eps.
+    """
+    s_tr64 = s_tr.to(torch.float64)
+    s_te64 = s_te.to(torch.float64)
+    w64 = omega.to(torch.float64)
+    mask = s_tr64 > eps_support
+    if not bool(mask.any().item()):
+        return 0.0
+    ratio = s_te64[mask] / s_tr64[mask]
+    transfer_sq = (1.0 - ratio).pow(2 * int(L))
+    return float((w64[mask] * s_te64[mask] * transfer_sq).sum().item())
+
+
 # ---------------------------------------------------------------------------
 # Symbol construction helpers (family 1)
 # ---------------------------------------------------------------------------
@@ -354,6 +395,7 @@ def _eval_family1(
     """Family 1: structural interpolation toward ``s_other``."""
     s_other = _build_f1_target_symbol(cfg)
     losses: dict[int, list[float]] = {int(L): [] for L in cfg.L_list}
+    losses_exact: dict[int, list[float]] = {int(L): [] for L in cfg.L_list}
     s_te_list: list[torch.Tensor] = []
     for alpha in cfg.f1_alphas:
         s_te = symbol_interpolate(s_tr, s_other, float(alpha))
@@ -362,11 +404,15 @@ def _eval_family1(
             losses[int(L)].append(
                 _ood_loss(gamma_final[int(L)], s_tr, s_te, omega, int(L))
             )
+            losses_exact[int(L)].append(
+                _ood_loss_exact(s_tr, s_te, omega, int(L))
+            )
     return {
         "alphas": tuple(float(a) for a in cfg.f1_alphas),
         "s_other": s_other,
         "s_te_list": s_te_list,
         "losses": {L: np.asarray(v) for L, v in losses.items()},
+        "losses_exact": {L: np.asarray(v) for L, v in losses_exact.items()},
     }
 
 
@@ -385,6 +431,9 @@ def _eval_family2(
     losses_per_seed: dict[int, np.ndarray] = {
         int(L): np.zeros((len(seeds), len(alphas))) for L in cfg.L_list
     }
+    losses_exact_per_seed: dict[int, np.ndarray] = {
+        int(L): np.zeros((len(seeds), len(alphas))) for L in cfg.L_list
+    }
     s_perm_dict: dict[int, torch.Tensor] = {}
     for si, seed in enumerate(seeds):
         s_perm = frequency_permutation(s_tr, seed=seed)
@@ -395,11 +444,15 @@ def _eval_family2(
                 losses_per_seed[int(L)][si, ai] = _ood_loss(
                     gamma_final[int(L)], s_tr, s_te, omega, int(L)
                 )
+                losses_exact_per_seed[int(L)][si, ai] = _ood_loss_exact(
+                    s_tr, s_te, omega, int(L)
+                )
     return {
         "alphas": alphas,
         "seeds": seeds,
         "s_perm_dict": s_perm_dict,
         "losses_per_seed": losses_per_seed,
+        "losses_exact_per_seed": losses_exact_per_seed,
     }
 
 
@@ -418,29 +471,52 @@ def _plot_family1(
 
     alphas = np.asarray(f1["alphas"])
     losses = f1["losses"]
+    losses_exact = f1.get("losses_exact", {})
     L_colors = sequential_colors(len(cfg.L_list), palette="rocket")
-    fig, ax = plt.subplots(figsize=(5.8, 4.0))
+
+    fig, (ax_emp, ax_ex) = plt.subplots(
+        1, 2, figsize=(10.4, 4.0), sharex=True
+    )
+
+    # Left panel: finite-time empirical (linear y) + matched baseline.
     for color, L in zip(L_colors, cfg.L_list):
         y = losses[int(L)]
-        ax.plot(alphas, y, color=color, lw=1.4, marker="o", ms=3.5,
-                label=f"L = {L}")
+        ax_emp.plot(alphas, y, color=color, lw=1.4, marker="o", ms=3.5,
+                    label=f"L = {L}")
     base_min = min(baseline.values())
     overlay_reference(
-        ax, alphas, np.full_like(alphas, base_min),
+        ax_emp, alphas, np.full_like(alphas, base_min),
         label=r"matched baseline (min over L)",
         style=":", color="gray", lw=1.0,
     )
-    ax.set_xlabel(r"shift $\alpha$ (family 1: structural interpolation)")
-    ax.set_ylabel(r"OOD loss $\mathcal{L}_{\mathrm{ood}}(\alpha)$")
-    ax.set_yscale("log")
-    ax.set_title(
-        f"B3 structural-interpolation brittleness "
+    ax_emp.set_xlabel(r"shift $\alpha$ (family 1: structural interpolation)")
+    ax_emp.set_ylabel(r"OOD loss $\mathcal{L}_{\mathrm{ood}}(\alpha)$")
+    ax_emp.set_title("finite-time empirical", fontsize=10)
+    ax_emp.legend(fontsize=8, loc="best", frameon=True)
+
+    # Right panel: exact Corollary at Q* = L T^{-1} (log y, same per-L colors).
+    if losses_exact:
+        for color, L in zip(L_colors, cfg.L_list):
+            y_ex = np.asarray(losses_exact[int(L)], dtype=float)
+            y_ex_plot = np.where(y_ex > 0, y_ex, np.nan)
+            ax_ex.plot(alphas, y_ex_plot, color=color, ls="--", lw=1.4,
+                       marker="o", ms=3.5, label=f"L = {L}")
+    ax_ex.set_xlabel(r"shift $\alpha$ (family 1: structural interpolation)")
+    ax_ex.set_ylabel(
+        r"exact OOD loss $E_{\mathrm{OOD}}^{\star}(L,\alpha)$"
+    )
+    ax_ex.set_yscale("log")
+    ax_ex.set_title(r"exact Corollary ($Q^\star = L T^{-1}$)", fontsize=10)
+    ax_ex.legend(fontsize=8, loc="best", frameon=True)
+
+    fig.suptitle(
+        "B3 structural-interpolation OOD: finite-time (left) vs "
+        r"exact Corollary (right)" "\n"
         f"(base = {cfg.base_symbol_kind}, target = {cfg.f1_target_kind}, "
         f"P = {cfg.P})",
         fontsize=10,
     )
-    ax.legend(fontsize=8, loc="best", frameon=True)
-    fig.tight_layout()
+    fig.tight_layout(rect=(0, 0, 1, 0.93))
     save_both(fig, run_dir, "ood_interpolation_structural")
     plt.close(fig)
 
@@ -455,33 +531,114 @@ def _plot_family2(
 
     alphas = np.asarray(f2["alphas"])
     losses = f2["losses_per_seed"]  # L -> (n_seeds, n_alpha)
+    losses_exact = f2.get("losses_exact_per_seed", {})
     L_colors = sequential_colors(len(cfg.L_list), palette="rocket")
-    fig, ax = plt.subplots(figsize=(5.8, 4.0))
+
+    fig, (ax_emp, ax_ex) = plt.subplots(
+        1, 2, figsize=(10.4, 4.0), sharex=True
+    )
+
+    # Left panel: finite-time empirical (median + min-max band, linear y).
     for color, L in zip(L_colors, cfg.L_list):
         y = losses[int(L)]
         median = np.median(y, axis=0)
         y_lo = np.min(y, axis=0)
         y_hi = np.max(y, axis=0)
-        ax.fill_between(alphas, y_lo, y_hi, color=color, alpha=0.18, lw=0)
-        ax.plot(alphas, median, color=color, lw=1.4, marker="o", ms=3.5,
-                label=f"L = {L} (median)")
+        ax_emp.fill_between(alphas, y_lo, y_hi, color=color, alpha=0.18, lw=0)
+        ax_emp.plot(alphas, median, color=color, lw=1.4, marker="o", ms=3.5,
+                    label=f"L = {L} (median)")
     base_min = min(baseline.values())
     overlay_reference(
-        ax, alphas, np.full_like(alphas, base_min),
+        ax_emp, alphas, np.full_like(alphas, base_min),
         label=r"matched baseline (min over L)",
         style=":", color="gray", lw=1.0,
     )
-    ax.set_xlabel(r"shift $\alpha$ (family 2: permutation interpolation)")
-    ax.set_ylabel(r"OOD loss $\mathcal{L}_{\mathrm{ood}}(\alpha)$")
+    ax_emp.set_xlabel(r"shift $\alpha$ (family 2: permutation interpolation)")
+    ax_emp.set_ylabel(r"OOD loss $\mathcal{L}_{\mathrm{ood}}(\alpha)$")
+    ax_emp.set_title(
+        f"finite-time empirical "
+        f"(median over {len(f2['seeds'])} seeds; band = min–max)",
+        fontsize=10,
+    )
+    ax_emp.legend(fontsize=8, loc="best", frameon=True)
+
+    # Right panel: exact Corollary median across seeds (log y, per-L colors).
+    if losses_exact:
+        for color, L in zip(L_colors, cfg.L_list):
+            ex_med = np.median(losses_exact[int(L)], axis=0)
+            ex_plot = np.where(ex_med > 0, ex_med, np.nan)
+            ax_ex.plot(alphas, ex_plot, color=color, ls="--", lw=1.4,
+                       marker="o", ms=3.5, label=f"L = {L} (median)")
+    ax_ex.set_xlabel(r"shift $\alpha$ (family 2: permutation interpolation)")
+    ax_ex.set_ylabel(
+        r"exact OOD loss $E_{\mathrm{OOD}}^{\star}(L,\alpha)$"
+    )
+    ax_ex.set_yscale("log")
+    ax_ex.set_title(
+        r"exact Corollary median ($Q^\star = L T^{-1}$)", fontsize=10,
+    )
+    ax_ex.legend(fontsize=8, loc="best", frameon=True)
+
+    fig.suptitle(
+        "B3 permutation-interpolation OOD: finite-time (left) vs "
+        r"exact Corollary (right)",
+        fontsize=10,
+    )
+    fig.tight_layout(rect=(0, 0, 1, 0.95))
+    save_both(fig, run_dir, "ood_interpolation_permutation")
+    plt.close(fig)
+
+
+def _plot_ood_exact_only(
+    cfg: B3Config,
+    f1: dict[str, Any],
+    run_dir: ThesisRunDir,
+) -> None:
+    """Exact-only supplementary figure: Corollary OOD loss at ``Q* = L T^{-1}``.
+
+    This is the direct spectral analogue of Bordelon Figure 3c. Family 1 only,
+    one line per depth ``L``. By the Corollary the curve starts at 0 for α = 0
+    (matched regime) and grows with the structural shift; for log-y plotting
+    we replace zero/nonpositive values with a small floor so the curves remain
+    visible near the origin.
+
+    Saved as ``b3_ood_exact_only``.
+    """
+    import matplotlib.pyplot as plt
+
+    losses_exact = f1.get("losses_exact")
+    if losses_exact is None:
+        return
+    alphas = np.asarray(f1["alphas"])
+    L_colors = sequential_colors(len(cfg.L_list), palette="rocket")
+
+    fig, ax = plt.subplots(figsize=(5.8, 4.0))
+    # Small floor for log-y visualization of α=0 (exactly 0 analytically).
+    pos_vals = [v for L in cfg.L_list
+                for v in np.asarray(losses_exact[int(L)]) if v > 0]
+    floor = (min(pos_vals) * 1e-3) if pos_vals else 1e-30
+    for color, L in zip(L_colors, cfg.L_list):
+        y = np.asarray(losses_exact[int(L)], dtype=float)
+        y_plot = np.where(y > 0, y, floor)
+        ax.plot(alphas, y_plot, color=color, lw=1.4, marker="o", ms=3.5,
+                label=f"L = {L}")
+    ax.set_xlabel(r"shift $\alpha$ (family 1: structural interpolation)")
+    ax.set_ylabel(
+        r"exact Corollary OOD loss "
+        r"$E_{\mathrm{OOD}}^{\star}(L,\alpha)$"
+    )
     ax.set_yscale("log")
     ax.set_title(
-        f"B3 permutation-interpolation brittleness "
-        f"(median over {len(f2['seeds'])} seeds; band = min–max) ",
-        fontsize=10,
+        r"B3 exact OOD at $Q^\star = L T^{-1}$: "
+        f"base = {cfg.base_symbol_kind}, target = {cfg.f1_target_kind}, "
+        f"P = {cfg.P}\n"
+        r"(spectral analogue of Bordelon Fig 3c; "
+        r"$\alpha = 0$ clipped to visualization floor)",
+        fontsize=9,
     )
     ax.legend(fontsize=8, loc="best", frameon=True)
     fig.tight_layout()
-    save_both(fig, run_dir, "ood_interpolation_permutation")
+    save_both(fig, run_dir, "b3_ood_exact_only")
     plt.close(fig)
 
 
@@ -704,6 +861,7 @@ def main() -> int:
         # --- Figures ---
         _plot_family1(cfg, f1, baseline, run)
         _plot_family2(cfg, f2, baseline, run)
+        _plot_ood_exact_only(cfg, f1, run)
         _plot_matched_baseline(cfg, baseline, run)
         _plot_symbol_samples(cfg, s_tr, f1, f2, run)
 
@@ -719,8 +877,12 @@ def main() -> int:
         for L in cfg.L_list:
             npz_payload[f"gamma_final_L{L}"] = gamma_final[int(L)].numpy()
             npz_payload[f"f1_loss_L{L}"] = f1["losses"][int(L)]
+            npz_payload[f"f1_loss_exact_L{L}"] = f1["losses_exact"][int(L)]
             npz_payload[f"f2_loss_per_seed_L{L}"] = (
                 f2["losses_per_seed"][int(L)]
+            )
+            npz_payload[f"f2_loss_exact_per_seed_L{L}"] = (
+                f2["losses_exact_per_seed"][int(L)]
             )
         for seed in f2["seeds"]:
             npz_payload[f"s_perm_seed{seed}"] = (
@@ -738,6 +900,7 @@ def main() -> int:
                         "alpha": float(alpha),
                         "L": int(L),
                         "L_ood": float(f1["losses"][int(L)][ai]),
+                        "L_ood_exact": float(f1["losses_exact"][int(L)][ai]),
                         "ratio_to_matched": float(
                             f1["losses"][int(L)][ai]
                             / (baseline[int(L)] + 1e-30)
@@ -748,6 +911,7 @@ def main() -> int:
         for ai, alpha in enumerate(f2["alphas"]):
             for L in cfg.L_list:
                 y = f2["losses_per_seed"][int(L)][:, ai]
+                y_ex = f2["losses_exact_per_seed"][int(L)][:, ai]
                 f2_rows.append(
                     {
                         "family": "permutation_interpolation",
@@ -756,6 +920,9 @@ def main() -> int:
                         "L_ood_median": float(np.median(y)),
                         "L_ood_min": float(np.min(y)),
                         "L_ood_max": float(np.max(y)),
+                        "L_ood_exact_median": float(np.median(y_ex)),
+                        "L_ood_exact_min": float(np.min(y_ex)),
+                        "L_ood_exact_max": float(np.max(y_ex)),
                         "ratio_to_matched_median": float(
                             np.median(y) / (baseline[int(L)] + 1e-30)
                         ),
@@ -812,6 +979,30 @@ def main() -> int:
                 }
             )
 
+        # --- Diagnostics: exact Corollary OOD ---
+        # (a) exact_matched_zero_check: exact should be 0 (or machine eps) at α=0.
+        exact_matched_zero_check = max(
+            abs(float(f1["losses_exact"][int(L)][0])) for L in cfg.L_list
+        )
+        # (b) max_exact_theory_rel_err_f1: finite-time empirical ≠ exact at Q*;
+        #     this ratio is large because empirical uses γ_k(T) ≠ L/s_tr_k on
+        #     the slow tail. It is reported for context, NOT gated.
+        _max_rel = 0.0
+        for L in cfg.L_list:
+            for ai in range(len(f1["alphas"])):
+                ex = float(f1["losses_exact"][int(L)][ai])
+                emp = float(f1["losses"][int(L)][ai])
+                rel = abs(emp - ex) / max(abs(ex), 1e-30)
+                if rel > _max_rel:
+                    _max_rel = rel
+        max_exact_theory_rel_err_f1 = _max_rel
+        # (c) exact_ood_at_full_shift: α=1 exact OOD per L (spectral analogue
+        #     of Bordelon Fig 3c terminal points).
+        exact_ood_at_full_shift = {
+            str(int(L)): float(f1["losses_exact"][int(L)][-1])
+            for L in cfg.L_list
+        }
+
         ctx.record_compute_proxy(float(t_train + t_f1 + t_f2))
         ctx.record_extra("n_L", len(cfg.L_list))
         ctx.record_extra("n_f1_alphas", len(cfg.f1_alphas))
@@ -820,6 +1011,11 @@ def main() -> int:
         ctx.record_extra("matched_baseline_f1_err", mb_f1_err)
         ctx.record_extra("matched_baseline_f2_err", mb_f2_err)
         ctx.record_extra("brittleness_rows", brittleness_rows)
+        ctx.record_extra("exact_matched_zero_check", float(exact_matched_zero_check))
+        ctx.record_extra(
+            "max_exact_theory_rel_err_f1", float(max_exact_theory_rel_err_f1)
+        )
+        ctx.record_extra("exact_ood_at_full_shift", exact_ood_at_full_shift)
         ctx.record_extra("train_seconds", float(t_train))
         ctx.record_extra("f1_seconds", float(t_f1))
         ctx.record_extra("f2_seconds", float(t_f2))
@@ -871,6 +1067,18 @@ def main() -> int:
                 "brittleness_alpha": cfg.brittleness_alpha,
                 "brittleness_ratio_min": cfg.brittleness_ratio_min,
                 "brittleness_rows": brittleness_rows,
+                # Exact-Corollary diagnostics (analytic Q* = L T^{-1}).
+                "exact_matched_zero_check": float(exact_matched_zero_check),
+                "max_exact_theory_rel_err_f1": float(max_exact_theory_rel_err_f1),
+                "exact_ood_at_full_shift": exact_ood_at_full_shift,
+                "exact_theory_rel_err_note": (
+                    "max_exact_theory_rel_err_f1 compares finite-time empirical "
+                    "L_ood(γ_k(T)) against the analytic Corollary L_ood(γ_k = L/s_tr_k). "
+                    "It is expected to be LARGE because B2-regime training is only "
+                    "partially converged on slow modes (s_k^3 tail). This is "
+                    "documented, not gated — the exact formula's role is to "
+                    "validate the Corollary shape, not to match finite-time runs."
+                ),
                 "train_wallclock_seconds": round(t_train, 3),
                 "f1_wallclock_seconds": round(t_f1, 3),
                 "f2_wallclock_seconds": round(t_f2, 3),
@@ -896,6 +1104,23 @@ def main() -> int:
                 f"     L={row['L']:<3d}  α={row['alpha']:.3f}  "
                 f"L_ood={row['L_ood']:.4e}  baseline="
                 f"{row['baseline']:.4e}  ratio={row['ratio']:.3e}"
+            )
+        print(
+            f"   exact Corollary (Q* = L T^-1) diagnostics:"
+        )
+        print(
+            f"     exact_matched_zero_check = {exact_matched_zero_check:.3e}  "
+            f"(should be 0 / machine eps)"
+        )
+        print(
+            f"     max_exact_theory_rel_err_f1 = {max_exact_theory_rel_err_f1:.3e}  "
+            f"(expected large: finite-time empirical vs analytic Q*; not gated)"
+        )
+        print(f"     exact_ood_at_full_shift (α = 1):")
+        for L in cfg.L_list:
+            print(
+                f"        L={L:<3d}  E_OOD_exact = "
+                f"{float(f1['losses_exact'][int(L)][-1]):.4e}"
             )
         print("=" * 72)
 

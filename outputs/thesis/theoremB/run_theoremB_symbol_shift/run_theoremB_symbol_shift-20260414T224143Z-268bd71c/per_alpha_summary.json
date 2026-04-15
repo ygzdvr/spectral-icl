@@ -1,0 +1,1213 @@
+{
+  "family1": [
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.0,
+      "L": 1,
+      "L_ood": 2.434408114143288,
+      "L_ood_exact": 0.0,
+      "ratio_to_matched": 1.0
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.0,
+      "L": 2,
+      "L_ood": 3.8643263622491006,
+      "L_ood_exact": 0.0,
+      "ratio_to_matched": 1.0
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.0,
+      "L": 4,
+      "L_ood": 4.77277274374156,
+      "L_ood_exact": 0.0,
+      "ratio_to_matched": 1.0
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.0,
+      "L": 8,
+      "L_ood": 5.282218945255922,
+      "L_ood_exact": 0.0,
+      "ratio_to_matched": 1.0
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.0,
+      "L": 16,
+      "L_ood": 5.55120120253417,
+      "L_ood_exact": 0.0,
+      "ratio_to_matched": 1.0
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.02,
+      "L": 1,
+      "L_ood": 2.4590350976977393,
+      "L_ood_exact": 0.011441560253230206,
+      "ratio_to_matched": 1.0101162099367706
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.02,
+      "L": 2,
+      "L_ood": 3.8957089294148655,
+      "L_ood_exact": 1.763647369207185e-06,
+      "ratio_to_matched": 1.0081210964664744
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.02,
+      "L": 4,
+      "L_ood": 4.805893262087199,
+      "L_ood_exact": 5.451237091259439e-14,
+      "ratio_to_matched": 1.0069394710630355
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.02,
+      "L": 8,
+      "L_ood": 5.315581412495444,
+      "L_ood_exact": 7.175853145353846e-29,
+      "ratio_to_matched": 1.0063159947713802
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.02,
+      "L": 16,
+      "L_ood": 5.5845056200037835,
+      "L_ood_exact": 1.5828239197964236e-58,
+      "ratio_to_matched": 1.0059994974519046
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.05,
+      "L": 1,
+      "L_ood": 2.495975573029417,
+      "L_ood_exact": 0.07032991119274319,
+      "ratio_to_matched": 1.0252905248419266
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.05,
+      "L": 2,
+      "L_ood": 3.9427827801635127,
+      "L_ood_exact": 6.764803415945649e-05,
+      "ratio_to_matched": 1.0203027411661858
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.05,
+      "L": 4,
+      "L_ood": 4.855574039605656,
+      "L_ood_exact": 8.15625648875933e-11,
+      "ratio_to_matched": 1.0173486776575886
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.05,
+      "L": 8,
+      "L_ood": 5.365625113354726,
+      "L_ood_exact": 1.6367481604293904e-22,
+      "ratio_to_matched": 1.0157899869284504
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.05,
+      "L": 16,
+      "L_ood": 5.634462246208202,
+      "L_ood_exact": 8.40248705912486e-46,
+      "ratio_to_matched": 1.0149987436297614
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.1,
+      "L": 1,
+      "L_ood": 2.5575430319155457,
+      "L_ood_exact": 0.2734540421713318,
+      "ratio_to_matched": 1.0505810496838535
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.1,
+      "L": 2,
+      "L_ood": 4.021239198077925,
+      "L_ood_exact": 0.0010491834478793035,
+      "ratio_to_matched": 1.0406054823323718
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.1,
+      "L": 4,
+      "L_ood": 4.938375335469753,
+      "L_ood_exact": 2.019021948370966e-08,
+      "ratio_to_matched": 1.034697355315177
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.1,
+      "L": 8,
+      "L_ood": 5.44903128145353,
+      "L_ood_exact": 1.0355109069768282e-17,
+      "ratio_to_matched": 1.031579973856901
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.1,
+      "L": 16,
+      "L_ood": 5.717723289882235,
+      "L_ood_exact": 3.481410032452297e-36,
+      "ratio_to_matched": 1.0299974872595226
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.15,
+      "L": 1,
+      "L_ood": 2.6191104908016745,
+      "L_ood_exact": 0.5975739890363126,
+      "ratio_to_matched": 1.07587157452578
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.15,
+      "L": 2,
+      "L_ood": 4.099695615992337,
+      "L_ood_exact": 0.005143491642862101,
+      "ratio_to_matched": 1.0609082234985576
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.15,
+      "L": 4,
+      "L_ood": 5.021176631333849,
+      "L_ood_exact": 4.997744964023575e-07,
+      "ratio_to_matched": 1.0520460329727654
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.15,
+      "L": 8,
+      "L_ood": 5.532437449552335,
+      "L_ood_exact": 6.557652846710611e-15,
+      "ratio_to_matched": 1.0473699607853513
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.15,
+      "L": 16,
+      "L_ood": 5.800984333556267,
+      "L_ood_exact": 1.4470404603479537e-30,
+      "ratio_to_matched": 1.0449962308892837
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.2,
+      "L": 1,
+      "L_ood": 2.6806779496878037,
+      "L_ood_exact": 1.0308913478882205,
+      "ratio_to_matched": 1.1011620993677071
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.2,
+      "L": 2,
+      "L_ood": 4.178152033906748,
+      "L_ood_exact": 0.01572501200856541,
+      "ratio_to_matched": 1.0812109646647432
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.2,
+      "L": 4,
+      "L_ood": 5.1039779271979455,
+      "L_ood_exact": 4.815520058542639e-06,
+      "ratio_to_matched": 1.0693947106303539
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.2,
+      "L": 8,
+      "L_ood": 5.615843617651138,
+      "L_ood_exact": 6.299413198225722e-13,
+      "ratio_to_matched": 1.0631599477138016
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.2,
+      "L": 16,
+      "L_ood": 5.884245377230299,
+      "L_ood_exact": 1.3857921027582072e-26,
+      "ratio_to_matched": 1.0599949745190451
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.3,
+      "L": 1,
+      "L_ood": 2.8038128674600613,
+      "L_ood_exact": 2.177924685955003,
+      "ratio_to_matched": 1.1517431490515604
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.3,
+      "L": 2,
+      "L_ood": 4.335064869735572,
+      "L_ood_exact": 0.07423188730850111,
+      "ratio_to_matched": 1.1218164469971148
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.3,
+      "L": 4,
+      "L_ood": 5.269580518926137,
+      "L_ood_exact": 0.00011436499421814873,
+      "ratio_to_matched": 1.1040920659455307
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.3,
+      "L": 8,
+      "L_ood": 5.782655953848746,
+      "L_ood_exact": 3.8178887469539476e-10,
+      "ratio_to_matched": 1.0947399215707023
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.3,
+      "L": 16,
+      "L_ood": 6.050767464578363,
+      "L_ood_exact": 5.506596585314948e-21,
+      "ratio_to_matched": 1.0899924617785672
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.4,
+      "L": 1,
+      "L_ood": 2.9269477852323194,
+      "L_ood_exact": 3.6201668251760104,
+      "ratio_to_matched": 1.202324198735414
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.4,
+      "L": 2,
+      "L_ood": 4.491977705564397,
+      "L_ood_exact": 0.2176186510969344,
+      "ratio_to_matched": 1.1624219293294866
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.4,
+      "L": 4,
+      "L_ood": 5.43518311065433,
+      "L_ood_exact": 0.0010519469567919428,
+      "ratio_to_matched": 1.1387894212607075
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.4,
+      "L": 8,
+      "L_ood": 5.949468290046354,
+      "L_ood_exact": 3.4901793405339994e-08,
+      "ratio_to_matched": 1.126319895427603
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.4,
+      "L": 16,
+      "L_ood": 6.217289551926427,
+      "L_ood_exact": 5.0116593043460346e-17,
+      "ratio_to_matched": 1.1199899490380898
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.5,
+      "L": 1,
+      "L_ood": 3.050082703004577,
+      "L_ood_exact": 5.263230534355584,
+      "ratio_to_matched": 1.2529052484192675
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.5,
+      "L": 2,
+      "L_ood": 4.648890541393221,
+      "L_ood_exact": 0.48981416156464397,
+      "ratio_to_matched": 1.2030274116618584
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.5,
+      "L": 4,
+      "L_ood": 5.600785702382524,
+      "L_ood_exact": 0.005731188462343536,
+      "ratio_to_matched": 1.1734867765758847
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.5,
+      "L": 8,
+      "L_ood": 6.116280626243961,
+      "L_ood_exact": 1.126592967895012e-06,
+      "ratio_to_matched": 1.1578998692845037
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.5,
+      "L": 16,
+      "L_ood": 6.383811639274493,
+      "L_ood_exact": 5.732208008106377e-14,
+      "ratio_to_matched": 1.1499874362976124
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.65,
+      "L": 1,
+      "L_ood": 3.2347850796629642,
+      "L_ood_exact": 7.897894473556736,
+      "ratio_to_matched": 1.328776822945048
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.65,
+      "L": 2,
+      "L_ood": 4.8842597951364555,
+      "L_ood_exact": 1.2212458012502996,
+      "ratio_to_matched": 1.2639356351604156
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.65,
+      "L": 4,
+      "L_ood": 5.849189589974811,
+      "L_ood_exact": 0.040157056666869945,
+      "ratio_to_matched": 1.2255328095486497
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.65,
+      "L": 8,
+      "L_ood": 6.366499130540373,
+      "L_ood_exact": 6.364984265018447e-05,
+      "ratio_to_matched": 1.205269830069855
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.65,
+      "L": 16,
+      "L_ood": 6.633594770296588,
+      "L_ood_exact": 2.143988110882173e-10,
+      "ratio_to_matched": 1.1949836671868959
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.8,
+      "L": 1,
+      "L_ood": 3.4194874563213506,
+      "L_ood_exact": 10.453478769689042,
+      "ratio_to_matched": 1.4046483974708281
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.8,
+      "L": 2,
+      "L_ood": 5.119629048879692,
+      "L_ood_exact": 2.394489104267347,
+      "ratio_to_matched": 1.3248438586589733
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.8,
+      "L": 4,
+      "L_ood": 6.0975934775671,
+      "L_ood_exact": 0.17671541770290788,
+      "ratio_to_matched": 1.2775788425214152
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.8,
+      "L": 8,
+      "L_ood": 6.616717634836785,
+      "L_ood_exact": 0.0014508170637629776,
+      "ratio_to_matched": 1.252639790855206
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 0.8,
+      "L": 16,
+      "L_ood": 6.883377901318685,
+      "L_ood_exact": 1.3448033914682849e-07,
+      "ratio_to_matched": 1.2399798980761796
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 1.0,
+      "L": 1,
+      "L_ood": 3.6657572918658663,
+      "L_ood_exact": 13.187319537783658,
+      "ratio_to_matched": 1.5058104968385353
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 1.0,
+      "L": 2,
+      "L_ood": 5.43345472053734,
+      "L_ood_exact": 4.518516717835801,
+      "ratio_to_matched": 1.4060548233237167
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 1.0,
+      "L": 4,
+      "L_ood": 6.428798661023486,
+      "L_ood_exact": 0.777387118846137,
+      "ratio_to_matched": 1.346973553151769
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 1.0,
+      "L": 8,
+      "L_ood": 6.950342307232001,
+      "L_ood_exact": 0.03668402930182013,
+      "ratio_to_matched": 1.3157997385690074
+    },
+    {
+      "family": "structural_interpolation",
+      "alpha": 1.0,
+      "L": 16,
+      "L_ood": 7.216422076014813,
+      "L_ood_exact": 0.00011876577933888083,
+      "ratio_to_matched": 1.2999748725952243
+    }
+  ],
+  "family2": [
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.0,
+      "L": 1,
+      "L_ood_median": 2.434408114143288,
+      "L_ood_min": 2.434408114143288,
+      "L_ood_max": 2.434408114143288,
+      "L_ood_exact_median": 0.0,
+      "L_ood_exact_min": 0.0,
+      "L_ood_exact_max": 0.0,
+      "ratio_to_matched_median": 1.0
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.0,
+      "L": 2,
+      "L_ood_median": 3.8643263622491006,
+      "L_ood_min": 3.8643263622491006,
+      "L_ood_max": 3.8643263622491006,
+      "L_ood_exact_median": 0.0,
+      "L_ood_exact_min": 0.0,
+      "L_ood_exact_max": 0.0,
+      "ratio_to_matched_median": 1.0
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.0,
+      "L": 4,
+      "L_ood_median": 4.77277274374156,
+      "L_ood_min": 4.77277274374156,
+      "L_ood_max": 4.77277274374156,
+      "L_ood_exact_median": 0.0,
+      "L_ood_exact_min": 0.0,
+      "L_ood_exact_max": 0.0,
+      "ratio_to_matched_median": 1.0
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.0,
+      "L": 8,
+      "L_ood_median": 5.282218945255922,
+      "L_ood_min": 5.282218945255922,
+      "L_ood_max": 5.282218945255922,
+      "L_ood_exact_median": 0.0,
+      "L_ood_exact_min": 0.0,
+      "L_ood_exact_max": 0.0,
+      "ratio_to_matched_median": 1.0
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.0,
+      "L": 16,
+      "L_ood_median": 5.55120120253417,
+      "L_ood_min": 5.55120120253417,
+      "L_ood_max": 5.55120120253417,
+      "L_ood_exact_median": 0.0,
+      "L_ood_exact_min": 0.0,
+      "L_ood_exact_max": 0.0,
+      "ratio_to_matched_median": 1.0
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.02,
+      "L": 1,
+      "L_ood_median": 2.45752471433875,
+      "L_ood_min": 2.4534813361970658,
+      "L_ood_max": 2.4603673759335978,
+      "L_ood_exact_median": 0.01011999819077082,
+      "L_ood_exact_min": 0.008298781785233834,
+      "L_ood_exact_max": 0.011566489738879936,
+      "ratio_to_matched_median": 1.0094957784856042
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.02,
+      "L": 2,
+      "L_ood_median": 3.893513525558231,
+      "L_ood_min": 3.887912675566711,
+      "L_ood_max": 3.899179268730601,
+      "L_ood_exact_median": 5.044637504134595e-06,
+      "L_ood_exact_min": 3.2793592487443436e-06,
+      "L_ood_exact_max": 6.638109712253667e-06,
+      "ratio_to_matched_median": 1.007552975751288
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.02,
+      "L": 4,
+      "L_ood_median": 4.803368728202771,
+      "L_ood_min": 4.796949726670779,
+      "L_ood_max": 4.809105850697879,
+      "L_ood_exact_median": 1.1038895398596414e-11,
+      "L_ood_exact_min": 1.2913247135504379e-12,
+      "L_ood_exact_max": 5.278906400015499e-11,
+      "ratio_to_matched_median": 1.006410526145694
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.02,
+      "L": 8,
+      "L_ood_median": 5.312819482849152,
+      "L_ood_min": 5.306242759995849,
+      "L_ood_max": 5.318402108075713,
+      "L_ood_exact_median": 1.4885833859622812e-22,
+      "L_ood_exact_min": 7.624997625232798e-25,
+      "L_ood_exact_max": 7.411576182487088e-21,
+      "ratio_to_matched_median": 1.0057931217752178
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.02,
+      "L": 16,
+      "L_ood_median": 5.58161292172262,
+      "L_ood_min": 5.575020871539554,
+      "L_ood_max": 5.5870851342471886,
+      "L_ood_exact_median": 3.4027195762553907e-44,
+      "L_ood_exact_min": 4.429737953609761e-49,
+      "L_ood_exact_max": 1.488822989213687e-40,
+      "ratio_to_matched_median": 1.0054784033363027
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.05,
+      "L": 1,
+      "L_ood_median": 2.492199614631944,
+      "L_ood_min": 2.4820911692777328,
+      "L_ood_max": 2.499306268619063,
+      "L_ood_exact_median": 0.06325349558456483,
+      "L_ood_exact_min": 0.05202584687853224,
+      "L_ood_exact_max": 0.07213128168762147,
+      "ratio_to_matched_median": 1.0237394462140106
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.05,
+      "L": 2,
+      "L_ood_median": 3.9372942705219263,
+      "L_ood_min": 3.9232921455431264,
+      "L_ood_max": 3.9514586284528512,
+      "L_ood_exact_median": 0.00020634916753018955,
+      "L_ood_exact_min": 0.00013025298777780096,
+      "L_ood_exact_max": 0.00027350749163439924,
+      "ratio_to_matched_median": 1.0188824393782199
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.05,
+      "L": 4,
+      "L_ood_median": 4.849262704894587,
+      "L_ood_min": 4.833215201064608,
+      "L_ood_max": 4.863605511132357,
+      "L_ood_exact_median": 1.788423816340866e-08,
+      "L_ood_exact_min": 2.049478620733365e-09,
+      "L_ood_exact_max": 8.721719307248658e-08,
+      "ratio_to_matched_median": 1.0160263153642348
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.05,
+      "L": 8,
+      "L_ood_median": 5.358720289238995,
+      "L_ood_min": 5.342278482105737,
+      "L_ood_max": 5.372676852305396,
+      "L_ood_exact_median": 3.685967654756795e-16,
+      "L_ood_exact_min": 1.8536966089516833e-18,
+      "L_ood_exact_max": 1.8692498469143553e-14,
+      "ratio_to_matched_median": 1.0144828044380443
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.05,
+      "L": 16,
+      "L_ood_median": 5.627230500505294,
+      "L_ood_min": 5.61075037504763,
+      "L_ood_max": 5.640911031816717,
+      "L_ood_exact_median": 1.9626860850848602e-31,
+      "L_ood_exact_min": 2.5086091943847704e-36,
+      "L_ood_exact_max": 8.742601507902598e-28,
+      "ratio_to_matched_median": 1.0136960083407562
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.1,
+      "L": 1,
+      "L_ood_median": 2.5499911151205996,
+      "L_ood_min": 2.5297742244121775,
+      "L_ood_max": 2.5642044230948375,
+      "L_ood_exact_median": 0.25303736161990553,
+      "L_ood_exact_min": 0.20915979231959797,
+      "L_ood_exact_max": 0.28746326554795854,
+      "ratio_to_matched_median": 1.0474788924280214
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.1,
+      "L": 2,
+      "L_ood_median": 4.010262178794752,
+      "L_ood_min": 3.9822579288371527,
+      "L_ood_max": 4.038590894656602,
+      "L_ood_exact_median": 0.0035494004144811906,
+      "L_ood_exact_min": 0.0021414615944107956,
+      "L_ood_exact_max": 0.004754955359470201,
+      "ratio_to_matched_median": 1.03776487875644
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.1,
+      "L": 4,
+      "L_ood_median": 4.925752666047613,
+      "L_ood_min": 4.8936576583876565,
+      "L_ood_max": 4.954438278523154,
+      "L_ood_exact_median": 5.022192394425832e-06,
+      "L_ood_exact_min": 5.58404544702942e-07,
+      "L_ood_exact_max": 2.517239026238428e-05,
+      "ratio_to_matched_median": 1.0320526307284696
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.1,
+      "L": 8,
+      "L_ood_median": 5.43522163322207,
+      "L_ood_min": 5.402338018955553,
+      "L_ood_max": 5.4631347593548725,
+      "L_ood_exact_median": 2.6560320512004385e-11,
+      "L_ood_exact_min": 1.3004324529555777e-13,
+      "L_ood_exact_max": 1.381889585976562e-09,
+      "ratio_to_matched_median": 1.0289656088760886
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.1,
+      "L": 16,
+      "L_ood_median": 5.70325979847642,
+      "L_ood_min": 5.670299547561089,
+      "L_ood_max": 5.730620861099265,
+      "L_ood_exact_median": 9.274836975458182e-22,
+      "L_ood_exact_min": 1.1542072879595352e-26,
+      "L_ood_exact_max": 4.23572310115283e-18,
+      "ratio_to_matched_median": 1.027392016681513
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.15,
+      "L": 1,
+      "L_ood_median": 2.6077826156092554,
+      "L_ood_min": 2.5774572795466226,
+      "L_ood_max": 2.6291025775706123,
+      "L_ood_exact_median": 0.5693866670284955,
+      "L_ood_exact_min": 0.4729864435314065,
+      "L_ood_exact_max": 0.6444031597772265,
+      "ratio_to_matched_median": 1.071218338642032
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.15,
+      "L": 2,
+      "L_ood_median": 4.0832300870675775,
+      "L_ood_min": 4.041223712131179,
+      "L_ood_max": 4.125723160860353,
+      "L_ood_exact_median": 0.019223396626676804,
+      "L_ood_exact_min": 0.011131806633407529,
+      "L_ood_exact_max": 0.025989816192249438,
+      "ratio_to_matched_median": 1.0566473181346596
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.15,
+      "L": 4,
+      "L_ood_median": 5.002242627200639,
+      "L_ood_min": 4.954100115710704,
+      "L_ood_max": 5.04527104591395,
+      "L_ood_exact_median": 0.00014008810950228017,
+      "L_ood_exact_min": 1.51759662208995e-05,
+      "L_ood_exact_max": 0.0007180496564975326,
+      "ratio_to_matched_median": 1.0480789460927045
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.15,
+      "L": 8,
+      "L_ood_median": 5.511722977205142,
+      "L_ood_min": 5.462397555805367,
+      "L_ood_max": 5.553592666404346,
+      "L_ood_exact_median": 1.902492411135814e-08,
+      "L_ood_exact_min": 9.103986705647948e-11,
+      "L_ood_exact_max": 1.0107122542460598e-06,
+      "ratio_to_matched_median": 1.0434484133141326
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.15,
+      "L": 16,
+      "L_ood_median": 5.779289096447544,
+      "L_ood_min": 5.729848720074549,
+      "L_ood_max": 5.820330690381811,
+      "L_ood_exact_median": 4.3661722241129214e-16,
+      "L_ood_exact_min": 5.310917668690109e-21,
+      "L_ood_exact_max": 2.034898050961604e-12,
+      "ratio_to_matched_median": 1.041088025022269
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.2,
+      "L": 1,
+      "L_ood_median": 2.6655741160979116,
+      "L_ood_min": 2.6251403346810678,
+      "L_ood_max": 2.6940007320463875,
+      "L_ood_exact_median": 1.0123364807328037,
+      "L_ood_exact_min": 0.8450904077221593,
+      "L_ood_exact_max": 1.1413581725716337,
+      "ratio_to_matched_median": 1.094957784856043
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.2,
+      "L": 2,
+      "L_ood_median": 4.156197995340404,
+      "L_ood_min": 4.100189495425205,
+      "L_ood_max": 4.212855427064104,
+      "L_ood_exact_median": 0.06472044611964058,
+      "L_ood_exact_min": 0.03610062678948459,
+      "L_ood_exact_max": 0.08820202153775719,
+      "ratio_to_matched_median": 1.0755297575128797
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.2,
+      "L": 4,
+      "L_ood_median": 5.078732588353666,
+      "L_ood_min": 5.014542573033752,
+      "L_ood_max": 5.136103813304747,
+      "L_ood_exact_median": 0.0015129208943647204,
+      "L_ood_exact_min": 0.00016022542855509222,
+      "L_ood_exact_max": 0.007900663791114116,
+      "ratio_to_matched_median": 1.0641052614569393
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.2,
+      "L": 8,
+      "L_ood_median": 5.588224321188217,
+      "L_ood_min": 5.522457092655183,
+      "L_ood_max": 5.644050573453821,
+      "L_ood_exact_median": 2.055749388965256e-06,
+      "L_ood_exact_min": 9.644409746761058e-09,
+      "L_ood_exact_max": 0.00011112320850867537,
+      "ratio_to_matched_median": 1.057931217752177
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.2,
+      "L": 16,
+      "L_ood_median": 5.855318394418669,
+      "L_ood_min": 5.789397892588009,
+      "L_ood_max": 5.91004051966436,
+      "L_ood_exact_median": 4.709502863878756e-12,
+      "L_ood_exact_min": 5.616713305817952e-17,
+      "L_ood_exact_max": 2.2322370072147522e-08,
+      "ratio_to_matched_median": 1.0547840333630254
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.3,
+      "L": 1,
+      "L_ood_median": 2.781157117075223,
+      "L_ood_min": 2.720506444949957,
+      "L_ood_max": 2.823797040997937,
+      "L_ood_exact_median": 2.2781779087184653,
+      "L_ood_exact_min": 1.9204687038733277,
+      "L_ood_exact_max": 2.554671202519539,
+      "ratio_to_matched_median": 1.1424366772840644
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.3,
+      "L": 2,
+      "L_ood_median": 4.302133811886055,
+      "L_ood_min": 4.218121062013257,
+      "L_ood_max": 4.3871199594716055,
+      "L_ood_exact_median": 0.362278492799522,
+      "L_ood_exact_min": 0.1920604570962569,
+      "L_ood_exact_max": 0.5078940839527044,
+      "ratio_to_matched_median": 1.1132946362693195
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.3,
+      "L": 4,
+      "L_ood_median": 5.231712510659718,
+      "L_ood_min": 5.135427487679847,
+      "L_ood_max": 5.31776934808634,
+      "L_ood_exact_median": 0.044598411230851405,
+      "L_ood_exact_min": 0.004549112756813071,
+      "L_ood_exact_max": 0.23981469071896205,
+      "ratio_to_matched_median": 1.0961578921854087
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.3,
+      "L": 8,
+      "L_ood_median": 5.741227009154363,
+      "L_ood_min": 5.642576166354812,
+      "L_ood_max": 5.82496638755277,
+      "L_ood_exact_median": 0.0015572655859953902,
+      "L_ood_exact_min": 7.071749015136486e-06,
+      "L_ood_exact_max": 0.08649470679606235,
+      "ratio_to_matched_median": 1.086896826628265
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.3,
+      "L": 16,
+      "L_ood_median": 6.007376990360917,
+      "L_ood_min": 5.908496237614928,
+      "L_ood_max": 6.089460178229452,
+      "L_ood_exact_median": 2.345088715357407e-06,
+      "L_ood_exact_min": 2.7077788593822665e-11,
+      "L_ood_exact_max": 0.011412641055829675,
+      "ratio_to_matched_median": 1.0821760500445379
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.4,
+      "L": 1,
+      "L_ood_median": 2.896740118052535,
+      "L_ood_min": 2.815872555218847,
+      "L_ood_max": 2.9535933499494864,
+      "L_ood_exact_median": 4.050842196956659,
+      "L_ood_exact_min": 3.4479715384387504,
+      "L_ood_exact_max": 4.53432498661884,
+      "ratio_to_matched_median": 1.1899155697120858
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.4,
+      "L": 2,
+      "L_ood_median": 4.448069628431707,
+      "L_ood_min": 4.336052628601308,
+      "L_ood_max": 4.5613844918791076,
+      "L_ood_exact_median": 1.254203850269533,
+      "L_ood_exact_min": 0.6364017495569321,
+      "L_ood_exact_max": 1.7991598897635979,
+      "ratio_to_matched_median": 1.1510595150257594
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.4,
+      "L": 4,
+      "L_ood_median": 5.384692432965771,
+      "L_ood_min": 5.256312402325943,
+      "L_ood_max": 5.499434882867934,
+      "L_ood_exact_median": 0.5036544453499255,
+      "L_ood_exact_min": 0.04986192864700712,
+      "L_ood_exact_max": 2.76831425510439,
+      "ratio_to_matched_median": 1.1282105229138784
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.4,
+      "L": 8,
+      "L_ood_median": 5.89422969712051,
+      "L_ood_min": 5.762695240054442,
+      "L_ood_max": 6.005882201651721,
+      "L_ood_exact_median": 0.17602535992500934,
+      "L_ood_exact_min": 0.0007791051402709655,
+      "L_ood_exact_max": 9.977370621568886,
+      "ratio_to_matched_median": 1.1158624355043534
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.4,
+      "L": 16,
+      "L_ood_median": 6.159435586303166,
+      "L_ood_min": 6.027594582641846,
+      "L_ood_max": 6.2688798367945475,
+      "L_ood_exact_median": 0.026463373540002347,
+      "L_ood_exact_min": 2.97880669804906e-07,
+      "L_ood_exact_max": 131.35094825911358,
+      "ratio_to_matched_median": 1.1095680667260506
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.5,
+      "L": 1,
+      "L_ood_median": 3.0123231190298467,
+      "L_ood_min": 2.911238665487737,
+      "L_ood_max": 3.0833896589010363,
+      "L_ood_exact_median": 6.330609896827154,
+      "L_ood_exact_min": 5.4402757690840735,
+      "L_ood_exact_max": 7.073456687296268,
+      "ratio_to_matched_median": 1.2373944621401072
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.5,
+      "L": 2,
+      "L_ood_median": 4.594005444977357,
+      "L_ood_min": 4.453984195189361,
+      "L_ood_max": 4.735649024286609,
+      "L_ood_exact_median": 3.330172396531984,
+      "L_ood_exact_min": 1.6254824463367208,
+      "L_ood_exact_max": 4.866024566267923,
+      "ratio_to_matched_median": 1.188824393782199
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.5,
+      "L": 4,
+      "L_ood_median": 5.537672355271823,
+      "L_ood_min": 5.377197316972037,
+      "L_ood_max": 5.681100417649526,
+      "L_ood_exact_median": 3.3487546059262967,
+      "L_ood_exact_min": 0.32355808088456833,
+      "L_ood_exact_max": 18.72293005820504,
+      "ratio_to_matched_median": 1.1602631536423478
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.5,
+      "L": 8,
+      "L_ood_median": 6.047232385086657,
+      "L_ood_min": 5.882814313754071,
+      "L_ood_max": 6.186798015750669,
+      "L_ood_exact_median": 6.987308293201276,
+      "L_ood_exact_min": 0.030291491690966278,
+      "L_ood_exact_max": 402.3366754758621,
+      "ratio_to_matched_median": 1.1448280443804417
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.5,
+      "L": 16,
+      "L_ood_median": 6.311494182245415,
+      "L_ood_min": 6.146692927668766,
+      "L_ood_max": 6.448299495359642,
+      "L_ood_exact_median": 37.337076843463045,
+      "L_ood_exact_min": 0.0004117260763824274,
+      "L_ood_exact_max": 188177.40175065657,
+      "ratio_to_matched_median": 1.1369600834075633
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.65,
+      "L": 1,
+      "L_ood_median": 3.1856976204958145,
+      "L_ood_min": 3.054287830891072,
+      "L_ood_max": 3.278084122328361,
+      "L_ood_exact_median": 10.74755007805665,
+      "L_ood_exact_min": 9.327965358845473,
+      "L_ood_exact_max": 11.925176627141179,
+      "ratio_to_matched_median": 1.3086128007821396
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.65,
+      "L": 2,
+      "L_ood_median": 4.812909169795834,
+      "L_ood_min": 4.630881545071439,
+      "L_ood_max": 4.997045822897862,
+      "L_ood_exact_median": 10.660105678135801,
+      "L_ood_exact_min": 4.950002025335829,
+      "L_ood_exact_max": 15.926587862100378,
+      "ratio_to_matched_median": 1.2454717119168586
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.65,
+      "L": 4,
+      "L_ood_median": 5.767142238730902,
+      "L_ood_min": 5.558524688941182,
+      "L_ood_max": 5.953598719821917,
+      "L_ood_exact_median": 31.5595192914,
+      "L_ood_exact_min": 2.9618759970829633,
+      "L_ood_exact_max": 179.92300854529003,
+      "ratio_to_matched_median": 1.2083420997350522
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.65,
+      "L": 8,
+      "L_ood_median": 6.276736417035877,
+      "L_ood_min": 6.062992924303517,
+      "L_ood_max": 6.458171736899093,
+      "L_ood_exact_median": 538.172662291028,
+      "L_ood_exact_min": 2.276368054419427,
+      "L_ood_exact_max": 31550.101196524338,
+      "ratio_to_matched_median": 1.1882764576945741
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.65,
+      "L": 16,
+      "L_ood_median": 6.539582076158789,
+      "L_ood_min": 6.325340445209145,
+      "L_ood_max": 6.7174289832072835,
+      "L_ood_exact_median": 191459.88862507354,
+      "L_ood_exact_min": 2.0604635423133235,
+      "L_ood_exact_max": 981912596.7824726,
+      "ratio_to_matched_median": 1.1780481084298322
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.8,
+      "L": 1,
+      "L_ood_median": 3.3590721219617823,
+      "L_ood_min": 3.197336996294406,
+      "L_ood_max": 3.472778585755686,
+      "L_ood_exact_median": 16.602536713827977,
+      "L_ood_exact_min": 14.332765414155908,
+      "L_ood_exact_max": 18.02029663848772,
+      "ratio_to_matched_median": 1.3798311394241718
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.8,
+      "L": 2,
+      "L_ood_median": 5.031812894614312,
+      "L_ood_min": 4.807778894953517,
+      "L_ood_max": 5.258442621509115,
+      "L_ood_exact_median": 27.096686458710508,
+      "L_ood_exact_min": 12.063763062516617,
+      "L_ood_exact_max": 41.20023968132106,
+      "ratio_to_matched_median": 1.3021190300515184
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.8,
+      "L": 4,
+      "L_ood_median": 5.9966121221899815,
+      "L_ood_min": 5.739852060910325,
+      "L_ood_max": 6.226097021994308,
+      "L_ood_exact_median": 188.50504656256985,
+      "L_ood_exact_min": 17.29289382932838,
+      "L_ood_exact_max": 1090.5095434912657,
+      "ratio_to_matched_median": 1.2564210458277565
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.8,
+      "L": 8,
+      "L_ood_median": 6.506240448985098,
+      "L_ood_min": 6.243171534852962,
+      "L_ood_max": 6.729545458047517,
+      "L_ood_exact_median": 16949.241175380674,
+      "L_ood_exact_min": 70.33345451526858,
+      "L_ood_exact_max": 1007089.790422722,
+      "ratio_to_matched_median": 1.231724871008707
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 0.8,
+      "L": 16,
+      "L_ood_median": 6.767669970072163,
+      "L_ood_min": 6.503987962749525,
+      "L_ood_max": 6.986558471054925,
+      "L_ood_exact_median": 167227983.59967726,
+      "L_ood_exact_min": 1765.9617470114445,
+      "L_ood_exact_max": 868893985535.3752,
+      "ratio_to_matched_median": 1.2191361334521014
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 1.0,
+      "L": 1,
+      "L_ood_median": 3.5902381239164063,
+      "L_ood_min": 3.3880692168321853,
+      "L_ood_max": 3.7323712036587846,
+      "L_ood_exact_median": 26.422228605703346,
+      "L_ood_exact_min": 22.817507881806815,
+      "L_ood_exact_max": 28.065304663271718,
+      "ratio_to_matched_median": 1.4747889242802148
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 1.0,
+      "L": 2,
+      "L_ood_median": 5.323684527705614,
+      "L_ood_min": 5.043642028129622,
+      "L_ood_max": 5.606971686324119,
+      "L_ood_exact_median": 74.73486056130247,
+      "L_ood_exact_min": 31.74909813798699,
+      "L_ood_exact_max": 115.73994239226764,
+      "ratio_to_matched_median": 1.3776487875643981
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 1.0,
+      "L": 4,
+      "L_ood_median": 6.302571966802088,
+      "L_ood_min": 5.981621890202516,
+      "L_ood_max": 6.589428091557495,
+      "L_ood_exact_median": 1301.1086037103191,
+      "L_ood_exact_min": 116.56888650164399,
+      "L_ood_exact_max": 7637.858930728067,
+      "ratio_to_matched_median": 1.3205263072846958
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 1.0,
+      "L": 8,
+      "L_ood_median": 6.812245824917391,
+      "L_ood_min": 6.483409682252223,
+      "L_ood_max": 7.091377086245416,
+      "L_ood_exact_median": 698316.5252822341,
+      "L_ood_exact_min": 2841.1216325886753,
+      "L_ood_exact_max": 42053336.99426166,
+      "ratio_to_matched_median": 1.2896560887608834
+    },
+    {
+      "family": "permutation_interpolation",
+      "alpha": 1.0,
+      "L": 16,
+      "L_ood_median": 7.071787161956662,
+      "L_ood_min": 6.742184652803363,
+      "L_ood_max": 7.345397788185115,
+      "L_ood_exact_median": 244877966741.32782,
+      "L_ood_exact_min": 2536028.464239709,
+      "L_ood_exact_max": 1289020131677870.5,
+      "ratio_to_matched_median": 1.2739201668151268
+    }
+  ],
+  "baseline": {
+    "1": 2.434408114143288,
+    "2": 3.8643263622491006,
+    "4": 4.77277274374156,
+    "8": 5.282218945255922,
+    "16": 5.55120120253417
+  }
+}

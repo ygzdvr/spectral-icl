@@ -1,0 +1,47 @@
+{
+  "run_id": "run_theoremB_depth_stationary-20260414T200155Z-3a9f3d53",
+  "script_stem": "run_theoremB_depth_stationary",
+  "phase": "theoremB",
+  "root": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremB/run_theoremB_depth_stationary/run_theoremB_depth_stationary-20260414T200155Z-3a9f3d53",
+  "started_utc": "2026-04-14T20:01:55.479158+00:00",
+  "seeds": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "git_commit": "408ec58",
+  "git_dirty": true,
+  "env": {
+    "python_version": "3.14.3",
+    "python_full_version": "3.14.3 (main, Mar 20 2026, 00:34:32) [Clang 22.1.1 ]",
+    "python_executable": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/.venv/bin/python",
+    "platform": "Linux-5.14.0-570.106.1.el9_6.x86_64-x86_64-with-glibc2.34",
+    "hostname": "della-i24g3",
+    "torch_version": "2.11.0+cu130",
+    "cuda_available": true,
+    "cuda_version": "13.0",
+    "cudnn_version": 91900,
+    "gpu_count": 1,
+    "gpu_names": [
+      "NVIDIA H200"
+    ]
+  },
+  "notes": null,
+  "status": "completed",
+  "finished_utc": "2026-04-14T20:03:18.903292+00:00",
+  "wall_clock_seconds": 83.4252278804779,
+  "compute_proxy": 62.656739634003316,
+  "measured_compute": null,
+  "per_step_wall_clock": {
+    "n_steps": 30,
+    "mean": 2.0884454176669047,
+    "median": 2.0502364010026213,
+    "total": 62.65336253000714
+  },
+  "error": null,
+  "extras": {
+    "n_trials": 30,
+    "device": "cuda"
+  }
+}

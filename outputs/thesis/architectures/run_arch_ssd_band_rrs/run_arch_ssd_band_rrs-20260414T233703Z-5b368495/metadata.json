@@ -1,0 +1,230 @@
+{
+  "run_id": "run_arch_ssd_band_rrs-20260414T233703Z-5b368495",
+  "script_stem": "run_arch_ssd_band_rrs",
+  "phase": "architectures",
+  "root": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/architectures/run_arch_ssd_band_rrs/run_arch_ssd_band_rrs-20260414T233703Z-5b368495",
+  "started_utc": "2026-04-14T23:37:03.511837+00:00",
+  "seeds": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "git_commit": "408ec58",
+  "git_dirty": true,
+  "env": {
+    "python_version": "3.14.3",
+    "python_full_version": "3.14.3 (main, Mar 20 2026, 00:34:32) [Clang 22.1.1 ]",
+    "python_executable": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/.venv/bin/python",
+    "platform": "Linux-5.14.0-570.106.1.el9_6.x86_64-x86_64-with-glibc2.34",
+    "hostname": "della-i21g3",
+    "torch_version": "2.11.0+cu130",
+    "cuda_available": true,
+    "cuda_version": "13.0",
+    "cudnn_version": 91900,
+    "gpu_count": 1,
+    "gpu_names": [
+      "NVIDIA H200"
+    ]
+  },
+  "notes": "\u00a79.2 architecture-aligned structured-mask / SSD experiment on G2 sampled band-RRS contexts. Spectral-only reduced-\u0393 forward with tied weights. Heterogeneity phase-diagram vs theorem-C.",
+  "status": "completed",
+  "finished_utc": "2026-04-15T00:11:47.780393+00:00",
+  "wall_clock_seconds": 2084.2688739299774,
+  "compute_proxy": 2077.343685275002,
+  "measured_compute": null,
+  "per_step_wall_clock": {
+    "n_steps": 120,
+    "mean": 17.311022648341957,
+    "median": 16.705238709000696,
+    "total": 2077.3227178010347
+  },
+  "error": null,
+  "extras": {
+    "nan_count": 0,
+    "stationary_bridge_loss": 0.2804383921063041,
+    "heterogeneity_violations": [
+      {
+        "m": 2,
+        "kappa_lo": 2.0,
+        "kappa_hi": 3.0,
+        "loss_lo": 0.2742849776865042,
+        "loss_hi": 0.2636874871690009
+      },
+      {
+        "m": 2,
+        "kappa_lo": 3.0,
+        "kappa_hi": 5.0,
+        "loss_lo": 0.2636874871690009,
+        "loss_hi": 0.23569579798108195
+      },
+      {
+        "m": 2,
+        "kappa_lo": 5.0,
+        "kappa_hi": 10.0,
+        "loss_lo": 0.23569579798108195,
+        "loss_hi": 0.19206226781481095
+      },
+      {
+        "m": 4,
+        "kappa_lo": 2.0,
+        "kappa_hi": 3.0,
+        "loss_lo": 0.2790350620052568,
+        "loss_hi": 0.2750647425416695
+      },
+      {
+        "m": 4,
+        "kappa_lo": 3.0,
+        "kappa_hi": 5.0,
+        "loss_lo": 0.2750647425416695,
+        "loss_hi": 0.26719658465611823
+      },
+      {
+        "m": 4,
+        "kappa_lo": 5.0,
+        "kappa_hi": 10.0,
+        "loss_lo": 0.26719658465611823,
+        "loss_hi": 0.24675102608869282
+      },
+      {
+        "m": 8,
+        "kappa_lo": 3.0,
+        "kappa_hi": 5.0,
+        "loss_lo": 0.2776938450287919,
+        "loss_hi": 0.27561274589353346
+      },
+      {
+        "m": 8,
+        "kappa_lo": 5.0,
+        "kappa_hi": 10.0,
+        "loss_lo": 0.27561274589353346,
+        "loss_hi": 0.25848807521980616
+      },
+      {
+        "m": 16,
+        "kappa_lo": 2.0,
+        "kappa_hi": 3.0,
+        "loss_lo": 0.27777486755407854,
+        "loss_hi": 0.27749355680110827
+      },
+      {
+        "m": 16,
+        "kappa_lo": 3.0,
+        "kappa_hi": 5.0,
+        "loss_lo": 0.27749355680110827,
+        "loss_hi": 0.27680595801807095
+      }
+    ],
+    "band_size_violations": [
+      {
+        "kappa": 2.0,
+        "m_lo": 1,
+        "m_hi": 2,
+        "loss_lo": 0.277133661620663,
+        "loss_hi": 0.2742849776865042
+      },
+      {
+        "kappa": 2.0,
+        "m_lo": 4,
+        "m_hi": 8,
+        "loss_lo": 0.2790350620052568,
+        "loss_hi": 0.27648865391816324
+      },
+      {
+        "kappa": 3.0,
+        "m_lo": 1,
+        "m_hi": 2,
+        "loss_lo": 0.2793916177482836,
+        "loss_hi": 0.2636874871690009
+      },
+      {
+        "kappa": 3.0,
+        "m_lo": 8,
+        "m_hi": 16,
+        "loss_lo": 0.2776938450287919,
+        "loss_hi": 0.27749355680110827
+      },
+      {
+        "kappa": 5.0,
+        "m_lo": 1,
+        "m_hi": 2,
+        "loss_lo": 0.27858938851153214,
+        "loss_hi": 0.23569579798108195
+      },
+      {
+        "kappa": 10.0,
+        "m_lo": 1,
+        "m_hi": 2,
+        "loss_lo": 0.2779745237497255,
+        "loss_hi": 0.19206226781481095
+      }
+    ],
+    "spearman_rho": -0.7664071190211346,
+    "filter_bridge_rel_err_max": 0.5235202060249167,
+    "block_scalar_records": [
+      {
+        "m": 4.0,
+        "kappa": 3.0,
+        "mean_within_std": 0.02105263929089795,
+        "between_band_means_std": 0.012392690297876064,
+        "ratio": 1.698794917396272
+      },
+      {
+        "m": 4.0,
+        "kappa": 5.0,
+        "mean_within_std": 0.01742874521168942,
+        "between_band_means_std": 0.01059851708376325,
+        "ratio": 1.6444513014363078
+      },
+      {
+        "m": 4.0,
+        "kappa": 10.0,
+        "mean_within_std": 0.01732638122433206,
+        "between_band_means_std": 0.006137658065931664,
+        "ratio": 2.8229629344302696
+      },
+      {
+        "m": 8.0,
+        "kappa": 3.0,
+        "mean_within_std": 0.019562995743583528,
+        "between_band_means_std": 0.00541349191384627,
+        "ratio": 3.613748030831375
+      },
+      {
+        "m": 8.0,
+        "kappa": 5.0,
+        "mean_within_std": 0.019514628453612345,
+        "between_band_means_std": 0.007119387148031713,
+        "ratio": 2.7410545385226768
+      },
+      {
+        "m": 8.0,
+        "kappa": 10.0,
+        "mean_within_std": 0.018988163232260713,
+        "between_band_means_std": 0.0075707050711103655,
+        "ratio": 2.508110282187468
+      },
+      {
+        "m": 16.0,
+        "kappa": 3.0,
+        "mean_within_std": 0.025927393470432773,
+        "between_band_means_std": 0.0036842134113817416,
+        "ratio": 7.037429859609806
+      },
+      {
+        "m": 16.0,
+        "kappa": 5.0,
+        "mean_within_std": 0.020172430298826892,
+        "between_band_means_std": 0.0014132993655031777,
+        "ratio": 14.273289008125246
+      },
+      {
+        "m": 16.0,
+        "kappa": 10.0,
+        "mean_within_std": 0.020190585722073492,
+        "between_band_means_std": 0.0009470192876134597,
+        "ratio": 21.32014203528512
+      }
+    ]
+  }
+}

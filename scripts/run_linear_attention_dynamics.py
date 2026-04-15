@@ -1,3 +1,4 @@
+# run_linear_attention_dynamics.py
 import argparse
 import math
 import sys

@@ -343,10 +343,16 @@ def _plot_rank_floor(
     result: dict[str, Any],
     theory_exponent: float,
     theory_coef: float,
+    theory_asymptotic_exponent: float,
+    theory_asymptotic_coef: float,
     run_dir: ThesisRunDir,
 ) -> None:
     """Primary figure: loss(T, r, L) vs r with analytical floor + theory
-    overlay.
+    overlay.  Two reference lines are drawn: the finite-P analytical slope
+    (black dashed, the tail-sum slope tested by the acceptance gate) and the
+    continuum asymptote ``r^{-νβ}`` (gray dash-dot, the Corollary statement),
+    so the reader can see how the finite-P tail truncation steepens the
+    floor away from the asymptotic exponent.
     """
     import matplotlib.pyplot as plt
 
@@ -371,10 +377,22 @@ def _plot_rank_floor(
         label=r"analytical floor $\Sigma_{k_\star \geq r} \omega_k s_k$",
         linestyle="-.",
     )
+    # Continuum asymptote (Corollary statement): r^{-νβ} (gray dash-dot).
+    overlay_powerlaw(
+        ax, r_arr,
+        coef=theory_asymptotic_coef,
+        exponent=theory_asymptotic_exponent,
+        label=(
+            rf"continuum asymptote $r^{{-\nu\beta}}$ "
+            rf"(exp = {theory_asymptotic_exponent:.2f})"
+        ),
+        style="-.", color="gray", lw=1.2,
+    )
+    # Finite-P analytical tail-sum slope (black dashed).
     overlay_powerlaw(
         ax, r_arr, coef=theory_coef, exponent=theory_exponent,
         label=(
-            rf"theorem-B $r^{{1-(\nu+\nu\beta)}}$ "
+            rf"finite-P analytical slope "
             rf"(exp = {theory_exponent:.2f})"
         ),
         style="--", color="black", lw=1.2,
@@ -382,8 +400,10 @@ def _plot_rank_floor(
     ax.set_xlabel(r"spectral rank $r$")
     ax.set_ylabel(r"matched stationary loss $\mathcal{L}(T, r, L)$")
     ax.set_title(
-        "B4 spectral-rank bottleneck floor (theorem-B pure-spectral shape)",
-        fontsize=11,
+        "B4 spectral-rank bottleneck floor (theorem-B pure-spectral shape)\n"
+        f"P = {cfg.P}; finite-P slope steeper than continuum due to tail "
+        "truncation",
+        fontsize=10,
     )
     ax.legend(fontsize=8, loc="best", frameon=True)
     fig.tight_layout()
@@ -699,6 +719,13 @@ def main() -> int:
             theory_coef = y_anchor * (r_closest ** (-theory_exponent))
         else:
             theory_coef = 1.0
+        # Continuum asymptote anchored through the same midpoint.
+        if y_anchor > 0 and r_closest > 0:
+            theory_asymptotic_coef = y_anchor * (
+                r_closest ** (-theory_asymptotic_exponent)
+            )
+        else:
+            theory_asymptotic_coef = 1.0
 
         # --- Depth collapse at max rank ---
         r_max = max(cfg.r_list)
@@ -712,7 +739,8 @@ def main() -> int:
 
         # --- Figures ---
         _plot_rank_floor(
-            cfg, result, theory_exponent, theory_coef, run
+            cfg, result, theory_exponent, theory_coef,
+            theory_asymptotic_exponent, theory_asymptotic_coef, run,
         )
         _plot_loss_vs_depth_at_fixed_rank(cfg, result, run)
         _plot_joint_rL_grid(cfg, result, run)
