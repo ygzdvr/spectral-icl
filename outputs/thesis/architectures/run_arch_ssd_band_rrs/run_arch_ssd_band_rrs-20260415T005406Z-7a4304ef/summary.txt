@@ -1,0 +1,22 @@
+run_id: run_arch_ssd_band_rrs-20260415T005406Z-7a4304ef
+phase: architectures
+script: run_arch_ssd_band_rrs
+status: completed
+wall_clock_seconds: 2213.030
+compute_proxy: 2204.16
+
+plan_reference: EXPERIMENT_PLAN_FINAL.MD §9.2 (architecture-aligned structured-mask/SSD suite); theorem refs: thesis/theorem_a.txt Proposition 3 (SSD realization); thesis/theorem_c.txt Proposition 4 (grouped closure).
+phase: Phase IV — architecture-aligned validation layer
+category: G2 sampled-context band-RRS with trainable spectral-only reduced-Γ model. NOT an exact theorem verification; qualitative architecture-level pattern matching against theorem-C grouped closure.
+framing: This experiment validates (a) that G2 sampled-context mode works correctly with a trainable model, and (b) that theorem-C grouped-closure predictions hold in the architecture-aligned setting. The spectral-only reduced-Γ model, trained on sampled band-RRS contexts with per-context independent block-Haar rotations, should reproduce the theorem-C phase diagram qualitatively: larger band size m and larger within-band condition number κ create higher spectral-only loss floors. The learned γ should exhibit block-scalar structure at m ≥ 4, κ ≥ 3 (commutant closure manifest at the architecture level).
+architecture: Reduced-Γ GD-compatible forward pass (equivalent to the theorem-A SSD realization). Single tied γ ∈ ℝ^D in the DCT-II spectral basis. Parameter count = D regardless of L. Initialization γ ≡ 0 matches theorem-C γ(0) = 0 boundary.
+task: G2 band-RRS sampled contexts. Per training step, fresh batch of 64 contexts with per-context block-Haar rotations. Block mean λ = 1 uniformly; within-band κ swept. ω ≡ 1. σ = 0 (noiseless). label_norm = sqrt_D.
+device: cuda
+geometry: {'D': 64, 'P': 256, 'K': 32, 'L': 4, 'batch_contexts': 64, 'train_steps': 10000, 'log_every': 100}
+sweep: {'m_list': [1, 2, 4, 8, 16], 'kappa_list': [1.0, 1.5, 2.0, 3.0, 5.0, 10.0], 'seed_list': [0, 1, 2, 3], 'n_cells': 120}
+optimizer: adam
+learning_rate: 0.01
+label_norm: sqrt_D
+status: no_nan_ok+bridge_ok+heterogeneity_FAIL+band_size_FAIL+correlation_ok+filter_bridge_ok+block_scalar_FAIL
+gates: {'no_nan': True, 'nan_count': 0, 'stationary_bridge_loss': 0.015480687231491983, 'stationary_bridge_threshold': 0.1, 'heterogeneity_ok': False, 'n_heterogeneity_violations': 1, 'band_size_ok': False, 'n_band_size_violations': 11, 'spearman_rho': 0.9755283648498332, 'spearman_rho_threshold': 0.3, 'filter_bridge_rel_err_max': 0.21648801155465008, 'filter_bridge_threshold': 0.5, 'block_scalar_ok': False, 'block_scalar_ratio_threshold': 0.3, 'block_scalar_records': [{'m': 4.0, 'kappa': 3.0, 'mean_within_std': 0.013547682649329434, 'between_band_means_std': 0.009460462484518376, 'ratio': 1.432031750191876}, {'m': 4.0, 'kappa': 5.0, 'mean_within_std': 0.014351067382395739, 'between_band_means_std': 0.009389132803248271, 'ratio': 1.528476344208363}, {'m': 4.0, 'kappa': 10.0, 'mean_within_std': 0.015629103984578792, 'between_band_means_std': 0.006387378826435605, 'ratio': 2.4468728737200034}, {'m': 8.0, 'kappa': 3.0, 'mean_within_std': 0.018004767038293575, 'between_band_means_std': 0.005612613445777895, 'ratio': 3.2079114680234593}, {'m': 8.0, 'kappa': 5.0, 'mean_within_std': 0.01498237151687255, 'between_band_means_std': 0.0065131696249684954, 'ratio': 2.300319564753393}, {'m': 8.0, 'kappa': 10.0, 'mean_within_std': 0.0153751733096966, 'between_band_means_std': 0.005520159881953962, 'ratio': 2.7852768105430807}, {'m': 16.0, 'kappa': 3.0, 'mean_within_std': 0.015439577725258603, 'between_band_means_std': 0.0006492010187278334, 'ratio': 23.782429909789446}, {'m': 16.0, 'kappa': 5.0, 'mean_within_std': 0.016675572850114617, 'between_band_means_std': 0.002391575934697752, 'ratio': 6.972629473386168}, {'m': 16.0, 'kappa': 10.0, 'mean_within_std': 0.018018010891845997, 'between_band_means_std': 0.005060775872135785, 'ratio': 3.5603257972856857}]}
+sweep_wallclock_seconds: 2204.158

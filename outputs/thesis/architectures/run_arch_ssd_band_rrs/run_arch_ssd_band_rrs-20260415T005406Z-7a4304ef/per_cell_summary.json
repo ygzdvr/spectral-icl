@@ -1,0 +1,1202 @@
+[
+  {
+    "m": 1,
+    "kappa": 1.0,
+    "seed": 0,
+    "initial_loss": 0.9742803170866718,
+    "final_loss": 0.01523956607725214,
+    "theorem_C_E_star": 4.510512143059498e-111,
+    "nan_failure": false,
+    "train_seconds": 19.41585332498653
+  },
+  {
+    "m": 1,
+    "kappa": 1.0,
+    "seed": 1,
+    "initial_loss": 0.9763018976313982,
+    "final_loss": 0.0159089614447094,
+    "theorem_C_E_star": 4.510512143059498e-111,
+    "nan_failure": false,
+    "train_seconds": 17.037159667990636
+  },
+  {
+    "m": 1,
+    "kappa": 1.0,
+    "seed": 2,
+    "initial_loss": 0.93104061277961,
+    "final_loss": 0.015670851917372733,
+    "theorem_C_E_star": 4.510512143059498e-111,
+    "nan_failure": false,
+    "train_seconds": 17.037480626022443
+  },
+  {
+    "m": 1,
+    "kappa": 1.0,
+    "seed": 3,
+    "initial_loss": 1.0144269423265002,
+    "final_loss": 0.01510336948663366,
+    "theorem_C_E_star": 4.510512143059498e-111,
+    "nan_failure": false,
+    "train_seconds": 17.02401747001568
+  },
+  {
+    "m": 1,
+    "kappa": 1.5,
+    "seed": 0,
+    "initial_loss": 0.9685032311581521,
+    "final_loss": 0.015923209703077045,
+    "theorem_C_E_star": 4.510512143059498e-111,
+    "nan_failure": false,
+    "train_seconds": 17.028667540987954
+  },
+  {
+    "m": 1,
+    "kappa": 1.5,
+    "seed": 1,
+    "initial_loss": 1.0311652688689574,
+    "final_loss": 0.015268758543530367,
+    "theorem_C_E_star": 4.510512143059498e-111,
+    "nan_failure": false,
+    "train_seconds": 17.070719479001127
+  },
+  {
+    "m": 1,
+    "kappa": 1.5,
+    "seed": 2,
+    "initial_loss": 0.985040282788508,
+    "final_loss": 0.016207532610962812,
+    "theorem_C_E_star": 4.510512143059498e-111,
+    "nan_failure": false,
+    "train_seconds": 16.996031219954602
+  },
+  {
+    "m": 1,
+    "kappa": 1.5,
+    "seed": 3,
+    "initial_loss": 0.9427987061060161,
+    "final_loss": 0.016051542482213327,
+    "theorem_C_E_star": 4.510512143059498e-111,
+    "nan_failure": false,
+    "train_seconds": 16.977908861998003
+  },
+  {
+    "m": 1,
+    "kappa": 2.0,
+    "seed": 0,
+    "initial_loss": 1.055931143181558,
+    "final_loss": 0.015415763106820274,
+    "theorem_C_E_star": 4.510512143059498e-111,
+    "nan_failure": false,
+    "train_seconds": 17.022182298009284
+  },
+  {
+    "m": 1,
+    "kappa": 2.0,
+    "seed": 1,
+    "initial_loss": 0.9697418038473519,
+    "final_loss": 0.015597849177225991,
+    "theorem_C_E_star": 4.510512143059498e-111,
+    "nan_failure": false,
+    "train_seconds": 17.00758695002878
+  },
+  {
+    "m": 1,
+    "kappa": 2.0,
+    "seed": 2,
+    "initial_loss": 1.0037556463517128,
+    "final_loss": 0.015731273176266738,
+    "theorem_C_E_star": 4.510512143059498e-111,
+    "nan_failure": false,
+    "train_seconds": 16.99503215099685
+  },
+  {
+    "m": 1,
+    "kappa": 2.0,
+    "seed": 3,
+    "initial_loss": 0.9710663581760278,
+    "final_loss": 0.015618742387263084,
+    "theorem_C_E_star": 4.510512143059498e-111,
+    "nan_failure": false,
+    "train_seconds": 16.99493505503051
+  },
+  {
+    "m": 1,
+    "kappa": 3.0,
+    "seed": 0,
+    "initial_loss": 1.0009239688629719,
+    "final_loss": 0.015495877216703821,
+    "theorem_C_E_star": 4.510512143059498e-111,
+    "nan_failure": false,
+    "train_seconds": 17.00100280501647
+  },
+  {
+    "m": 1,
+    "kappa": 3.0,
+    "seed": 1,
+    "initial_loss": 1.026016721528941,
+    "final_loss": 0.015292552849340063,
+    "theorem_C_E_star": 4.510512143059498e-111,
+    "nan_failure": false,
+    "train_seconds": 16.9845065389527
+  },
+  {
+    "m": 1,
+    "kappa": 3.0,
+    "seed": 2,
+    "initial_loss": 1.0059604922010608,
+    "final_loss": 0.01578115758081274,
+    "theorem_C_E_star": 4.510512143059498e-111,
+    "nan_failure": false,
+    "train_seconds": 17.00969769002404
+  },
+  {
+    "m": 1,
+    "kappa": 3.0,
+    "seed": 3,
+    "initial_loss": 1.018265803393251,
+    "final_loss": 0.01595062633131115,
+    "theorem_C_E_star": 4.510512143059498e-111,
+    "nan_failure": false,
+    "train_seconds": 16.936323739006184
+  },
+  {
+    "m": 1,
+    "kappa": 5.0,
+    "seed": 0,
+    "initial_loss": 1.0431408974751668,
+    "final_loss": 0.015549723896310435,
+    "theorem_C_E_star": 4.510512143059498e-111,
+    "nan_failure": false,
+    "train_seconds": 16.95644103101222
+  },
+  {
+    "m": 1,
+    "kappa": 5.0,
+    "seed": 1,
+    "initial_loss": 0.9709429023982884,
+    "final_loss": 0.01572314416237399,
+    "theorem_C_E_star": 4.510512143059498e-111,
+    "nan_failure": false,
+    "train_seconds": 16.932218348025344
+  },
+  {
+    "m": 1,
+    "kappa": 5.0,
+    "seed": 2,
+    "initial_loss": 1.0101289270600782,
+    "final_loss": 0.01578352206582595,
+    "theorem_C_E_star": 4.510512143059498e-111,
+    "nan_failure": false,
+    "train_seconds": 16.948646057979204
+  },
+  {
+    "m": 1,
+    "kappa": 5.0,
+    "seed": 3,
+    "initial_loss": 1.0306727619305769,
+    "final_loss": 0.01543612844006147,
+    "theorem_C_E_star": 4.510512143059498e-111,
+    "nan_failure": false,
+    "train_seconds": 16.922256560006645
+  },
+  {
+    "m": 1,
+    "kappa": 10.0,
+    "seed": 0,
+    "initial_loss": 1.0085611761167508,
+    "final_loss": 0.015501778792938192,
+    "theorem_C_E_star": 4.510512143059498e-111,
+    "nan_failure": false,
+    "train_seconds": 16.97853435203433
+  },
+  {
+    "m": 1,
+    "kappa": 10.0,
+    "seed": 1,
+    "initial_loss": 0.9693112320473788,
+    "final_loss": 0.015437056433089125,
+    "theorem_C_E_star": 4.510512143059498e-111,
+    "nan_failure": false,
+    "train_seconds": 16.954119657049887
+  },
+  {
+    "m": 1,
+    "kappa": 10.0,
+    "seed": 2,
+    "initial_loss": 1.0072478464128576,
+    "final_loss": 0.015797294635176228,
+    "theorem_C_E_star": 4.510512143059498e-111,
+    "nan_failure": false,
+    "train_seconds": 16.922253242053557
+  },
+  {
+    "m": 1,
+    "kappa": 10.0,
+    "seed": 3,
+    "initial_loss": 0.9527974838986899,
+    "final_loss": 0.016029330647820892,
+    "theorem_C_E_star": 4.510512143059498e-111,
+    "nan_failure": false,
+    "train_seconds": 16.97326245700242
+  },
+  {
+    "m": 2,
+    "kappa": 1.0,
+    "seed": 0,
+    "initial_loss": 0.940309690869812,
+    "final_loss": 0.015642921438173762,
+    "theorem_C_E_star": 4.510512143059498e-111,
+    "nan_failure": false,
+    "train_seconds": 16.846582856960595
+  },
+  {
+    "m": 2,
+    "kappa": 1.0,
+    "seed": 1,
+    "initial_loss": 1.015042496463486,
+    "final_loss": 0.015859063078182804,
+    "theorem_C_E_star": 4.510512143059498e-111,
+    "nan_failure": false,
+    "train_seconds": 16.888132005988155
+  },
+  {
+    "m": 2,
+    "kappa": 1.0,
+    "seed": 2,
+    "initial_loss": 0.9611453173139983,
+    "final_loss": 0.01554842223570603,
+    "theorem_C_E_star": 4.510512143059498e-111,
+    "nan_failure": false,
+    "train_seconds": 16.89600391901331
+  },
+  {
+    "m": 2,
+    "kappa": 1.0,
+    "seed": 3,
+    "initial_loss": 1.0278849527471956,
+    "final_loss": 0.015881754578433566,
+    "theorem_C_E_star": 4.510512143059498e-111,
+    "nan_failure": false,
+    "train_seconds": 16.910304093034938
+  },
+  {
+    "m": 2,
+    "kappa": 1.5,
+    "seed": 0,
+    "initial_loss": 1.0272414943309713,
+    "final_loss": 0.020386496794121814,
+    "theorem_C_E_star": 2.3343499512864516e-06,
+    "nan_failure": false,
+    "train_seconds": 16.919826656987425
+  },
+  {
+    "m": 2,
+    "kappa": 1.5,
+    "seed": 1,
+    "initial_loss": 1.057262460438062,
+    "final_loss": 0.02059820113755239,
+    "theorem_C_E_star": 2.3343499512864516e-06,
+    "nan_failure": false,
+    "train_seconds": 16.87945424503414
+  },
+  {
+    "m": 2,
+    "kappa": 1.5,
+    "seed": 2,
+    "initial_loss": 0.9840856397064345,
+    "final_loss": 0.020524549446455,
+    "theorem_C_E_star": 2.3343499512864516e-06,
+    "nan_failure": false,
+    "train_seconds": 16.859295453992672
+  },
+  {
+    "m": 2,
+    "kappa": 1.5,
+    "seed": 3,
+    "initial_loss": 1.0201304363467711,
+    "final_loss": 0.02053718737170237,
+    "theorem_C_E_star": 2.3343499512864516e-06,
+    "nan_failure": false,
+    "train_seconds": 16.82810129201971
+  },
+  {
+    "m": 2,
+    "kappa": 2.0,
+    "seed": 0,
+    "initial_loss": 1.0225439642078835,
+    "final_loss": 0.028923680294357084,
+    "theorem_C_E_star": 0.00011742038149266525,
+    "nan_failure": false,
+    "train_seconds": 16.819163718027994
+  },
+  {
+    "m": 2,
+    "kappa": 2.0,
+    "seed": 1,
+    "initial_loss": 0.9512066386223939,
+    "final_loss": 0.028833289481284545,
+    "theorem_C_E_star": 0.00011742038149266525,
+    "nan_failure": false,
+    "train_seconds": 16.901116658002138
+  },
+  {
+    "m": 2,
+    "kappa": 2.0,
+    "seed": 2,
+    "initial_loss": 1.010919773571793,
+    "final_loss": 0.028512129342424985,
+    "theorem_C_E_star": 0.00011742038149266525,
+    "nan_failure": false,
+    "train_seconds": 16.869711861014366
+  },
+  {
+    "m": 2,
+    "kappa": 2.0,
+    "seed": 3,
+    "initial_loss": 1.007393545128444,
+    "final_loss": 0.029121068882044587,
+    "theorem_C_E_star": 0.00011742038149266525,
+    "nan_failure": false,
+    "train_seconds": 16.866299418965355
+  },
+  {
+    "m": 2,
+    "kappa": 3.0,
+    "seed": 0,
+    "initial_loss": 0.9428566824506379,
+    "final_loss": 0.04388321331690284,
+    "theorem_C_E_star": 0.0021213286339442647,
+    "nan_failure": false,
+    "train_seconds": 16.81276873900788
+  },
+  {
+    "m": 2,
+    "kappa": 3.0,
+    "seed": 1,
+    "initial_loss": 0.9040165495084137,
+    "final_loss": 0.0435654454434109,
+    "theorem_C_E_star": 0.0021213286339442647,
+    "nan_failure": false,
+    "train_seconds": 16.827270798035897
+  },
+  {
+    "m": 2,
+    "kappa": 3.0,
+    "seed": 2,
+    "initial_loss": 0.9639506780739514,
+    "final_loss": 0.04261747558995435,
+    "theorem_C_E_star": 0.0021213286339442647,
+    "nan_failure": false,
+    "train_seconds": 16.82651420700131
+  },
+  {
+    "m": 2,
+    "kappa": 3.0,
+    "seed": 3,
+    "initial_loss": 0.9840728242986987,
+    "final_loss": 0.04336585084308865,
+    "theorem_C_E_star": 0.0021213286339442647,
+    "nan_failure": false,
+    "train_seconds": 16.84880034404341
+  },
+  {
+    "m": 2,
+    "kappa": 5.0,
+    "seed": 0,
+    "initial_loss": 1.0072527013584673,
+    "final_loss": 0.057811008697672604,
+    "theorem_C_E_star": 0.012163319614893227,
+    "nan_failure": false,
+    "train_seconds": 16.856712434033398
+  },
+  {
+    "m": 2,
+    "kappa": 5.0,
+    "seed": 1,
+    "initial_loss": 1.0163002084866033,
+    "final_loss": 0.057907769100836115,
+    "theorem_C_E_star": 0.012163319614893227,
+    "nan_failure": false,
+    "train_seconds": 16.88572398002725
+  },
+  {
+    "m": 2,
+    "kappa": 5.0,
+    "seed": 2,
+    "initial_loss": 0.9921847103299635,
+    "final_loss": 0.058634362486492994,
+    "theorem_C_E_star": 0.012163319614893227,
+    "nan_failure": false,
+    "train_seconds": 16.91010159900179
+  },
+  {
+    "m": 2,
+    "kappa": 5.0,
+    "seed": 3,
+    "initial_loss": 0.9712824379006779,
+    "final_loss": 0.058042413845063145,
+    "theorem_C_E_star": 0.012163319614893227,
+    "nan_failure": false,
+    "train_seconds": 16.89813480497105
+  },
+  {
+    "m": 2,
+    "kappa": 10.0,
+    "seed": 0,
+    "initial_loss": 0.9628725649474084,
+    "final_loss": 0.05931456010690391,
+    "theorem_C_E_star": 0.027480865630699736,
+    "nan_failure": false,
+    "train_seconds": 16.881613112986088
+  },
+  {
+    "m": 2,
+    "kappa": 10.0,
+    "seed": 1,
+    "initial_loss": 1.0205809314814056,
+    "final_loss": 0.056869864739440654,
+    "theorem_C_E_star": 0.027480865630699736,
+    "nan_failure": false,
+    "train_seconds": 16.91139032097999
+  },
+  {
+    "m": 2,
+    "kappa": 10.0,
+    "seed": 2,
+    "initial_loss": 0.9868575374563961,
+    "final_loss": 0.057111798353453355,
+    "theorem_C_E_star": 0.027480865630699736,
+    "nan_failure": false,
+    "train_seconds": 16.895443870977033
+  },
+  {
+    "m": 2,
+    "kappa": 10.0,
+    "seed": 3,
+    "initial_loss": 1.00212599538785,
+    "final_loss": 0.05820196985024695,
+    "theorem_C_E_star": 0.027480865630699736,
+    "nan_failure": false,
+    "train_seconds": 16.887427307025064
+  },
+  {
+    "m": 4,
+    "kappa": 1.0,
+    "seed": 0,
+    "initial_loss": 0.9723533789365548,
+    "final_loss": 0.016017832625598756,
+    "theorem_C_E_star": 4.510512143059498e-111,
+    "nan_failure": false,
+    "train_seconds": 16.952396685024723
+  },
+  {
+    "m": 4,
+    "kappa": 1.0,
+    "seed": 1,
+    "initial_loss": 0.983159490535415,
+    "final_loss": 0.01599595762820999,
+    "theorem_C_E_star": 4.510512143059498e-111,
+    "nan_failure": false,
+    "train_seconds": 16.966733134002425
+  },
+  {
+    "m": 4,
+    "kappa": 1.0,
+    "seed": 2,
+    "initial_loss": 1.0346415418476629,
+    "final_loss": 0.01574722507365687,
+    "theorem_C_E_star": 4.510512143059498e-111,
+    "nan_failure": false,
+    "train_seconds": 16.966653319017496
+  },
+  {
+    "m": 4,
+    "kappa": 1.0,
+    "seed": 3,
+    "initial_loss": 1.017837102568118,
+    "final_loss": 0.015582641252432135,
+    "theorem_C_E_star": 4.510512143059498e-111,
+    "nan_failure": false,
+    "train_seconds": 16.967553901020437
+  },
+  {
+    "m": 4,
+    "kappa": 1.5,
+    "seed": 0,
+    "initial_loss": 1.0491952183817288,
+    "final_loss": 0.018735043165044315,
+    "theorem_C_E_star": 1.1792463728316565e-06,
+    "nan_failure": false,
+    "train_seconds": 16.942415024968795
+  },
+  {
+    "m": 4,
+    "kappa": 1.5,
+    "seed": 1,
+    "initial_loss": 1.1199085368416046,
+    "final_loss": 0.018721252487201214,
+    "theorem_C_E_star": 1.1792463728316565e-06,
+    "nan_failure": false,
+    "train_seconds": 16.96429068199359
+  },
+  {
+    "m": 4,
+    "kappa": 1.5,
+    "seed": 2,
+    "initial_loss": 1.001568773236443,
+    "final_loss": 0.018817509345317368,
+    "theorem_C_E_star": 1.1792463728316565e-06,
+    "nan_failure": false,
+    "train_seconds": 17.081869893998373
+  },
+  {
+    "m": 4,
+    "kappa": 1.5,
+    "seed": 3,
+    "initial_loss": 1.0028392505938237,
+    "final_loss": 0.01825521644351317,
+    "theorem_C_E_star": 1.1792463728316565e-06,
+    "nan_failure": false,
+    "train_seconds": 17.294726286025252
+  },
+  {
+    "m": 4,
+    "kappa": 2.0,
+    "seed": 0,
+    "initial_loss": 0.9262775935413546,
+    "final_loss": 0.02384752024589553,
+    "theorem_C_E_star": 6.056045354523074e-05,
+    "nan_failure": false,
+    "train_seconds": 17.15344222803833
+  },
+  {
+    "m": 4,
+    "kappa": 2.0,
+    "seed": 1,
+    "initial_loss": 0.9545744001637884,
+    "final_loss": 0.024163980617009785,
+    "theorem_C_E_star": 6.056045354523074e-05,
+    "nan_failure": false,
+    "train_seconds": 16.993707593996078
+  },
+  {
+    "m": 4,
+    "kappa": 2.0,
+    "seed": 2,
+    "initial_loss": 1.0022861236397418,
+    "final_loss": 0.024134295045343132,
+    "theorem_C_E_star": 6.056045354523074e-05,
+    "nan_failure": false,
+    "train_seconds": 16.952135114988778
+  },
+  {
+    "m": 4,
+    "kappa": 2.0,
+    "seed": 3,
+    "initial_loss": 1.0455057869770004,
+    "final_loss": 0.024275486003968377,
+    "theorem_C_E_star": 6.056045354523074e-05,
+    "nan_failure": false,
+    "train_seconds": 17.266996883961838
+  },
+  {
+    "m": 4,
+    "kappa": 3.0,
+    "seed": 0,
+    "initial_loss": 1.0144715277610636,
+    "final_loss": 0.035538644827275936,
+    "theorem_C_E_star": 0.0011551176749957613,
+    "nan_failure": false,
+    "train_seconds": 17.288291681965347
+  },
+  {
+    "m": 4,
+    "kappa": 3.0,
+    "seed": 1,
+    "initial_loss": 0.9310020540793607,
+    "final_loss": 0.036224330300730787,
+    "theorem_C_E_star": 0.0011551176749957613,
+    "nan_failure": false,
+    "train_seconds": 17.228465421998408
+  },
+  {
+    "m": 4,
+    "kappa": 3.0,
+    "seed": 2,
+    "initial_loss": 1.0111103648709199,
+    "final_loss": 0.035610491110792446,
+    "theorem_C_E_star": 0.0011551176749957613,
+    "nan_failure": false,
+    "train_seconds": 16.992800542968325
+  },
+  {
+    "m": 4,
+    "kappa": 3.0,
+    "seed": 3,
+    "initial_loss": 1.0548380201388772,
+    "final_loss": 0.034854104917517045,
+    "theorem_C_E_star": 0.0011551176749957613,
+    "nan_failure": false,
+    "train_seconds": 16.954167525982484
+  },
+  {
+    "m": 4,
+    "kappa": 5.0,
+    "seed": 0,
+    "initial_loss": 1.0649821250313063,
+    "final_loss": 0.05201425695666155,
+    "theorem_C_E_star": 0.007514368711827205,
+    "nan_failure": false,
+    "train_seconds": 16.97360064595705
+  },
+  {
+    "m": 4,
+    "kappa": 5.0,
+    "seed": 1,
+    "initial_loss": 0.9306322738392372,
+    "final_loss": 0.053010111929406925,
+    "theorem_C_E_star": 0.007514368711827205,
+    "nan_failure": false,
+    "train_seconds": 16.945898609992582
+  },
+  {
+    "m": 4,
+    "kappa": 5.0,
+    "seed": 2,
+    "initial_loss": 0.9370699660576991,
+    "final_loss": 0.053108249459963855,
+    "theorem_C_E_star": 0.007514368711827205,
+    "nan_failure": false,
+    "train_seconds": 16.945296938007232
+  },
+  {
+    "m": 4,
+    "kappa": 5.0,
+    "seed": 3,
+    "initial_loss": 1.0379567616399692,
+    "final_loss": 0.05366257392732728,
+    "theorem_C_E_star": 0.007514368711827205,
+    "nan_failure": false,
+    "train_seconds": 16.885908415017184
+  },
+  {
+    "m": 4,
+    "kappa": 10.0,
+    "seed": 0,
+    "initial_loss": 0.9767544607866644,
+    "final_loss": 0.0700952631275483,
+    "theorem_C_E_star": 0.02281094755413733,
+    "nan_failure": false,
+    "train_seconds": 16.905240566993598
+  },
+  {
+    "m": 4,
+    "kappa": 10.0,
+    "seed": 1,
+    "initial_loss": 1.006562353104429,
+    "final_loss": 0.07027498126230869,
+    "theorem_C_E_star": 0.02281094755413733,
+    "nan_failure": false,
+    "train_seconds": 16.92300502199214
+  },
+  {
+    "m": 4,
+    "kappa": 10.0,
+    "seed": 2,
+    "initial_loss": 0.9950455318767769,
+    "final_loss": 0.06963067256941424,
+    "theorem_C_E_star": 0.02281094755413733,
+    "nan_failure": false,
+    "train_seconds": 16.982166611996945
+  },
+  {
+    "m": 4,
+    "kappa": 10.0,
+    "seed": 3,
+    "initial_loss": 0.9349978279660958,
+    "final_loss": 0.06986435342954468,
+    "theorem_C_E_star": 0.02281094755413733,
+    "nan_failure": false,
+    "train_seconds": 17.008087476016954
+  },
+  {
+    "m": 8,
+    "kappa": 1.0,
+    "seed": 0,
+    "initial_loss": 1.0031861761633953,
+    "final_loss": 0.015615507888456564,
+    "theorem_C_E_star": 4.510512143059498e-111,
+    "nan_failure": false,
+    "train_seconds": 17.01932870101882
+  },
+  {
+    "m": 8,
+    "kappa": 1.0,
+    "seed": 1,
+    "initial_loss": 0.9720470429896123,
+    "final_loss": 0.015755789344283518,
+    "theorem_C_E_star": 4.510512143059498e-111,
+    "nan_failure": false,
+    "train_seconds": 16.971301908022724
+  },
+  {
+    "m": 8,
+    "kappa": 1.0,
+    "seed": 2,
+    "initial_loss": 0.984719968532657,
+    "final_loss": 0.015904460703998907,
+    "theorem_C_E_star": 4.510512143059498e-111,
+    "nan_failure": false,
+    "train_seconds": 16.942063444992527
+  },
+  {
+    "m": 8,
+    "kappa": 1.0,
+    "seed": 3,
+    "initial_loss": 1.01543673336886,
+    "final_loss": 0.01566624058842512,
+    "theorem_C_E_star": 4.510512143059498e-111,
+    "nan_failure": false,
+    "train_seconds": 16.93106919794809
+  },
+  {
+    "m": 8,
+    "kappa": 1.5,
+    "seed": 0,
+    "initial_loss": 1.0556857679589515,
+    "final_loss": 0.01779868542948137,
+    "theorem_C_E_star": 6.482130306303831e-07,
+    "nan_failure": false,
+    "train_seconds": 16.985723779012915
+  },
+  {
+    "m": 8,
+    "kappa": 1.5,
+    "seed": 1,
+    "initial_loss": 1.0337148064667563,
+    "final_loss": 0.01823336269292132,
+    "theorem_C_E_star": 6.482130306303831e-07,
+    "nan_failure": false,
+    "train_seconds": 16.995303837000392
+  },
+  {
+    "m": 8,
+    "kappa": 1.5,
+    "seed": 2,
+    "initial_loss": 0.9902772750976081,
+    "final_loss": 0.017945132328053337,
+    "theorem_C_E_star": 6.482130306303831e-07,
+    "nan_failure": false,
+    "train_seconds": 16.976330092991702
+  },
+  {
+    "m": 8,
+    "kappa": 1.5,
+    "seed": 3,
+    "initial_loss": 1.018230578292918,
+    "final_loss": 0.018189250664309008,
+    "theorem_C_E_star": 6.482130306303831e-07,
+    "nan_failure": false,
+    "train_seconds": 16.957508283026982
+  },
+  {
+    "m": 8,
+    "kappa": 2.0,
+    "seed": 0,
+    "initial_loss": 1.082478834423233,
+    "final_loss": 0.022405670080375552,
+    "theorem_C_E_star": 3.505655089901134e-05,
+    "nan_failure": false,
+    "train_seconds": 16.977258534985594
+  },
+  {
+    "m": 8,
+    "kappa": 2.0,
+    "seed": 1,
+    "initial_loss": 1.0434816019975095,
+    "final_loss": 0.02190408292535185,
+    "theorem_C_E_star": 3.505655089901134e-05,
+    "nan_failure": false,
+    "train_seconds": 17.020155390026048
+  },
+  {
+    "m": 8,
+    "kappa": 2.0,
+    "seed": 2,
+    "initial_loss": 0.996489181031058,
+    "final_loss": 0.022666046343371694,
+    "theorem_C_E_star": 3.505655089901134e-05,
+    "nan_failure": false,
+    "train_seconds": 16.938237069000024
+  },
+  {
+    "m": 8,
+    "kappa": 2.0,
+    "seed": 3,
+    "initial_loss": 1.0671553255648663,
+    "final_loss": 0.02249468694311481,
+    "theorem_C_E_star": 3.505655089901134e-05,
+    "nan_failure": false,
+    "train_seconds": 16.979200570029207
+  },
+  {
+    "m": 8,
+    "kappa": 3.0,
+    "seed": 0,
+    "initial_loss": 1.0601452168734666,
+    "final_loss": 0.03256219636817353,
+    "theorem_C_E_star": 0.0007434676014654027,
+    "nan_failure": false,
+    "train_seconds": 17.018556005961727
+  },
+  {
+    "m": 8,
+    "kappa": 3.0,
+    "seed": 1,
+    "initial_loss": 1.0325093529019513,
+    "final_loss": 0.03211738633721827,
+    "theorem_C_E_star": 0.0007434676014654027,
+    "nan_failure": false,
+    "train_seconds": 17.05295520601794
+  },
+  {
+    "m": 8,
+    "kappa": 3.0,
+    "seed": 2,
+    "initial_loss": 1.0272070290108148,
+    "final_loss": 0.03213670166902208,
+    "theorem_C_E_star": 0.0007434676014654027,
+    "nan_failure": false,
+    "train_seconds": 17.045950847968925
+  },
+  {
+    "m": 8,
+    "kappa": 3.0,
+    "seed": 3,
+    "initial_loss": 0.9944343787132888,
+    "final_loss": 0.03198656857064926,
+    "theorem_C_E_star": 0.0007434676014654027,
+    "nan_failure": false,
+    "train_seconds": 16.97325507196365
+  },
+  {
+    "m": 8,
+    "kappa": 5.0,
+    "seed": 0,
+    "initial_loss": 1.0368979347585725,
+    "final_loss": 0.04875907836007946,
+    "theorem_C_E_star": 0.005663216244622504,
+    "nan_failure": false,
+    "train_seconds": 17.010266994009726
+  },
+  {
+    "m": 8,
+    "kappa": 5.0,
+    "seed": 1,
+    "initial_loss": 0.9743376679536013,
+    "final_loss": 0.04881191555873354,
+    "theorem_C_E_star": 0.005663216244622504,
+    "nan_failure": false,
+    "train_seconds": 17.007526224013418
+  },
+  {
+    "m": 8,
+    "kappa": 5.0,
+    "seed": 2,
+    "initial_loss": 0.9853417893227187,
+    "final_loss": 0.04783454466229257,
+    "theorem_C_E_star": 0.005663216244622504,
+    "nan_failure": false,
+    "train_seconds": 17.009034430026077
+  },
+  {
+    "m": 8,
+    "kappa": 5.0,
+    "seed": 3,
+    "initial_loss": 0.9406229803989241,
+    "final_loss": 0.04761904739935337,
+    "theorem_C_E_star": 0.005663216244622504,
+    "nan_failure": false,
+    "train_seconds": 17.006471572967712
+  },
+  {
+    "m": 8,
+    "kappa": 10.0,
+    "seed": 0,
+    "initial_loss": 1.12690505316468,
+    "final_loss": 0.06912161724386867,
+    "theorem_C_E_star": 0.020939464524039036,
+    "nan_failure": false,
+    "train_seconds": 16.99566215102095
+  },
+  {
+    "m": 8,
+    "kappa": 10.0,
+    "seed": 1,
+    "initial_loss": 0.9428254951428282,
+    "final_loss": 0.06864602765878135,
+    "theorem_C_E_star": 0.020939464524039036,
+    "nan_failure": false,
+    "train_seconds": 17.02134598302655
+  },
+  {
+    "m": 8,
+    "kappa": 10.0,
+    "seed": 2,
+    "initial_loss": 1.067654543126991,
+    "final_loss": 0.06842669964443295,
+    "theorem_C_E_star": 0.020939464524039036,
+    "nan_failure": false,
+    "train_seconds": 17.02821097301785
+  },
+  {
+    "m": 8,
+    "kappa": 10.0,
+    "seed": 3,
+    "initial_loss": 1.0226738701032039,
+    "final_loss": 0.06855066562282908,
+    "theorem_C_E_star": 0.020939464524039036,
+    "nan_failure": false,
+    "train_seconds": 16.965953341976274
+  },
+  {
+    "m": 16,
+    "kappa": 1.0,
+    "seed": 0,
+    "initial_loss": 0.9954191108903663,
+    "final_loss": 0.015654134813668362,
+    "theorem_C_E_star": 4.510512143059498e-111,
+    "nan_failure": false,
+    "train_seconds": 16.94991778797703
+  },
+  {
+    "m": 16,
+    "kappa": 1.0,
+    "seed": 1,
+    "initial_loss": 0.9770524164059703,
+    "final_loss": 0.015494062159349013,
+    "theorem_C_E_star": 4.510512143059498e-111,
+    "nan_failure": false,
+    "train_seconds": 16.91415954596596
+  },
+  {
+    "m": 16,
+    "kappa": 1.0,
+    "seed": 2,
+    "initial_loss": 0.9938906132725142,
+    "final_loss": 0.015881961165641105,
+    "theorem_C_E_star": 4.510512143059498e-111,
+    "nan_failure": false,
+    "train_seconds": 16.971827500034124
+  },
+  {
+    "m": 16,
+    "kappa": 1.0,
+    "seed": 3,
+    "initial_loss": 1.0085836238396746,
+    "final_loss": 0.015610939257791622,
+    "theorem_C_E_star": 4.510512143059498e-111,
+    "nan_failure": false,
+    "train_seconds": 16.97123206499964
+  },
+  {
+    "m": 16,
+    "kappa": 1.5,
+    "seed": 0,
+    "initial_loss": 1.019482974093635,
+    "final_loss": 0.01785477221074891,
+    "theorem_C_E_star": 4.392135777107103e-07,
+    "nan_failure": false,
+    "train_seconds": 16.981817436986603
+  },
+  {
+    "m": 16,
+    "kappa": 1.5,
+    "seed": 1,
+    "initial_loss": 0.9649648718040349,
+    "final_loss": 0.01792772000623888,
+    "theorem_C_E_star": 4.392135777107103e-07,
+    "nan_failure": false,
+    "train_seconds": 17.007123938004952
+  },
+  {
+    "m": 16,
+    "kappa": 1.5,
+    "seed": 2,
+    "initial_loss": 0.8670875823767638,
+    "final_loss": 0.01787605209264302,
+    "theorem_C_E_star": 4.392135777107103e-07,
+    "nan_failure": false,
+    "train_seconds": 17.003516570024658
+  },
+  {
+    "m": 16,
+    "kappa": 1.5,
+    "seed": 3,
+    "initial_loss": 1.0038244737738715,
+    "final_loss": 0.01741850783253986,
+    "theorem_C_E_star": 4.392135777107103e-07,
+    "nan_failure": false,
+    "train_seconds": 17.004283585993107
+  },
+  {
+    "m": 16,
+    "kappa": 2.0,
+    "seed": 0,
+    "initial_loss": 0.9952864634101601,
+    "final_loss": 0.021594745468808497,
+    "theorem_C_E_star": 2.4569985567192997e-05,
+    "nan_failure": false,
+    "train_seconds": 16.972836522036232
+  },
+  {
+    "m": 16,
+    "kappa": 2.0,
+    "seed": 1,
+    "initial_loss": 0.9328137654053527,
+    "final_loss": 0.02158781827026021,
+    "theorem_C_E_star": 2.4569985567192997e-05,
+    "nan_failure": false,
+    "train_seconds": 17.059063322027214
+  },
+  {
+    "m": 16,
+    "kappa": 2.0,
+    "seed": 2,
+    "initial_loss": 0.9886662981719956,
+    "final_loss": 0.021744746981414587,
+    "theorem_C_E_star": 2.4569985567192997e-05,
+    "nan_failure": false,
+    "train_seconds": 17.059324987989385
+  },
+  {
+    "m": 16,
+    "kappa": 2.0,
+    "seed": 3,
+    "initial_loss": 0.995417584237524,
+    "final_loss": 0.021738165155422325,
+    "theorem_C_E_star": 2.4569985567192997e-05,
+    "nan_failure": false,
+    "train_seconds": 17.043715801031794
+  },
+  {
+    "m": 16,
+    "kappa": 3.0,
+    "seed": 0,
+    "initial_loss": 0.9338180924881276,
+    "final_loss": 0.030231352061990367,
+    "theorem_C_E_star": 0.000556425572980947,
+    "nan_failure": false,
+    "train_seconds": 17.050320151029155
+  },
+  {
+    "m": 16,
+    "kappa": 3.0,
+    "seed": 1,
+    "initial_loss": 1.0093108996287734,
+    "final_loss": 0.03042940433916962,
+    "theorem_C_E_star": 0.000556425572980947,
+    "nan_failure": false,
+    "train_seconds": 17.045530325034633
+  },
+  {
+    "m": 16,
+    "kappa": 3.0,
+    "seed": 2,
+    "initial_loss": 0.9023285844057962,
+    "final_loss": 0.03065817293133985,
+    "theorem_C_E_star": 0.000556425572980947,
+    "nan_failure": false,
+    "train_seconds": 17.073988873977214
+  },
+  {
+    "m": 16,
+    "kappa": 3.0,
+    "seed": 3,
+    "initial_loss": 1.005400789223844,
+    "final_loss": 0.029831834594876344,
+    "theorem_C_E_star": 0.000556425572980947,
+    "nan_failure": false,
+    "train_seconds": 17.070490832964424
+  },
+  {
+    "m": 16,
+    "kappa": 5.0,
+    "seed": 0,
+    "initial_loss": 1.0658588615834805,
+    "final_loss": 0.04584452745854896,
+    "theorem_C_E_star": 0.0046469830241039015,
+    "nan_failure": false,
+    "train_seconds": 17.07971974799875
+  },
+  {
+    "m": 16,
+    "kappa": 5.0,
+    "seed": 1,
+    "initial_loss": 1.0150859649797823,
+    "final_loss": 0.044818584503838806,
+    "theorem_C_E_star": 0.0046469830241039015,
+    "nan_failure": false,
+    "train_seconds": 17.084366513998248
+  },
+  {
+    "m": 16,
+    "kappa": 5.0,
+    "seed": 2,
+    "initial_loss": 1.0282782819699787,
+    "final_loss": 0.04534235195950228,
+    "theorem_C_E_star": 0.0046469830241039015,
+    "nan_failure": false,
+    "train_seconds": 17.040743397024926
+  },
+  {
+    "m": 16,
+    "kappa": 5.0,
+    "seed": 3,
+    "initial_loss": 1.0384677099367086,
+    "final_loss": 0.04579659555303293,
+    "theorem_C_E_star": 0.0046469830241039015,
+    "nan_failure": false,
+    "train_seconds": 16.980346262978856
+  },
+  {
+    "m": 16,
+    "kappa": 10.0,
+    "seed": 0,
+    "initial_loss": 1.043706184303484,
+    "final_loss": 0.06614994708830216,
+    "theorem_C_E_star": 0.019186946158676443,
+    "nan_failure": false,
+    "train_seconds": 16.99450443999376
+  },
+  {
+    "m": 16,
+    "kappa": 10.0,
+    "seed": 1,
+    "initial_loss": 0.994918003410518,
+    "final_loss": 0.06776031683555275,
+    "theorem_C_E_star": 0.019186946158676443,
+    "nan_failure": false,
+    "train_seconds": 16.93504779797513
+  },
+  {
+    "m": 16,
+    "kappa": 10.0,
+    "seed": 2,
+    "initial_loss": 0.9109234516027761,
+    "final_loss": 0.06674869525418108,
+    "theorem_C_E_star": 0.019186946158676443,
+    "nan_failure": false,
+    "train_seconds": 17.01664935296867
+  },
+  {
+    "m": 16,
+    "kappa": 10.0,
+    "seed": 3,
+    "initial_loss": 1.0809362099525,
+    "final_loss": 0.06729082196070707,
+    "theorem_C_E_star": 0.019186946158676443,
+    "nan_failure": false,
+    "train_seconds": 17.00232482503634
+  }
+]
