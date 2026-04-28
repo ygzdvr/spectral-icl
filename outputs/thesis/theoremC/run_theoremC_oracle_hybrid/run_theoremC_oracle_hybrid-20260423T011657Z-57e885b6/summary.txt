@@ -1,0 +1,28 @@
+run_id: run_theoremC_oracle_hybrid-20260423T011657Z-57e885b6
+phase: theoremC
+script: run_theoremC_oracle_hybrid
+status: completed
+wall_clock_seconds: 18.836
+compute_proxy: 15.3031
+
+plan_reference: EXPERIMENT_PLAN_FINAL.MD §7.6 (C6)
+oracle_hybrid_definition: BINDING: In the exact theorem-C tier, the 'oracle hybrid' is the DIRECT OPTIMIZATION OVER THE REFINED COMMUTANT CLASS — i.e. L_hybrid = oracle_commutant_loss(λ, ω, B_{m/2}, L). It is NOT a learned, estimated, or trained projector. Architecture-aligned experiments (§9) will approximate this theorem-level reference with learned projectors and adaptive modules; that is a separate layer. C6 compares three purely operator-level objects: L_coarse (coarse class), L_hybrid (refined class, = oracle hybrid), L_unconstrained (singleton = attention-only unconstrained = oracle ceiling; ≡ 0 in the matched regime by per-mode q_k = L/λ_k).
+category: operator-level exact theorem-C validation — three-way comparison coarse / refined / unconstrained across (m, κ, L). No learned architecture.
+interpretation: At every (m, κ, L) the three-way ordering L_coarse ≥ L_hybrid ≥ L_unconstrained holds within float eps. The captured fraction F = (L_coarse − L_hybrid) / L_coarse measures the share of the total coarse-to-unconstrained obstruction that the theorem-level oracle hybrid already closes with ONE dyadic refinement step. At m = 2 the refined partition IS the singleton, so F ≡ 1 (hybrid equals unconstrained). At larger coarse block sizes, F ∈ (0, 1) quantifies the diminishing returns of a single refinement step. At κ = 1 (homogeneous blocks) L_coarse ≡ 0 and F is degenerate (reported NaN). Depth enters as a secondary axis; the ordering persists and the captured-fraction map is stable across L.
+not_architecture_comparison: C6 contains NO learned architectures, NO trained networks, NO estimated projectors. Those belong to §9 and will reference C6's L_hybrid as the oracle they must approximate.
+device: cuda
+D: 64
+m_list: [2, 4, 8, 16, 32]
+kappa_list: [1.0, 1.2, 1.5, 2.0, 3.0, 5.0, 10.0]
+L_list: [1, 2, 4, 8, 16]
+L_primary: 4
+status: ordering_ok+oracle_ceiling_ok+captured_fraction_m2_ok
+monotonicity_tol: 1e-07
+oracle_ceiling_tol: 1e-07
+captured_fraction_m2_tol: 0.001
+worst_c_h_neg: -5.2372630487944275e-12
+worst_h_u_neg: -1.0573842846257634e-11
+worst_unconstrained: 2.1580392740705694e-10
+worst_F_m2_from_1: 5.083990249454828e-06
+aggregates_at_L_primary: {'argmax_L_coarse_cell': {'m': 8, 'kappa': 10.0, 'L': 4, 'L_coarse': 0.560020256008645, 'L_hybrid': 0.03726598797156281, 'captured_fraction': 0.9334559999004973}, 'max_captured_fraction_at_L_primary': 0.9999999999960367, 'min_captured_fraction_at_L_primary': 0.9290975141772166}
+sweep_wallclock_seconds: 15.303

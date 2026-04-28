@@ -1,0 +1,32 @@
+run_id: run_theoremC_commutant_closure-20260423T011514Z-343334be
+phase: theoremC
+script: run_theoremC_commutant_closure
+status: completed
+wall_clock_seconds: 27.012
+compute_proxy: 22.5013
+
+plan_reference: EXPERIMENT_PLAN_FINAL.MD §7.1 (C1) and §7.2 (C2)
+category: operator-level exact theorem-C validation — no learned architecture. C1 validates band-RRS commutant closure from symmetric initialization; C2 validates the grouped scalar dynamics against the matrix path. C2 is only interpreted AFTER C1 acceptance passes.
+interpretation: C1: the R-averaged reduced-Γ recursion starting from Γ(0) = 0 preserves the block commutant C(B) exactly at machine precision (float64 eps-scale). The naive per-F-mode recursion (no R-averaging) is tracked alongside as a NEGATIVE CONTROL ONLY — under within-block heterogeneity κ_b > 1 it leaves C(B) by many orders of magnitude, confirming R-averaging is what enforces the theorem-C commutant closure. The MC-Haar consistency diagnostic further confirms that the algebraic commutant projection used by C1 equals the intended band-Haar population average (||MC − alg||_F → 0 as N → ∞ at 1/√N rate). C2: the grouped scalar ODE on q_b(t) agrees to float eps with the block-scalars extracted from the matrix path. C2 is interpreted only AFTER C1 acceptance passes. The effective reduced dynamics is fully captured by a length-n_blocks vector trajectory.
+device: cuda
+D: 64
+partition: {'kind': 'equal', 'm': 8, 'n_blocks': 8, 'sizes': [8, 8, 8, 8, 8, 8, 8, 8]}
+n_L: 4
+L_list: [1, 2, 4, 8]
+T: 5000
+eta: 0.005
+status: c1_commutant_ok+c1_contrast_ok+c2_closure_ok+c1_mc_haar_ok
+commutant_tol: 1e-12
+c2_tol: 1e-12
+naive_contrast_ratio: 100000000.0
+mc_haar_tol: 0.02
+mc_n_samples_list: [100, 1000, 10000, 50000]
+mc_checkpoint_fractions: [0.0, 0.5, 1.0]
+cv_r_max_all: 0.0
+cv_n_final_min: 0.02518692328158036
+q_err_max_all: 5.551115123125783e-17
+mc_worst_at_N_max: 0.00294743483711945
+mc_rows: [{'checkpoint_step': 0, 'checkpoint_fraction': 0.0, 'N': 100, 'L': 4, 'abs_err_frobenius': 0.3318432715501403, 'rel_err_frobenius': 0.0679623753467407, 'alg_norm': 4.8827497546560465, 'seconds': 0.041453851968981326}, {'checkpoint_step': 0, 'checkpoint_fraction': 0.0, 'N': 1000, 'L': 4, 'abs_err_frobenius': 0.10036774277834401, 'rel_err_frobenius': 0.020555577865246172, 'alg_norm': 4.8827497546560465, 'seconds': 0.031594111933372915}, {'checkpoint_step': 0, 'checkpoint_fraction': 0.0, 'N': 10000, 'L': 4, 'abs_err_frobenius': 0.03257531281409792, 'rel_err_frobenius': 0.0066715097948722565, 'alg_norm': 4.8827497546560465, 'seconds': 0.29689121898263693}, {'checkpoint_step': 0, 'checkpoint_fraction': 0.0, 'N': 50000, 'L': 4, 'abs_err_frobenius': 0.014391586727809678, 'rel_err_frobenius': 0.00294743483711945, 'alg_norm': 4.8827497546560465, 'seconds': 1.4732391879661009}, {'checkpoint_step': 2500, 'checkpoint_fraction': 0.5, 'N': 100, 'L': 4, 'abs_err_frobenius': 0.012376102655797767, 'rel_err_frobenius': 0.03457346063206871, 'alg_norm': 0.35796539974706143, 'seconds': 0.0033367800060659647}, {'checkpoint_step': 2500, 'checkpoint_fraction': 0.5, 'N': 1000, 'L': 4, 'abs_err_frobenius': 0.004047394123529543, 'rel_err_frobenius': 0.011306662952311686, 'alg_norm': 0.35796539974706143, 'seconds': 0.031020659022033215}, {'checkpoint_step': 2500, 'checkpoint_fraction': 0.5, 'N': 10000, 'L': 4, 'abs_err_frobenius': 0.0012521086941205974, 'rel_err_frobenius': 0.00349784838145066, 'alg_norm': 0.35796539974706143, 'seconds': 0.2931181350722909}, {'checkpoint_step': 2500, 'checkpoint_fraction': 0.5, 'N': 50000, 'L': 4, 'abs_err_frobenius': 0.0005222285329216534, 'rel_err_frobenius': 0.0014588799176978012, 'alg_norm': 0.35796539974706143, 'seconds': 1.4833466769196093}, {'checkpoint_step': 5000, 'checkpoint_fraction': 1.0, 'N': 100, 'L': 4, 'abs_err_frobenius': 0.0067769826527844185, 'rel_err_frobenius': 0.033322957246397694, 'alg_norm': 0.2033727859947673, 'seconds': 0.0033205789513885975}, {'checkpoint_step': 5000, 'checkpoint_fraction': 1.0, 'N': 1000, 'L': 4, 'abs_err_frobenius': 0.0021837009519963878, 'rel_err_frobenius': 0.010737429500781749, 'alg_norm': 0.2033727859947673, 'seconds': 0.030690863961353898}, {'checkpoint_step': 5000, 'checkpoint_fraction': 1.0, 'N': 10000, 'L': 4, 'abs_err_frobenius': 0.0006800579809104957, 'rel_err_frobenius': 0.003343898632179791, 'alg_norm': 0.2033727859947673, 'seconds': 0.29264457896351814}, {'checkpoint_step': 5000, 'checkpoint_fraction': 1.0, 'N': 50000, 'L': 4, 'abs_err_frobenius': 0.0003275772240788841, 'rel_err_frobenius': 0.001610723000506629, 'alg_norm': 0.2033727859947673, 'seconds': 1.4764563019853085}]
+per_trial: [{'L': 1, 'cv_r_max': 0.0, 'cv_r_final': 0.0, 'cv_n_max': 0.29633540906464667, 'cv_n_final': 0.04706040234456938, 'q_err_max': 0.0}, {'L': 2, 'cv_r_max': 0.0, 'cv_r_final': 0.0, 'cv_n_max': 0.29633540906464667, 'cv_n_final': 0.027475743673348724, 'q_err_max': 0.0}, {'L': 4, 'cv_r_max': 0.0, 'cv_r_final': 0.0, 'cv_n_max': 0.29633540906464667, 'cv_n_final': 0.02518692328158036, 'q_err_max': 0.0}, {'L': 8, 'cv_r_max': 0.0, 'cv_r_final': 0.0, 'cv_n_max': 0.29633540906464667, 'cv_n_final': 0.02526011724659476, 'q_err_max': 5.551115123125783e-17}]
+sweep_wallclock_seconds: 17.042
+mc_diagnostic_wallclock_seconds: 5.459

@@ -907,11 +907,6 @@ def _plot_item1(
                label=r"$\widehat{E}_L(Q)$ (baseline)")
     ax.set_xlabel("U sample index")
     ax.set_ylabel(r"population loss estimate $\widehat{E}_L$")
-    ax.set_title(
-        f"Item 1 — Lemma 3.5 band-rotation invariance (L = {bar['L']}, "
-        f"random Q): paired MC with N = {cfg.item1_n_mc}",
-        fontsize=10,
-    )
     ax.legend(fontsize=8, loc="best", frameon=True)
     fig.tight_layout()
     save_both(fig, run_dir, "item1_lemma35_invariance_bar")
@@ -925,7 +920,7 @@ def _plot_item2(
 ) -> None:
     import matplotlib.pyplot as plt
 
-    L_colors = sequential_colors(len(cfg.L_list), palette="rocket")
+    L_colors = sequential_colors(len(cfg.L_list), palette="mako")
 
     # (i) Loss curves: matrix vs grouped formula.
     fig, ax = plt.subplots(figsize=(6.2, 4.2))
@@ -942,11 +937,6 @@ def _plot_item2(
     ax.set_yscale("log")
     ax.set_xlabel("step t")
     ax.set_ylabel(r"$E_L(Q(t))$")
-    ax.set_title(
-        "Item 2 — matrix loss (colored, solid) vs grouped formula eq. (3.2) "
-        "(dashed black); visually indistinguishable",
-        fontsize=9,
-    )
     ax.legend(fontsize=8, loc="best")
     fig.tight_layout()
     save_both(fig, run_dir, "item2_loss_curves")
@@ -970,11 +960,6 @@ def _plot_item2(
         r"$|E_L^{\mathrm{mat}} - E_L^{\mathrm{grp}}| "
         r"/ |E_L^{\mathrm{mat}}|$"
     )
-    ax.set_title(
-        "Item 2 — relative error between matrix-loss and grouped-formula "
-        "paths (expected ≈ float eps)",
-        fontsize=9,
-    )
     ax.legend(fontsize=8, loc="best")
     fig.tight_layout()
     save_both(fig, run_dir, "item2_relative_error")
@@ -995,7 +980,7 @@ def _plot_item4(
 
     # (a) Singletons — 8 representative modes.
     mode_indices = [int(i) for i in cfg.item4_plot_mode_indices]
-    colors_a = sequential_colors(len(mode_indices), palette="rocket")
+    colors_a = sequential_colors(len(mode_indices), palette="mako")
     gamma_a = item4["singleton"]["gamma_matrix"].numpy()
     q_per_mode = item4["singleton"]["q_per_mode"].numpy()
     for color, k in zip(colors_a, mode_indices):
@@ -1021,7 +1006,7 @@ def _plot_item4(
     axes[0].legend(fontsize=7, loc="best", ncol=2)
 
     # (c) m = 8 — eight block scalars.
-    colors_c = sequential_colors(partition_main.n_blocks, palette="rocket")
+    colors_c = sequential_colors(partition_main.n_blocks, palette="mako")
     q_c_mat = item4["m8"]["q_matrix"].numpy()
     q_c_ode = item4["m8"]["q_ode"].numpy()
     for color, b in zip(colors_c, range(partition_main.n_blocks)):
@@ -1069,12 +1054,7 @@ def _plot_item4(
     )
     axes[2].legend(fontsize=8, loc="best")
 
-    fig.suptitle(
-        "Item 4 — Corollary 3.9 endpoint recovery "
-        f"(L = {cfg.item4_L}):  modewise (M=P) ↔ grouped (M=8) ↔ scalar (M=1)",
-        fontsize=11,
-    )
-    fig.tight_layout(rect=(0, 0, 1, 0.96))
+    fig.tight_layout()
     save_both(fig, run_dir, "item4_endpoint_recovery")
     plt.close(fig)
 
@@ -1106,11 +1086,6 @@ def _plot_item5(
     ax.set_ylabel(
         r"commutant violation $\|\Gamma - \Pi_C(\Gamma)\|_F^2/\|\Gamma\|_F^2$"
     )
-    ax.set_title(
-        f"Item 5 — unequal partition {tuple(partition.sizes)}: "
-        "commutant closure (expected ≈ float eps)",
-        fontsize=10,
-    )
     ax.legend(fontsize=8, loc="best")
     fig.tight_layout()
     save_both(fig, run_dir, "item5_unequal_commutant_trajectory")
@@ -1118,7 +1093,7 @@ def _plot_item5(
 
     # Grouped trajectories.
     n_blocks = partition.n_blocks
-    colors = sequential_colors(n_blocks, palette="rocket")
+    colors = sequential_colors(n_blocks, palette="mako")
     q_mat = item5["q_mat"].numpy()
     q_ode = item5["q_ode"].numpy()
     fig, ax = plt.subplots(figsize=(6.2, 4.2))
@@ -1137,11 +1112,6 @@ def _plot_item5(
     ax.set_yscale("log")
     ax.set_xlabel("step t")
     ax.set_ylabel(r"block scalar $q_b(t)$")
-    ax.set_title(
-        f"Item 5 — unequal partition {tuple(partition.sizes)}: "
-        "matrix $q_b$ (solid) vs grouped ODE (dashed)",
-        fontsize=10,
-    )
     ax.legend(fontsize=7, loc="best", frameon=True)
     fig.tight_layout()
     save_both(fig, run_dir, "item5_unequal_grouped_trajectories")

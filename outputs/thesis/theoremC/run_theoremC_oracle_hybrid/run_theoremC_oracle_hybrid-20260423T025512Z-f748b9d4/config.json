@@ -1,0 +1,46 @@
+{
+  "D": 64,
+  "m_list": [
+    2,
+    4,
+    8,
+    16,
+    32
+  ],
+  "kappa_list": [
+    1.0,
+    1.2,
+    1.5,
+    2.0,
+    3.0,
+    5.0,
+    10.0
+  ],
+  "L_list": [
+    1,
+    2,
+    4,
+    8,
+    16
+  ],
+  "L_primary": 4,
+  "block_mean_lam": 1.0,
+  "block_mean_omega": 1.0,
+  "kappa_omega_matches_lam": true,
+  "xi_shape": "linear",
+  "spectral_basis_kind": "dct2",
+  "line_m": 8,
+  "line_kappa": 3.0,
+  "depth_interaction_kappas": [
+    1.5,
+    3.0,
+    10.0
+  ],
+  "monotonicity_tol": 1e-07,
+  "oracle_ceiling_tol": 1e-07,
+  "captured_fraction_m2_tol": 0.001,
+  "optimizer": "lbfgs",
+  "max_iter": 500,
+  "dtype": "float64",
+  "device": "cuda"
+}

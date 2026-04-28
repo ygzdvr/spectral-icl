@@ -1,0 +1,29 @@
+run_id: run_theoremA_exact_equivalence_full_model-20260420T030327Z-83040235
+phase: theoremA
+script: run_theoremA_exact_equivalence_full_model
+status: completed
+wall_clock_seconds: 105.540
+compute_proxy: 102.618
+
+plan_reference: EXPERIMENT_PLAN_FINAL.MD §8.1 (A1, A1b extension)
+category: exact theorem-A operator-level forward-pass equivalence test — A1b adds the TRUE full-hidden-state aligned structured forward pass (R0) that A1's R1 (iterative reduced recursion) did not exercise. R0 builds the full (P+K)×(P+K) bilinear score from (X, Γ) and applies L explicit residual-stream layer updates with a GD-compatible signed mask, without consuming the GA-generator's (A_S, B_S, T) as inputs. Compared against the same R2 (reduced AB closed form) and R3 (reduced-Γ closed form) used in A1.
+interpretation: If R0 (full model) agrees with R2 (reduced AB) to float64 machine precision, the GA generator's (A_S, B_S, T) outputs are exactly consistent with the forward map of the aligned linear-attention structured mixer in the GD-compatible regime — this is the end-to-end exactness statement theorem A asserts. A1's canonical result remains valid and unchanged; A1b is a strictly additional check closing the full-vs-reduced gap.
+device: cuda
+D_list: [8, 16, 32, 64]
+P_list: [8, 16, 32, 64]
+K_list: [4, 8, 16]
+L_list: [1, 2, 4, 8]
+n_cells: 192
+B: 4
+label_norm: sqrt_D
+Sigma_kind: isotropic
+Omega_kind: isotropic
+Gamma_kind: identity
+mask_kind: gd_compatible
+status: R0_R2_ok+R2_R3_ok
+machine_eps_tol: 1e-10
+worst_R0_R2: 1.025238347441516e-15
+worst_R2_R3: 1.0267610010029903e-15
+worst_R0_R3: 1.4675349532738898e-15
+worst_cell: {'D': 64, 'P': 8, 'K': 16, 'L': 4, 'err_R0_R2': 4.547676472166188e-16, 'err_R2_R3': 1.0267610010029903e-15}
+sweep_wallclock_seconds: 102.618

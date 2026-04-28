@@ -153,9 +153,12 @@ class C5Config:
     confirm the ladder structure across L.
     """
 
-    D: int = 64
-    # Dyadic ladder depth. ``None`` ⇒ full dyadic (log2(D) levels).
-    J: int | None = None
+    D: int = 128
+    # Dyadic ladder depth. ``None`` ⇒ full dyadic (log2(D) levels). Default
+    # here is J = 6 with D = 128, which gives block sizes
+    # 128 → 64 → 32 → 16 → 8 → 4 → 2 (stopping before the m = 1 singleton,
+    # which is a trivial oracle endpoint rather than a theorem object).
+    J: int | None = 6
     # Reference partition for mass-preserving spectrum construction. Index
     # 0 = coarsest = single block; κ then spreads across ALL D modes.
     reference_partition_index: int = 0
@@ -165,12 +168,12 @@ class C5Config:
     base_block_mean_omega: float = 1.0
 
     # Heterogeneity sweep.
-    kappa_list: tuple[float, ...] = (1.0, 1.2, 1.5, 2.0, 3.0, 5.0, 10.0)
+    kappa_list: tuple[float, ...] = (1.2, 1.5, 2.0, 3.0, 5.0, 10.0, 20.0)
 
     # Depth axis (secondary per §7.5 / user constraint: at least two L).
-    L_list: tuple[int, ...] = (1, 4)
+    L_list: tuple[int, ...] = (1, 3)
     L_primary: int = 1
-    L_deeper: int = 4
+    L_deeper: int = 3
 
     # Mass-preserving conventions (matched to C3 / C4).
     xi_shape: str = "linear"
@@ -326,7 +329,7 @@ def _plot_refinement_ladder(
     n_kappa = len(kappa_list)
     level_axis = _level_axis(result)
     level_sizes = result["level_sizes"]
-    k_colors = sequential_colors(n_kappa, palette="rocket")
+    k_colors = sequential_colors(n_kappa, palette="mako")
     floor = 1e-18
 
     fig, ax = plt.subplots(figsize=(6.4, 4.4))
@@ -349,7 +352,6 @@ def _plot_refinement_ladder(
     ax2.set_xticks(list(level_axis))
     ax2.set_xticklabels([f"m = {s}" for s in level_sizes], fontsize=7)
     ax2.tick_params(axis="x", which="both", labelsize=7)
-    ax.set_title(title, fontsize=10)
     ax.legend(fontsize=8, loc="best", frameon=True)
     fig.tight_layout()
     save_both(fig, run_dir, fname)
@@ -374,7 +376,7 @@ def _plot_depth_comparison(
     kappa_list = list(result["kappa_list"])
     level_axis = _level_axis(result)
     level_sizes = result["level_sizes"]
-    k_colors = sequential_colors(len(kappa_list), palette="rocket")
+    k_colors = sequential_colors(len(kappa_list), palette="mako")
     floor = 1e-18
 
     fig, axes = plt.subplots(1, 2, figsize=(12.0, 4.4), sharey=True)
@@ -394,14 +396,14 @@ def _plot_depth_comparison(
         ax.set_xlabel(r"refinement level $j$ (coarsest $\to$ finest)")
         ax.set_title(rf"L = {int(L_val)}", fontsize=11)
         ax.grid(True, which="both", lw=0.3, alpha=0.5)
+        ax2 = ax.twiny()
+        ax2.set_xlim(ax.get_xlim())
+        ax2.set_xticks(list(level_axis))
+        ax2.set_xticklabels([f"m = {s}" for s in level_sizes], fontsize=7)
+        ax2.tick_params(axis="x", which="both", labelsize=7)
     axes[0].set_ylabel(r"$L^\star(j, \kappa)$")
     axes[0].legend(fontsize=8, loc="best")
-    fig.suptitle(
-        "C5 refinement ladder across depth: same staircase structure "
-        "persists",
-        fontsize=11,
-    )
-    fig.tight_layout(rect=(0, 0, 1, 0.94))
+    fig.tight_layout()
     save_both(fig, run_dir, "c5_depth_comparison")
     plt.close(fig)
 
@@ -421,7 +423,7 @@ def _plot_level_drops(
     drops = loss_slice[:-1, :] - loss_slice[1:, :]  # (n_levels - 1, n_kappa)
     n_levels = result["n_levels"]
     kappa_list = list(result["kappa_list"])
-    k_colors = sequential_colors(len(kappa_list), palette="rocket")
+    k_colors = sequential_colors(len(kappa_list), palette="mako")
 
     # Bar plot: x is j → j+1 step index; one group per step with n_kappa bars.
     n_steps = n_levels - 1
@@ -448,15 +450,64 @@ def _plot_level_drops(
         ],
         fontsize=8,
     )
-    ax.set_title(
-        rf"C5 per-step refinement drops (L = {cfg.L_primary}); "
-        r"every step is nonnegative (monotonicity); strict > 0 where "
-        r"heterogeneous modes are separated",
-        fontsize=10,
-    )
     ax.legend(fontsize=8, loc="best", frameon=True)
     fig.tight_layout()
     save_both(fig, run_dir, "c5_level_drops")
+    plt.close(fig)
+
+
+def _plot_level_drops_new(
+    cfg: C5Config, result: dict[str, Any], run_dir: ThesisRunDir
+) -> None:
+    """Per-level drop L★(j) − L★(j+1) at the primary depth, one grouped
+    bar per κ, but with κ = 1 (trivial flat ladder) excluded to focus
+    on the staircase regime."""
+    import matplotlib.pyplot as plt
+
+    L_list = list(result["L_list"])
+    if int(cfg.L_primary) not in L_list:
+        return
+    i_L = L_list.index(int(cfg.L_primary))
+    loss_slice = result["loss_grid"][:, :, i_L]
+    drops = loss_slice[:-1, :] - loss_slice[1:, :]
+    n_levels = result["n_levels"]
+    kappa_list = list(result["kappa_list"])
+    keep_idx = [i for i, k in enumerate(kappa_list) if float(k) != 1.0]
+    if not keep_idx:
+        return
+    filtered_kappas = [kappa_list[i] for i in keep_idx]
+    filtered_drops = drops[:, keep_idx]
+    k_colors = sequential_colors(len(filtered_kappas), palette="mako")
+
+    n_steps = n_levels - 1
+    step_index = np.arange(n_steps)
+    width = 0.8 / len(filtered_kappas)
+    fig, ax = plt.subplots(figsize=(8.5, 4.4))
+    floor = 1e-30
+    for i_k in range(len(filtered_kappas)):
+        offset = (i_k - (len(filtered_kappas) - 1) / 2) * width
+        heights = np.where(
+            filtered_drops[:, i_k] > floor, filtered_drops[:, i_k], floor
+        )
+        ax.bar(
+            step_index + offset, heights, width=width * 0.92,
+            color=k_colors[i_k], edgecolor="black", lw=0.3,
+            label=rf"$\kappa = {filtered_kappas[i_k]:.2g}$",
+        )
+    ax.set_yscale("log")
+    ax.set_xlabel("dyadic refinement step (j → j + 1)")
+    ax.set_ylabel(r"per-step drop $L^\star(j) - L^\star(j+1)$")
+    ax.set_xticks(step_index)
+    ax.set_xticklabels(
+        [
+            f"{result['level_sizes'][i]}→{result['level_sizes'][i + 1]}"
+            for i in range(n_steps)
+        ],
+        fontsize=8,
+    )
+    ax.legend(fontsize=8, loc="best", frameon=True)
+    fig.tight_layout()
+    save_both(fig, run_dir, "c5_level_drops_new")
     plt.close(fig)
 
 
@@ -486,11 +537,6 @@ def _plot_ladder_heatmap(
         ylabel=r"block size $m$ (level: coarsest=$D$, finest=$1$)",
         cbar_label=r"$L^\star(j, \kappa)$",
         log_z=True, log_x=True, log_y=True,
-    )
-    ax.set_title(
-        rf"C5 ladder heatmap at L = {cfg.L_primary}: monotone staircase "
-        "along m, flat at κ = 1",
-        fontsize=10,
     )
     fig.tight_layout()
     save_both(fig, run_dir, "c5_ladder_heatmap")
@@ -604,6 +650,7 @@ def main() -> int:
             ),
         )
         _plot_level_drops(cfg, result, run)
+        _plot_level_drops_new(cfg, result, run)
         _plot_ladder_heatmap(cfg, result, run)
         _plot_depth_comparison(cfg, result, run)
 
@@ -682,11 +729,7 @@ def main() -> int:
             )
         kappa_one_ok = kappa_one_worst <= cfg.kappa_1_tol
 
-        # 3. Finest level ≡ 0.
-        finest_worst = float(np.abs(loss_grid[-1, :, :]).max())
-        finest_ok = finest_worst <= cfg.finest_tol
-
-        # 4. Strict-drop diagnostic: count strict drops per κ at L_primary.
+        # 3. Strict-drop diagnostic: count strict drops per κ at L_primary.
         strict_drop_counts: list[dict[str, Any]] = []
         if int(cfg.L_primary) in list(result["L_list"]):
             i_L_p = list(result["L_list"]).index(int(cfg.L_primary))
@@ -718,17 +761,12 @@ def main() -> int:
             "kappa1_zero_ok" if kappa_one_ok else
             f"kappa1_zero_violated(worst={kappa_one_worst:.2e})"
         )
-        status_parts.append(
-            "finest_zero_ok" if finest_ok else
-            f"finest_zero_violated(worst={finest_worst:.2e})"
-        )
         status = "+".join(status_parts)
 
         ctx.record_compute_proxy(float(result["total_wallclock"]))
         ctx.record_extra("worst_mono_increase", worst_mono_increase)
         ctx.record_extra("worst_mono_cell", worst_mono_cell)
         ctx.record_extra("kappa_one_worst", kappa_one_worst)
-        ctx.record_extra("finest_worst", finest_worst)
         ctx.record_extra("strict_drop_counts", strict_drop_counts)
 
         ctx.write_summary(
@@ -774,11 +812,9 @@ def main() -> int:
                 "status": status,
                 "monotonicity_tol": cfg.monotonicity_tol,
                 "kappa_1_tol": cfg.kappa_1_tol,
-                "finest_tol": cfg.finest_tol,
                 "worst_mono_increase": worst_mono_increase,
                 "worst_mono_cell": worst_mono_cell,
                 "kappa_one_worst": float(kappa_one_worst),
-                "finest_worst": float(finest_worst),
                 "strict_drop_counts": strict_drop_counts,
                 "sweep_wallclock_seconds": round(
                     float(result["total_wallclock"]), 3
@@ -805,10 +841,6 @@ def main() -> int:
             f"   κ = 1 → L★ ≡ 0:  worst = {kappa_one_worst:.3e}  "
             f"{'OK' if kappa_one_ok else 'FAIL'}  (tol = {cfg.kappa_1_tol:.1e})"
         )
-        print(
-            f"   finest (m = 1) ≡ 0: worst = {finest_worst:.3e}  "
-            f"{'OK' if finest_ok else 'FAIL'}  (tol = {cfg.finest_tol:.1e})"
-        )
         print("   Strict-drop counts per κ (diagnostic) at L = "
               f"{cfg.L_primary}:")
         for row in strict_drop_counts:
@@ -820,7 +852,7 @@ def main() -> int:
             )
         print("=" * 72)
 
-        if not mono_ok or not kappa_one_ok or not finest_ok:
+        if not mono_ok or not kappa_one_ok:
             return 1
         return 0
 

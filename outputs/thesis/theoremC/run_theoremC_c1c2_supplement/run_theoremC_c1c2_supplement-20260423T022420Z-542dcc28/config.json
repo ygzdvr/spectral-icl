@@ -1,0 +1,112 @@
+{
+  "D": 64,
+  "main_partition_m": 8,
+  "block_means_lam": [
+    1.0,
+    0.9,
+    0.8,
+    0.7,
+    0.6,
+    0.5,
+    0.4,
+    0.3
+  ],
+  "block_kappas_lam": [
+    2.0,
+    2.0,
+    2.0,
+    2.0,
+    2.0,
+    2.0,
+    2.0,
+    2.0
+  ],
+  "block_means_omega": [
+    1.0,
+    0.95,
+    0.9,
+    0.85,
+    0.8,
+    0.75,
+    0.7,
+    0.65
+  ],
+  "block_kappas_omega": [
+    2.0,
+    2.0,
+    2.0,
+    2.0,
+    2.0,
+    2.0,
+    2.0,
+    2.0
+  ],
+  "xi_shape": "linear",
+  "spectral_basis_kind": "dct2",
+  "L_list": [
+    1,
+    2,
+    4,
+    8
+  ],
+  "T": 5000,
+  "eta": 0.005,
+  "item1_n_U": 20,
+  "item1_n_mc": 10000,
+  "item1_mc_batch": 500,
+  "item1_tol_sigmas": 5.0,
+  "item1_seed": 12345,
+  "item1_random_Q_norm": 1.0,
+  "item1_figure_L": 4,
+  "n_checkpoints": 50,
+  "item4_L": 4,
+  "item4_plot_mode_indices": [
+    0,
+    8,
+    16,
+    24,
+    32,
+    40,
+    48,
+    56
+  ],
+  "item5_block_sizes": [
+    4,
+    4,
+    8,
+    16,
+    32
+  ],
+  "item5_block_means_lam": [
+    1.0,
+    0.85,
+    0.7,
+    0.55,
+    0.4
+  ],
+  "item5_block_kappas_lam": [
+    2.0,
+    2.0,
+    2.0,
+    2.0,
+    2.0
+  ],
+  "item5_block_means_omega": [
+    1.0,
+    0.9,
+    0.8,
+    0.7,
+    0.6
+  ],
+  "item5_block_kappas_omega": [
+    2.0,
+    2.0,
+    2.0,
+    2.0,
+    2.0
+  ],
+  "item5_L": 4,
+  "tol_exact": 1e-12,
+  "dtype": "float64",
+  "device": "cuda"
+}

@@ -1,0 +1,133 @@
+{
+  "run_id": "cleanup-20260423T014734Z-be1e5598",
+  "script_stem": "cleanup",
+  "phase": "theoremC",
+  "root": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremC/cleanup/cleanup-20260423T014734Z-be1e5598",
+  "started_utc": "2026-04-23T01:47:34.881829+00:00",
+  "seeds": [
+    0
+  ],
+  "git_commit": "811d1f0",
+  "git_dirty": true,
+  "env": {
+    "python_version": "3.14.3",
+    "python_full_version": "3.14.3 (main, Mar 20 2026, 00:34:32) [Clang 22.1.1 ]",
+    "python_executable": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/.venv/bin/python",
+    "platform": "Linux-5.14.0-570.106.1.el9_6.x86_64-x86_64-with-glibc2.34",
+    "hostname": "della-gpu.princeton.edu",
+    "torch_version": "2.11.0+cu130",
+    "cuda_available": true,
+    "cuda_version": "13.0",
+    "cudnn_version": 91900,
+    "gpu_count": 1,
+    "gpu_names": [
+      "NVIDIA A100-PCIE-40GB"
+    ]
+  },
+  "notes": "Theorem-C cleanup: hatched zero-region heatmaps for C3, C4, C5; inactive-block Cor 3.11 edge case; \u03ba-monotonicity artifact note.",
+  "status": "completed",
+  "finished_utc": "2026-04-23T01:47:45.926732+00:00",
+  "wall_clock_seconds": 11.045409440994263,
+  "compute_proxy": null,
+  "measured_compute": null,
+  "per_step_wall_clock": {
+    "n_steps": 3,
+    "mean": 3.6218433143221773,
+    "median": 4.844907274993602,
+    "total": 10.865529942966532
+  },
+  "error": null,
+  "extras": {
+    "item1_regenerated": {
+      "cleaned_c3_obstruction_heatmap": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremC/cleanup/cleanup-20260423T014734Z-be1e5598/figures/cleaned_c3_obstruction_heatmap.png",
+      "cleaned_c3_obstruction_heatmap_from_patch": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremC/cleanup/cleanup-20260423T014734Z-be1e5598/figures/cleaned_c3_obstruction_heatmap_from_patch.png",
+      "cleaned_c4_phase_diagram_main": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremC/cleanup/cleanup-20260423T014734Z-be1e5598/figures/cleaned_c4_phase_diagram_main.png",
+      "cleaned_c5_ladder_heatmap": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremC/cleanup/cleanup-20260423T014734Z-be1e5598/figures/cleaned_c5_ladder_heatmap.png"
+    },
+    "item2": {
+      "D": 64,
+      "m": 8,
+      "n_blocks": 8,
+      "kappa": 3.0,
+      "inactive_block_idx": 0,
+      "inactive_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "probes": [
+        {
+          "q_b": -10.0,
+          "block_loss_L1": 0.0,
+          "ok": true
+        },
+        {
+          "q_b": 0.0,
+          "block_loss_L1": 0.0,
+          "ok": true
+        },
+        {
+          "q_b": 1.0,
+          "block_loss_L1": 0.0,
+          "ok": true
+        },
+        {
+          "q_b": 100.0,
+          "block_loss_L1": 0.0,
+          "ok": true
+        }
+      ],
+      "max_probe_loss": 0.0,
+      "probes_ok": true,
+      "cf_total_loss": 4.337167957429482,
+      "cf_per_block_loss": [
+        0.0,
+        0.619595422489926,
+        0.619595422489926,
+        0.619595422489926,
+        0.619595422489926,
+        0.619595422489926,
+        0.619595422489926,
+        0.619595422489926
+      ],
+      "cf_inactive_contribution": 0.0,
+      "cf_inactive_zero_ok": true,
+      "numerical_total_loss": 4.337167957429497,
+      "cf_vs_num_abs_err": 1.4210854715202004e-14,
+      "cf_vs_num_rel_err": 3.2765285676472577e-15,
+      "cf_vs_num_ok": true,
+      "inactive_block_zero_ok": true
+    },
+    "item3": {
+      "c3_npz_found": true,
+      "violations_only_at_m2": true,
+      "m_all_gte_4_monotonic": true,
+      "violation_m_values": [
+        2
+      ],
+      "violations": [
+        {
+          "m": 2,
+          "kappa_prev": 3.0,
+          "kappa_curr": 5.0,
+          "L_prev": 3.5121951219512226,
+          "L_curr": 2.271920482783102,
+          "drop": 1.2402746391681205
+        },
+        {
+          "m": 2,
+          "kappa_prev": 5.0,
+          "kappa_curr": 10.0,
+          "L_prev": 2.271920482783102,
+          "L_curr": 0.8567738267495315,
+          "drop": 1.4151466560335706
+        }
+      ]
+    }
+  }
+}

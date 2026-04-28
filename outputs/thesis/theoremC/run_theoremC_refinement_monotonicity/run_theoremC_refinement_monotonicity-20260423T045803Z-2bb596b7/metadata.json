@@ -1,0 +1,92 @@
+{
+  "run_id": "run_theoremC_refinement_monotonicity-20260423T045803Z-2bb596b7",
+  "script_stem": "run_theoremC_refinement_monotonicity",
+  "phase": "theoremC",
+  "root": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremC/run_theoremC_refinement_monotonicity/run_theoremC_refinement_monotonicity-20260423T045803Z-2bb596b7",
+  "started_utc": "2026-04-23T04:58:03.149883+00:00",
+  "seeds": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "git_commit": "811d1f0",
+  "git_dirty": true,
+  "env": {
+    "python_version": "3.14.3",
+    "python_full_version": "3.14.3 (main, Mar 20 2026, 00:34:32) [Clang 22.1.1 ]",
+    "python_executable": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/.venv/bin/python",
+    "platform": "Linux-5.14.0-570.106.1.el9_6.x86_64-x86_64-with-glibc2.34",
+    "hostname": "della-gpu.princeton.edu",
+    "torch_version": "2.11.0+cu130",
+    "cuda_available": true,
+    "cuda_version": "13.0",
+    "cudnn_version": 91900,
+    "gpu_count": 1,
+    "gpu_names": [
+      "NVIDIA A100-PCIE-40GB"
+    ]
+  },
+  "notes": "C5 theorem-C refinement monotonicity ladder. Operator-level exact optimization only; no learned architectures. Extends C4's one-step dyadic gain to a full multi-level ladder.",
+  "status": "completed",
+  "finished_utc": "2026-04-23T04:58:28.409059+00:00",
+  "wall_clock_seconds": 25.25857925415039,
+  "compute_proxy": 17.968966911023017,
+  "measured_compute": null,
+  "per_step_wall_clock": {
+    "n_steps": 0,
+    "mean": null,
+    "median": null,
+    "total": null
+  },
+  "error": null,
+  "extras": {
+    "worst_mono_increase": 0.0,
+    "worst_mono_cell": null,
+    "kappa_one_worst": 0.0,
+    "strict_drop_counts": [
+      {
+        "kappa": 1.2,
+        "L_star_0": 0.35515939850648653,
+        "strict_drops": 6,
+        "total_steps": 6
+      },
+      {
+        "kappa": 1.5,
+        "L_star_0": 1.6654198177380395,
+        "strict_drops": 6,
+        "total_steps": 6
+      },
+      {
+        "kappa": 2.0,
+        "L_star_0": 4.327698858744485,
+        "strict_drops": 6,
+        "total_steps": 6
+      },
+      {
+        "kappa": 3.0,
+        "L_star_0": 8.683593362912152,
+        "strict_drops": 6,
+        "total_steps": 6
+      },
+      {
+        "kappa": 5.0,
+        "L_star_0": 13.605634298273259,
+        "strict_drops": 6,
+        "total_steps": 6
+      },
+      {
+        "kappa": 10.0,
+        "L_star_0": 18.818817990692793,
+        "strict_drops": 6,
+        "total_steps": 6
+      },
+      {
+        "kappa": 20.0,
+        "L_star_0": 23.255902186464155,
+        "strict_drops": 6,
+        "total_steps": 6
+      }
+    ]
+  }
+}

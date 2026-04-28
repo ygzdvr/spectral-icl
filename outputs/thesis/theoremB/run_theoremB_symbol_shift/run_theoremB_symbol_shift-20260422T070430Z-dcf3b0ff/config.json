@@ -1,0 +1,89 @@
+{
+  "P": 64,
+  "L_list": [
+    1,
+    2,
+    4,
+    8,
+    16
+  ],
+  "T": 100000,
+  "eta": 5e-05,
+  "base_symbol_kind": "power_law",
+  "power_law_nu": 0.5,
+  "task_spec_nu_beta": 1.0,
+  "multiband": [
+    [
+      0,
+      2,
+      1.0
+    ],
+    [
+      5,
+      7,
+      0.8
+    ]
+  ],
+  "f1_target_kind": "flat",
+  "f1_target_params_flat_value": 1.0,
+  "f1_target_params_power_law_nu": 0.0,
+  "f1_target_params_multiband": [
+    [
+      0,
+      4,
+      1.0
+    ]
+  ],
+  "f1_alphas": [
+    0.0,
+    0.02,
+    0.05,
+    0.1,
+    0.15,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.65,
+    0.8,
+    1.0
+  ],
+  "f2_perm_seeds": [
+    17,
+    23,
+    31,
+    41,
+    47,
+    53,
+    61,
+    71
+  ],
+  "f2_alphas": [
+    0.0,
+    0.02,
+    0.05,
+    0.1,
+    0.15,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.65,
+    0.8,
+    1.0
+  ],
+  "query_mode": "full_window",
+  "matched_query_realization": "independent",
+  "matched_baseline_tol": 1e-10,
+  "brittleness_alpha": 1.0,
+  "brittleness_ratio_min": 1.25,
+  "symbol_samples_alphas": [
+    0.0,
+    0.1,
+    0.3,
+    0.5,
+    1.0
+  ],
+  "dtype": "float64",
+  "device": "cuda"
+}

@@ -393,7 +393,7 @@ def _plot_three_way_heatmap(
     )
     _overlay_log_contours(axes[1], k_arr, m_arr, lh_plot)
     axes[1].set_title(
-        r"(b) oracle hybrid $L_{\mathrm{hybrid}}$ — refined commutant, "
+        r"(b) oracle hybrid $L_{\mathrm{hybrid}}$, refined commutant, "
         r"NOT learned",
         fontsize=10,
     )
@@ -412,25 +412,26 @@ def _plot_three_way_heatmap(
         r"captured fraction $F = (L_{\mathrm{coarse}} - L_{\mathrm{hybrid}})"
         r" / L_{\mathrm{coarse}}$"
     )
-    # Overlay F contours at 0.25 / 0.5 / 0.75 / 0.9 / 0.99.
-    levels = (0.25, 0.5, 0.75, 0.9, 0.99)
-    X, Y = np.meshgrid(k_arr, m_arr)
-    cs = axes[2].contour(
-        X, Y, F_plot, levels=levels, colors="white", linewidths=0.8, alpha=0.85,
-    )
-    axes[2].clabel(cs, cs.levels, fontsize=6, inline=True, fmt="%.2f")
+    # Data-adaptive F contour levels: in the matched regime F saturates
+    # near 1 across most of the grid, so fixed levels at 0.25/0.5/0.75
+    # fall below the observed minimum and draw no lines.
+    F_finite = F_plot[np.isfinite(F_plot) & (F_plot > 0.0)]
+    if F_finite.size > 0:
+        f_levels = tuple(np.unique(np.quantile(F_finite, (0.2, 0.4, 0.6, 0.8))))
+        if len(f_levels) >= 2:
+            X, Y = np.meshgrid(k_arr, m_arr)
+            cs = axes[2].contour(
+                X, Y, F_plot, levels=f_levels,
+                colors="white", linewidths=0.8, alpha=0.85,
+            )
+            axes[2].clabel(cs, cs.levels, fontsize=6, inline=True, fmt="%.3f")
     axes[2].set_title(
-        "(c) captured fraction $F$ — share of total gap to "
+        "(c) captured fraction $F$, share of total gap to "
         "unconstrained oracle",
         fontsize=10,
     )
 
-    fig.suptitle(
-        rf"C6 oracle hybrid three-way comparison (L = {cfg.L_primary}); "
-        r"oracle hybrid = refined commutant, not a learned projector",
-        fontsize=11,
-    )
-    fig.tight_layout(rect=(0, 0, 1, 0.95))
+    fig.tight_layout()
     save_both(fig, run_dir, "c6_three_way_heatmap")
     plt.close(fig)
 
@@ -459,13 +460,15 @@ def _plot_three_way_slices(
     L_hybrid = result["L_hybrid"]
     L_unc = result["L_unconstrained"]
 
+    mako3 = sequential_colors(3, palette="mako")
+
     fig, axes = plt.subplots(1, 2, figsize=(11.8, 4.4))
 
     # Left panel: vs κ at fixed m.
     ax = axes[0]
     k_arr = np.asarray(kappa_list, dtype=float)
     floor = 1e-18
-    for arr, label, style in (
+    for color, (arr, label, style) in zip(mako3, (
         (L_coarse[i_m_line, :, i_L],
          rf"$L_{{\mathrm{{coarse}}}}$ ($m = {cfg.line_m}$)", "-"),
         (L_hybrid[i_m_line, :, i_L],
@@ -473,9 +476,12 @@ def _plot_three_way_slices(
          "--"),
         (L_unc[i_m_line, :, i_L],
          r"$L_{\mathrm{unconstrained}}$ (singleton)", ":"),
-    ):
+    )):
         y = np.where(arr > floor, arr, floor)
-        ax.plot(k_arr, y, lw=1.5, marker="o", ms=4.0, ls=style, label=label)
+        ax.plot(
+            k_arr, y, color=color, lw=1.5, marker="o", ms=4.0,
+            ls=style, label=label,
+        )
     ax.set_xscale("log")
     ax.set_yscale("log")
     ax.set_xlabel(r"within-block heterogeneity $\kappa$")
@@ -489,16 +495,19 @@ def _plot_three_way_slices(
     # Right panel: vs m at fixed κ.
     ax = axes[1]
     m_arr = np.asarray(m_list, dtype=float)
-    for arr, label, style in (
+    for color, (arr, label, style) in zip(mako3, (
         (L_coarse[:, i_k_line, i_L],
          rf"$L_{{\mathrm{{coarse}}}}$ ($\kappa = {cfg.line_kappa}$)", "-"),
         (L_hybrid[:, i_k_line, i_L],
          rf"$L_{{\mathrm{{hybrid}}}}$ (refined to $m/2$)", "--"),
         (L_unc[:, i_k_line, i_L],
          r"$L_{\mathrm{unconstrained}}$ (singleton)", ":"),
-    ):
+    )):
         y = np.where(arr > floor, arr, floor)
-        ax.plot(m_arr, y, lw=1.5, marker="o", ms=4.0, ls=style, label=label)
+        ax.plot(
+            m_arr, y, color=color, lw=1.5, marker="o", ms=4.0,
+            ls=style, label=label,
+        )
     ax.set_xscale("log")
     ax.set_yscale("log")
     ax.set_xlabel(r"coarse block size $m$")
@@ -509,12 +518,7 @@ def _plot_three_way_slices(
     )
     ax.legend(fontsize=8, loc="best")
 
-    fig.suptitle(
-        "C6 three-way comparison: coarse ≥ hybrid ≥ unconstrained; "
-        "hybrid is the REFINED COMMUTANT OPTIMUM (not a learned projector)",
-        fontsize=11,
-    )
-    fig.tight_layout(rect=(0, 0, 1, 0.94))
+    fig.tight_layout()
     save_both(fig, run_dir, "c6_three_way_slices")
     plt.close(fig)
 
@@ -569,12 +573,7 @@ def _plot_captured_fraction_depth(
         ax.clabel(cs, cs.levels, fontsize=6, inline=True, fmt="%.2f")
         ax.set_title(rf"$\kappa = {k_target:.2g}$", fontsize=10)
 
-    fig.suptitle(
-        "C6 captured fraction F across (m, L) per κ — "
-        "how much of the gap the oracle hybrid captures",
-        fontsize=11,
-    )
-    fig.tight_layout(rect=(0, 0, 1, 0.94))
+    fig.tight_layout()
     save_both(fig, run_dir, "c6_captured_fraction_depth")
     plt.close(fig)
 

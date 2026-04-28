@@ -554,7 +554,7 @@ def _plot_c1_commutant_trajectory(
     paths, across depths."""
     import matplotlib.pyplot as plt
 
-    L_colors = sequential_colors(len(cfg.L_list), palette="rocket")
+    L_colors = sequential_colors(len(cfg.L_list), palette="mako")
     fig, axes = plt.subplots(1, 2, figsize=(11.2, 4.0), sharey=True)
 
     t_axis = np.arange(0, cfg.T + 1, dtype=float)
@@ -562,8 +562,8 @@ def _plot_c1_commutant_trajectory(
     floor = cfg.commutant_tol * 1e-3
 
     for ax, key, title in (
-        (axes[0], "cv_r", "C1 R-averaged: commutant violation (expected ≈ float eps)"),
-        (axes[1], "cv_n", "C1 diagnostic: naive per-F-mode (expected grows; not theorem-C)"),
+        (axes[0], "cv_r", "R-averaged: commutant violation (expected ≈ float eps)"),
+        (axes[1], "cv_n", "diagnostic: naive per-F-mode (expected grows; not theorem-C)"),
     ):
         for color, trial in zip(L_colors, trials):
             cv = trial[key].numpy()
@@ -608,18 +608,18 @@ def _plot_c1_grouped_operator_heatmap(
     Gamma_r = np.diag(gamma_r_final)
     Gamma_n = np.diag(gamma_n_final)
 
+    L_val = int(cfg.heatmap_L)
+    panel_titles = (
+        rf"R-averaged $\Gamma(T)$, block-scalar by construction (L = {L_val})",
+        r"Naive per-F-mode $\Gamma(T)$, showing within-block variation",
+    )
     fig, axes = plt.subplots(1, 2, figsize=(11.5, 4.2))
-    for ax, M, title in (
-        (axes[0], Gamma_r,
-         f"C1 R-averaged Γ(T) — block-scalar by construction (L = {cfg.heatmap_L})"),
-        (axes[1], Gamma_n,
-         f"C1 naive per-F-mode Γ(T) — shows within-block variation"),
-    ):
+    for ax, M, title in zip(axes, (Gamma_r, Gamma_n), panel_titles):
         vmax = float(np.abs(M).max())
         if vmax == 0:
             vmax = 1.0
         im = ax.imshow(
-            M, aspect="equal", cmap="rocket_r", vmin=0.0, vmax=vmax,
+            M, aspect="equal", cmap="mako_r", vmin=0.0, vmax=vmax,
             interpolation="nearest",
         )
         # Overlay block boundaries.
@@ -632,9 +632,9 @@ def _plot_c1_grouped_operator_heatmap(
             ax.axhline(hi, color="white", lw=0.6)
             ax.axvline(lo, color="white", lw=0.6)
             ax.axhline(lo, color="white", lw=0.6)
-        ax.set_title(title, fontsize=10)
         ax.set_xlabel("index k")
         ax.set_ylabel("index k")
+        ax.set_title(title)
         fig.colorbar(im, ax=ax, fraction=0.045, pad=0.04)
     fig.tight_layout()
     save_both(fig, run_dir, "c1_grouped_operator_heatmap")
@@ -659,7 +659,7 @@ def _plot_c2_grouped_trajectories(
     q_ode = trial["q_ode"].numpy()
 
     n_blocks = partition.n_blocks
-    colors = sequential_colors(n_blocks, palette="rocket")
+    colors = sequential_colors(n_blocks, palette="mako")
     t_axis = np.arange(1, cfg.T + 1, dtype=float)  # skip t=0 for log
     fig, ax = plt.subplots(figsize=(6.2, 4.2))
     for b in range(n_blocks):
@@ -679,11 +679,6 @@ def _plot_c2_grouped_trajectories(
     ax.set_yscale("log")
     ax.set_xlabel("step t")
     ax.set_ylabel(r"block scalar $q_b(t)$")
-    ax.set_title(
-        f"C2 grouped dynamics (L = {cfg.heatmap_L}): matrix-level "
-        r"$q_b$ (solid) vs grouped ODE (dashed black)",
-        fontsize=10,
-    )
     ax.legend(fontsize=8, loc="best", frameon=True)
     fig.tight_layout()
     save_both(fig, run_dir, "c2_grouped_trajectories")
@@ -700,7 +695,7 @@ def _plot_c2_matrix_vs_ode_closure(
     import matplotlib.pyplot as plt
 
     fig, ax = plt.subplots(figsize=(6.0, 4.0))
-    L_colors = sequential_colors(len(cfg.L_list), palette="rocket")
+    L_colors = sequential_colors(len(cfg.L_list), palette="mako")
     floor = cfg.c2_tol * 1e-3
     t_axis = np.arange(1, cfg.T + 1, dtype=float)
     for color, trial in zip(L_colors, trials):
@@ -714,10 +709,6 @@ def _plot_c2_matrix_vs_ode_closure(
     ax.set_yscale("log")
     ax.set_xlabel("step t")
     ax.set_ylabel(r"max over blocks $|q_b^{\mathrm{mat}}(t) - q_b^{\mathrm{ode}}(t)|$")
-    ax.set_title(
-        "C2 matrix↔ODE closure: max block-scalar error across (t, b)",
-        fontsize=10,
-    )
     ax.legend(fontsize=8, loc="best")
     fig.tight_layout()
     save_both(fig, run_dir, "c2_matrix_vs_ode_closure")
@@ -739,7 +730,7 @@ def _plot_c1_mc_consistency(
         return
     checkpoints = sorted({row["checkpoint_step"] for row in mc_rows})
     N_values = sorted({row["N"] for row in mc_rows})
-    colors = sequential_colors(len(checkpoints), palette="rocket")
+    colors = sequential_colors(len(checkpoints), palette="mako")
 
     fig, ax = plt.subplots(figsize=(6.0, 4.2))
     for color, step in zip(colors, checkpoints):
@@ -783,11 +774,6 @@ def _plot_c1_mc_consistency(
     ax.set_xlabel(r"Monte Carlo sample count $N$")
     ax.set_ylabel(
         r"relative Frobenius error $\|\mathrm{MC}-\mathrm{alg}\|_F/\|\mathrm{alg}\|_F$"
-    )
-    ax.set_title(
-        f"C1 MC-Haar consistency (L = {cfg.heatmap_L}): algebraic commutant "
-        "projection = population block-Haar average",
-        fontsize=10,
     )
     ax.legend(fontsize=8, loc="best")
     fig.tight_layout()

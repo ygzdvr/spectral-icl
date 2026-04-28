@@ -1,0 +1,229 @@
+{
+  "run_id": "c5_strict_drops_patch-20260423T011935Z-7a147dc1",
+  "script_stem": "c5_strict_drops_patch",
+  "phase": "theoremC",
+  "root": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremC/c5_strict_drops_patch/c5_strict_drops_patch-20260423T011935Z-7a147dc1",
+  "started_utc": "2026-04-23T01:19:35.899602+00:00",
+  "seeds": [
+    0
+  ],
+  "git_commit": "811d1f0",
+  "git_dirty": true,
+  "env": {
+    "python_version": "3.14.3",
+    "python_full_version": "3.14.3 (main, Mar 20 2026, 00:34:32) [Clang 22.1.1 ]",
+    "python_executable": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/.venv/bin/python",
+    "platform": "Linux-5.14.0-570.106.1.el9_6.x86_64-x86_64-with-glibc2.34",
+    "hostname": "della-gpu.princeton.edu",
+    "torch_version": "2.11.0+cu130",
+    "cuda_available": true,
+    "cuda_version": "13.0",
+    "cudnn_version": 91900,
+    "gpu_count": 1,
+    "gpu_names": [
+      "NVIDIA A100-PCIE-40GB"
+    ]
+  },
+  "notes": "C5 strict-drops patch: acceptance-record fix recording the Corollary 3.16 strict positivity of ladder refinement drops at every \u03ba > 1, the \u03ba = 1 zero-drop assertion, and the resolved diagnostic at L_deeper.",
+  "status": "completed",
+  "finished_utc": "2026-04-23T01:19:36.541325+00:00",
+  "wall_clock_seconds": 0.6434617042541504,
+  "compute_proxy": null,
+  "measured_compute": null,
+  "per_step_wall_clock": {
+    "n_steps": 0,
+    "mean": null,
+    "median": null,
+    "total": null
+  },
+  "error": null,
+  "extras": {
+    "canonical_c5_run": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremC/run_theoremC_refinement_monotonicity/run_theoremC_refinement_monotonicity-20260423T011730Z-4099ef8e",
+    "checks": {
+      "strict_drops_all_kappa_gt1_ok": false,
+      "gt1_cells": [
+        {
+          "kappa": 1.2,
+          "L": 1,
+          "strict_drops": 6,
+          "total_steps": 6,
+          "ok": true
+        },
+        {
+          "kappa": 1.2,
+          "L": 4,
+          "strict_drops": 5,
+          "total_steps": 6,
+          "ok": false
+        },
+        {
+          "kappa": 1.5,
+          "L": 1,
+          "strict_drops": 6,
+          "total_steps": 6,
+          "ok": true
+        },
+        {
+          "kappa": 1.5,
+          "L": 4,
+          "strict_drops": 5,
+          "total_steps": 6,
+          "ok": false
+        },
+        {
+          "kappa": 2.0,
+          "L": 1,
+          "strict_drops": 6,
+          "total_steps": 6,
+          "ok": true
+        },
+        {
+          "kappa": 2.0,
+          "L": 4,
+          "strict_drops": 4,
+          "total_steps": 6,
+          "ok": false
+        },
+        {
+          "kappa": 3.0,
+          "L": 1,
+          "strict_drops": 6,
+          "total_steps": 6,
+          "ok": true
+        },
+        {
+          "kappa": 3.0,
+          "L": 4,
+          "strict_drops": 6,
+          "total_steps": 6,
+          "ok": true
+        },
+        {
+          "kappa": 5.0,
+          "L": 1,
+          "strict_drops": 6,
+          "total_steps": 6,
+          "ok": true
+        },
+        {
+          "kappa": 5.0,
+          "L": 4,
+          "strict_drops": 5,
+          "total_steps": 6,
+          "ok": false
+        },
+        {
+          "kappa": 10.0,
+          "L": 1,
+          "strict_drops": 6,
+          "total_steps": 6,
+          "ok": true
+        },
+        {
+          "kappa": 10.0,
+          "L": 4,
+          "strict_drops": 6,
+          "total_steps": 6,
+          "ok": true
+        }
+      ],
+      "gt1_worst": {
+        "kappa": 2.0,
+        "L": 4,
+        "strict_drops": 4,
+        "total_steps": 6,
+        "ok": false
+      },
+      "total_steps": 6,
+      "kappa1_no_strict_drops_ok": false,
+      "kappa1_no_strict_drops_resolved_ok": true,
+      "kappa_eq1_max_loss_overall": 6.804507281106812e-13,
+      "kappa_eq1_cells": [
+        {
+          "kappa": 1.0,
+          "L": 1,
+          "strict_drops": 0,
+          "max_loss_all_levels": 0.0,
+          "ok": true
+        },
+        {
+          "kappa": 1.0,
+          "L": 4,
+          "strict_drops": 2,
+          "max_loss_all_levels": 6.804507281106812e-13,
+          "ok": false
+        }
+      ],
+      "L_deeper": 4,
+      "strict_drops_resolved_ok": true,
+      "resolved_count_total": 14,
+      "resolved_count_strict": 14,
+      "resolved_min_drop": 1.2711455104451826e-09,
+      "resolved_min_loc": {
+        "step": 4,
+        "level_from": 4,
+        "level_to": 5,
+        "kappa": 10.0,
+        "L": 4,
+        "loss_coarser": 3.6328032066348255e-09,
+        "loss_finer": 2.361657696189643e-09
+      },
+      "failing_above_precision": 0,
+      "failing_above_cells": [],
+      "failing_below_precision": 5,
+      "failing_below_cells": [
+        {
+          "step": 4,
+          "level_from": 4,
+          "level_to": 5,
+          "kappa": 1.5,
+          "L": 4,
+          "loss_coarser": 5.479364544778522e-13,
+          "loss_finer": 5.661826614923101e-13,
+          "drop": -1.8246207014457844e-14
+        },
+        {
+          "step": 4,
+          "level_from": 4,
+          "level_to": 5,
+          "kappa": 2.0,
+          "L": 4,
+          "loss_coarser": 4.941554932036934e-13,
+          "loss_finer": 6.193474064524856e-13,
+          "drop": -1.251919132487922e-13
+        },
+        {
+          "step": 5,
+          "level_from": 5,
+          "level_to": 6,
+          "kappa": 1.2,
+          "L": 4,
+          "loss_coarser": 5.010739869776312e-13,
+          "loss_finer": 5.415190090498823e-13,
+          "drop": -4.044502207225112e-14
+        },
+        {
+          "step": 5,
+          "level_from": 5,
+          "level_to": 6,
+          "kappa": 2.0,
+          "L": 4,
+          "loss_coarser": 6.193474064524856e-13,
+          "loss_finer": 6.359000205409579e-13,
+          "drop": -1.655261408847229e-14
+        },
+        {
+          "step": 5,
+          "level_from": 5,
+          "level_to": 6,
+          "kappa": 5.0,
+          "L": 4,
+          "loss_coarser": 5.721801899446746e-13,
+          "loss_finer": 6.135602875083744e-13,
+          "drop": -4.138009756369978e-14
+        }
+      ]
+    },
+    "data_source": "canonical C5 npz: outputs/thesis/theoremC/run_theoremC_refinement_monotonicity/run_theoremC_refinement_monotonicity-20260423T011730Z-4099ef8e/npz/refinement_ladder.npz"
+  }
+}

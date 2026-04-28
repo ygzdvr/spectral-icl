@@ -1,0 +1,205 @@
+{
+  "run_id": "run_theoremC_commutant_closure-20260423T022614Z-1f591f07",
+  "script_stem": "run_theoremC_commutant_closure",
+  "phase": "theoremC",
+  "root": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremC/run_theoremC_commutant_closure/run_theoremC_commutant_closure-20260423T022614Z-1f591f07",
+  "started_utc": "2026-04-23T02:26:14.191768+00:00",
+  "seeds": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "git_commit": "811d1f0",
+  "git_dirty": true,
+  "env": {
+    "python_version": "3.14.3",
+    "python_full_version": "3.14.3 (main, Mar 20 2026, 00:34:32) [Clang 22.1.1 ]",
+    "python_executable": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/.venv/bin/python",
+    "platform": "Linux-5.14.0-570.106.1.el9_6.x86_64-x86_64-with-glibc2.34",
+    "hostname": "della-i24g1",
+    "torch_version": "2.11.0+cu130",
+    "cuda_available": true,
+    "cuda_version": "13.0",
+    "cudnn_version": 91900,
+    "gpu_count": 1,
+    "gpu_names": [
+      "NVIDIA H200"
+    ]
+  },
+  "notes": "C1: operator-level band-RRS commutant closure. C2: grouped scalar dynamics validated against the matrix path.",
+  "status": "completed",
+  "finished_utc": "2026-04-23T02:26:39.774209+00:00",
+  "wall_clock_seconds": 25.583161115646362,
+  "compute_proxy": 22.05136866401881,
+  "measured_compute": null,
+  "per_step_wall_clock": {
+    "n_steps": 4,
+    "mean": 4.267992115259403,
+    "median": 4.272578937001526,
+    "total": 17.071968461037613
+  },
+  "error": null,
+  "extras": {
+    "cv_r_max_all": 0.0,
+    "cv_n_final_min": 0.02518692328158036,
+    "q_err_max_all": 5.551115123125783e-17,
+    "per_trial": [
+      {
+        "L": 1,
+        "cv_r_max": 0.0,
+        "cv_r_final": 0.0,
+        "cv_n_max": 0.29633540906464667,
+        "cv_n_final": 0.04706040234456938,
+        "q_err_max": 0.0
+      },
+      {
+        "L": 2,
+        "cv_r_max": 0.0,
+        "cv_r_final": 0.0,
+        "cv_n_max": 0.29633540906464667,
+        "cv_n_final": 0.027475743673348724,
+        "q_err_max": 0.0
+      },
+      {
+        "L": 4,
+        "cv_r_max": 0.0,
+        "cv_r_final": 0.0,
+        "cv_n_max": 0.29633540906464667,
+        "cv_n_final": 0.02518692328158036,
+        "q_err_max": 0.0
+      },
+      {
+        "L": 8,
+        "cv_r_max": 0.0,
+        "cv_r_final": 0.0,
+        "cv_n_max": 0.29633540906464667,
+        "cv_n_final": 0.02526011724659476,
+        "q_err_max": 5.551115123125783e-17
+      }
+    ],
+    "mc_consistency_rows": [
+      {
+        "checkpoint_step": 0,
+        "checkpoint_fraction": 0.0,
+        "N": 100,
+        "L": 4,
+        "abs_err_frobenius": 0.3318432715501403,
+        "rel_err_frobenius": 0.0679623753467407,
+        "alg_norm": 4.8827497546560465,
+        "seconds": 0.005534021067433059
+      },
+      {
+        "checkpoint_step": 0,
+        "checkpoint_fraction": 0.0,
+        "N": 1000,
+        "L": 4,
+        "abs_err_frobenius": 0.10036774277834401,
+        "rel_err_frobenius": 0.020555577865246172,
+        "alg_norm": 4.8827497546560465,
+        "seconds": 0.028927664970979095
+      },
+      {
+        "checkpoint_step": 0,
+        "checkpoint_fraction": 0.0,
+        "N": 10000,
+        "L": 4,
+        "abs_err_frobenius": 0.03257531281409792,
+        "rel_err_frobenius": 0.0066715097948722565,
+        "alg_norm": 4.8827497546560465,
+        "seconds": 0.2718366699991748
+      },
+      {
+        "checkpoint_step": 0,
+        "checkpoint_fraction": 0.0,
+        "N": 50000,
+        "L": 4,
+        "abs_err_frobenius": 0.014391586727809678,
+        "rel_err_frobenius": 0.00294743483711945,
+        "alg_norm": 4.8827497546560465,
+        "seconds": 1.3665342159802094
+      },
+      {
+        "checkpoint_step": 2500,
+        "checkpoint_fraction": 0.5,
+        "N": 100,
+        "L": 4,
+        "abs_err_frobenius": 0.012376102655797767,
+        "rel_err_frobenius": 0.03457346063206871,
+        "alg_norm": 0.35796539974706143,
+        "seconds": 0.0031174629693850875
+      },
+      {
+        "checkpoint_step": 2500,
+        "checkpoint_fraction": 0.5,
+        "N": 1000,
+        "L": 4,
+        "abs_err_frobenius": 0.004047394123529543,
+        "rel_err_frobenius": 0.011306662952311686,
+        "alg_norm": 0.35796539974706143,
+        "seconds": 0.02737498900387436
+      },
+      {
+        "checkpoint_step": 2500,
+        "checkpoint_fraction": 0.5,
+        "N": 10000,
+        "L": 4,
+        "abs_err_frobenius": 0.0012521086941205974,
+        "rel_err_frobenius": 0.00349784838145066,
+        "alg_norm": 0.35796539974706143,
+        "seconds": 0.2678340539569035
+      },
+      {
+        "checkpoint_step": 2500,
+        "checkpoint_fraction": 0.5,
+        "N": 50000,
+        "L": 4,
+        "abs_err_frobenius": 0.0005222285329216534,
+        "rel_err_frobenius": 0.0014588799176978012,
+        "alg_norm": 0.35796539974706143,
+        "seconds": 1.3532211150741205
+      },
+      {
+        "checkpoint_step": 5000,
+        "checkpoint_fraction": 1.0,
+        "N": 100,
+        "L": 4,
+        "abs_err_frobenius": 0.0067769826527844185,
+        "rel_err_frobenius": 0.033322957246397694,
+        "alg_norm": 0.2033727859947673,
+        "seconds": 0.003115642932243645
+      },
+      {
+        "checkpoint_step": 5000,
+        "checkpoint_fraction": 1.0,
+        "N": 1000,
+        "L": 4,
+        "abs_err_frobenius": 0.0021837009519963878,
+        "rel_err_frobenius": 0.010737429500781749,
+        "alg_norm": 0.2033727859947673,
+        "seconds": 0.02660759398713708
+      },
+      {
+        "checkpoint_step": 5000,
+        "checkpoint_fraction": 1.0,
+        "N": 10000,
+        "L": 4,
+        "abs_err_frobenius": 0.0006800579809104957,
+        "rel_err_frobenius": 0.003343898632179791,
+        "alg_norm": 0.2033727859947673,
+        "seconds": 0.2672804769827053
+      },
+      {
+        "checkpoint_step": 5000,
+        "checkpoint_fraction": 1.0,
+        "N": 50000,
+        "L": 4,
+        "abs_err_frobenius": 0.0003275772240788841,
+        "rel_err_frobenius": 0.001610723000506629,
+        "alg_norm": 0.2033727859947673,
+        "seconds": 1.3556149270152673
+      }
+    ],
+    "mc_worst_at_N_max": 0.00294743483711945
+  }
+}

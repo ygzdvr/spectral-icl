@@ -472,7 +472,7 @@ def _plot_family1(
     alphas = np.asarray(f1["alphas"])
     losses = f1["losses"]
     losses_exact = f1.get("losses_exact", {})
-    L_colors = sequential_colors(len(cfg.L_list), palette="rocket")
+    L_colors = sequential_colors(len(cfg.L_list), palette="mako")
 
     fig, (ax_emp, ax_ex) = plt.subplots(
         1, 2, figsize=(10.4, 4.0), sharex=True
@@ -509,14 +509,7 @@ def _plot_family1(
     ax_ex.set_title(r"exact Corollary ($Q^\star = L T^{-1}$)", fontsize=10)
     ax_ex.legend(fontsize=8, loc="best", frameon=True)
 
-    fig.suptitle(
-        "B3 structural-interpolation OOD: finite-time (left) vs "
-        r"exact Corollary (right)" "\n"
-        f"(base = {cfg.base_symbol_kind}, target = {cfg.f1_target_kind}, "
-        f"P = {cfg.P})",
-        fontsize=10,
-    )
-    fig.tight_layout(rect=(0, 0, 1, 0.93))
+    fig.tight_layout()
     save_both(fig, run_dir, "ood_interpolation_structural")
     plt.close(fig)
 
@@ -532,7 +525,7 @@ def _plot_family2(
     alphas = np.asarray(f2["alphas"])
     losses = f2["losses_per_seed"]  # L -> (n_seeds, n_alpha)
     losses_exact = f2.get("losses_exact_per_seed", {})
-    L_colors = sequential_colors(len(cfg.L_list), palette="rocket")
+    L_colors = sequential_colors(len(cfg.L_list), palette="mako")
 
     fig, (ax_emp, ax_ex) = plt.subplots(
         1, 2, figsize=(10.4, 4.0), sharex=True
@@ -579,12 +572,7 @@ def _plot_family2(
     )
     ax_ex.legend(fontsize=8, loc="best", frameon=True)
 
-    fig.suptitle(
-        "B3 permutation-interpolation OOD: finite-time (left) vs "
-        r"exact Corollary (right)",
-        fontsize=10,
-    )
-    fig.tight_layout(rect=(0, 0, 1, 0.95))
+    fig.tight_layout()
     save_both(fig, run_dir, "ood_interpolation_permutation")
     plt.close(fig)
 
@@ -610,7 +598,7 @@ def _plot_ood_exact_only(
     if losses_exact is None:
         return
     alphas = np.asarray(f1["alphas"])
-    L_colors = sequential_colors(len(cfg.L_list), palette="rocket")
+    L_colors = sequential_colors(len(cfg.L_list), palette="mako")
 
     fig, ax = plt.subplots(figsize=(5.8, 4.0))
     # Small floor for log-y visualization of α=0 (exactly 0 analytically).
@@ -628,14 +616,6 @@ def _plot_ood_exact_only(
         r"$E_{\mathrm{OOD}}^{\star}(L,\alpha)$"
     )
     ax.set_yscale("log")
-    ax.set_title(
-        r"B3 exact OOD at $Q^\star = L T^{-1}$: "
-        f"base = {cfg.base_symbol_kind}, target = {cfg.f1_target_kind}, "
-        f"P = {cfg.P}\n"
-        r"(spectral analogue of Bordelon Fig 3c; "
-        r"$\alpha = 0$ clipped to visualization floor)",
-        fontsize=9,
-    )
     ax.legend(fontsize=8, loc="best", frameon=True)
     fig.tight_layout()
     save_both(fig, run_dir, "b3_ood_exact_only")
@@ -655,11 +635,6 @@ def _plot_matched_baseline(
     ax.set_yscale("log")
     ax.set_xlabel(r"depth $L$")
     ax.set_ylabel(r"matched baseline loss $\mathcal{L}(\alpha = 0, L)$")
-    ax.set_title(
-        "B3 matched-training baseline (α = 0); sanity check vs B2 terminal "
-        "losses",
-        fontsize=10,
-    )
     fig.tight_layout()
     save_both(fig, run_dir, "matched_baseline")
     plt.close(fig)
@@ -686,7 +661,7 @@ def _plot_symbol_samples(
     sel_alphas = [a for a in cfg.symbol_samples_alphas if a in alphas_f1]
     if not sel_alphas:
         sel_alphas = alphas_f1[:4]
-    colors = sequential_colors(len(sel_alphas), palette="rocket")
+    colors = sequential_colors(len(sel_alphas), palette="mako")
 
     fig, axes = plt.subplots(1, 2, figsize=(9.8, 3.8), sharey=True)
     # Panel (a): family 1 structural interpolation.
@@ -718,11 +693,7 @@ def _plot_symbol_samples(
     ax.set_yscale("log")
     ax.legend(fontsize=8, loc="best")
 
-    fig.suptitle(
-        f"B3 symbol-shift samples (base = {cfg.base_symbol_kind}, P = {cfg.P})",
-        fontsize=11,
-    )
-    fig.tight_layout(rect=(0, 0, 1, 0.93))
+    fig.tight_layout()
     save_both(fig, run_dir, "symbol_samples")
     plt.close(fig)
 
@@ -965,6 +936,8 @@ def main() -> int:
         brittleness_rows = []
         brittleness_ok = False
         for L in cfg.L_list:
+            loss_at_0 = float(f1["losses"][int(L)][0])
+            ratio_at_0 = loss_at_0 / (baseline[int(L)] + 1e-30)
             loss_at_b = float(f1["losses"][int(L)][idx_b])
             ratio = loss_at_b / (baseline[int(L)] + 1e-30)
             if ratio >= cfg.brittleness_ratio_min:
@@ -972,10 +945,45 @@ def main() -> int:
             brittleness_rows.append(
                 {
                     "L": int(L),
+                    "L_ood_alpha0": loss_at_0,
+                    "ratio_alpha0": float(ratio_at_0),
                     "alpha": float(f1_alphas_arr[idx_b]),
                     "L_ood": loss_at_b,
                     "baseline": float(baseline[int(L)]),
                     "ratio": float(ratio),
+                }
+            )
+
+        # --- Diagnostics: F2 permutation brittleness at α≈brittleness_alpha ---
+        f2_alphas_arr = np.asarray(f2["alphas"])
+        idx_b_f2 = int(
+            np.argmin(np.abs(f2_alphas_arr - cfg.brittleness_alpha))
+        )
+        f2_brittleness_rows = []
+        for L in cfg.L_list:
+            y0_seeds = f2["losses_per_seed"][int(L)][:, 0]
+            loss0_med = float(np.median(y0_seeds))
+            loss0_min = float(np.min(y0_seeds))
+            loss0_max = float(np.max(y0_seeds))
+            ratio0_med = loss0_med / (baseline[int(L)] + 1e-30)
+            y_seeds = f2["losses_per_seed"][int(L)][:, idx_b_f2]
+            loss_med = float(np.median(y_seeds))
+            loss_min = float(np.min(y_seeds))
+            loss_max = float(np.max(y_seeds))
+            ratio_med = loss_med / (baseline[int(L)] + 1e-30)
+            f2_brittleness_rows.append(
+                {
+                    "L": int(L),
+                    "L_ood_alpha0_median": loss0_med,
+                    "L_ood_alpha0_min": loss0_min,
+                    "L_ood_alpha0_max": loss0_max,
+                    "ratio_alpha0_median": float(ratio0_med),
+                    "alpha": float(f2_alphas_arr[idx_b_f2]),
+                    "L_ood_median": loss_med,
+                    "L_ood_min": loss_min,
+                    "L_ood_max": loss_max,
+                    "baseline": float(baseline[int(L)]),
+                    "ratio_median": float(ratio_med),
                 }
             )
 
@@ -1011,6 +1019,7 @@ def main() -> int:
         ctx.record_extra("matched_baseline_f1_err", mb_f1_err)
         ctx.record_extra("matched_baseline_f2_err", mb_f2_err)
         ctx.record_extra("brittleness_rows", brittleness_rows)
+        ctx.record_extra("f2_brittleness_rows", f2_brittleness_rows)
         ctx.record_extra("exact_matched_zero_check", float(exact_matched_zero_check))
         ctx.record_extra(
             "max_exact_theory_rel_err_f1", float(max_exact_theory_rel_err_f1)
@@ -1067,6 +1076,7 @@ def main() -> int:
                 "brittleness_alpha": cfg.brittleness_alpha,
                 "brittleness_ratio_min": cfg.brittleness_ratio_min,
                 "brittleness_rows": brittleness_rows,
+                "f2_brittleness_rows": f2_brittleness_rows,
                 # Exact-Corollary diagnostics (analytic Q* = L T^{-1}).
                 "exact_matched_zero_check": float(exact_matched_zero_check),
                 "max_exact_theory_rel_err_f1": float(max_exact_theory_rel_err_f1),
@@ -1101,9 +1111,26 @@ def main() -> int:
         )
         for row in brittleness_rows:
             print(
-                f"     L={row['L']:<3d}  α={row['alpha']:.3f}  "
-                f"L_ood={row['L_ood']:.4e}  baseline="
-                f"{row['baseline']:.4e}  ratio={row['ratio']:.3e}"
+                f"     L={row['L']:<3d}  "
+                f"α=0: L_ood={row['L_ood_alpha0']:.4e} "
+                f"(ratio={row['ratio_alpha0']:.3e})  |  "
+                f"α={row['alpha']:.3f}: L_ood={row['L_ood']:.4e} "
+                f"(ratio={row['ratio']:.3e})  "
+                f"baseline={row['baseline']:.4e}"
+            )
+        print(
+            f"   F2 permutation brittleness at α≈{cfg.brittleness_alpha:.2f} "
+            f"(median across {len(f2['seeds'])} seeds):"
+        )
+        for row in f2_brittleness_rows:
+            print(
+                f"     L={row['L']:<3d}  "
+                f"α=0: L_ood_med={row['L_ood_alpha0_median']:.4e} "
+                f"(ratio_med={row['ratio_alpha0_median']:.3e})  |  "
+                f"α={row['alpha']:.3f}: L_ood[med|min|max]="
+                f"{row['L_ood_median']:.4e}|{row['L_ood_min']:.4e}|"
+                f"{row['L_ood_max']:.4e} "
+                f"(ratio_med={row['ratio_median']:.3e})"
             )
         print(
             f"   exact Corollary (Q* = L T^-1) diagnostics:"

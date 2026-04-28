@@ -1,0 +1,42 @@
+Theorem-C cleanup — three non-blocking items
+========================================================================
+Plan ref: EXPERIMENT_PLAN_FINAL.MD §7.3 (C3), §7.4 (C4), §7.5 (C5)
+Theorem ref: thesis/theorem_c.txt — Cor 3.11 (inactive block convention), Cor 3.12 (heterogeneity criterion).
+
+Item 1 — heatmap zero-region visual encoding
+  Regenerated heatmaps with light-gray diagonal-hatched overlay on (m = 1) rows and (κ = 1) columns, plus a legend proxy '≡ 0 (Cor. 3.12)'.
+    cleaned_c3_obstruction_heatmap: written  /scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremC/cleanup/cleanup-20260423T014734Z-be1e5598/figures/cleaned_c3_obstruction_heatmap.png
+    cleaned_c3_obstruction_heatmap_from_patch: written  /scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremC/cleanup/cleanup-20260423T014734Z-be1e5598/figures/cleaned_c3_obstruction_heatmap_from_patch.png
+    cleaned_c4_phase_diagram_main: written  /scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremC/cleanup/cleanup-20260423T014734Z-be1e5598/figures/cleaned_c4_phase_diagram_main.png
+    cleaned_c5_ladder_heatmap: written  /scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremC/cleanup/cleanup-20260423T014734Z-be1e5598/figures/cleaned_c5_ladder_heatmap.png
+
+Item 2 — inactive-block Corollary 3.11 edge case
+  Setup: D = 64, m = 8 (n_blocks = 8), κ = 3.0; block 0 made inactive by ω[0:8] = 0.
+  Probe test (L = 1, inactive block's L_b(q_b) for several q_b):
+    q_b =  -10.00  L_b = 0.000e+00  PASS
+    q_b =   +0.00  L_b = 0.000e+00  PASS
+    q_b =   +1.00  L_b = 0.000e+00  PASS
+    q_b = +100.00  L_b = 0.000e+00  PASS
+    max |L_b| = 0.000e+00  tol = 1e-12  PASS
+  Closed-form L = 1 optimum contribution of inactive block = 0.000e+00  PASS
+  Numerical (L-BFGS) total = 4.3372e+00; closed-form total = 4.3372e+00; abs err = 1.421e-14  PASS
+  → inactive_block_zero_ok: PASS
+
+Item 3 — κ-monotonicity parameterization artifact
+  C3 npz: /scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremC/run_theoremC_L1_closed_form/run_theoremC_L1_closed_form-20260423T011657Z-0e6fdff6/npz/L1_closed_form.npz
+  Total violations detected = 2
+  Violating m values = [2]
+  (a) violations only at m = 2: PASS
+  (b) m >= 4 monotonic in κ: PASS
+      m =  4  violations = 0
+      m =  8  violations = 0
+      m = 16  violations = 0
+      m = 32  violations = 0
+  (c) m = 2 violating cells (κ_prev → κ_curr, L* turnover):
+      m = 2  κ: 3.00 → 5.00  L*: 3.5122e+00 → 2.2719e+00  drop = 1.240e+00
+      m = 2  κ: 5.00 → 10.00  L*: 2.2719e+00 → 8.5677e-01  drop = 1.415e+00
+  LaTeX-ready note written to cleanup_nonmonotonicity_note.txt
+
+========================================================================
+Top-line status: PASS
+

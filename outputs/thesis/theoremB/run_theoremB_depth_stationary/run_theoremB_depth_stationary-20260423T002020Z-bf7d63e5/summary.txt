@@ -1,0 +1,6 @@
+run_id: run_theoremB_depth_stationary-20260423T002020Z-bf7d63e5
+phase: theoremB
+script: run_theoremB_depth_stationary
+status: failed
+wall_clock_seconds: 45.143
+error: RuntimeError('Expected all tensors to be on the same device, but got mat2 is on cuda:0, different from other tensors on cpu (when checking argument in method wrapper_CUDA_mm)')

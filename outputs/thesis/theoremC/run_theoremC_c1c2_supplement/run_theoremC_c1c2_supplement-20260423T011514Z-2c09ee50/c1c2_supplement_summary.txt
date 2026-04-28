@@ -1,0 +1,52 @@
+Experiment C1+C2 supplement — per-item acceptance summary
+========================================================================
+Plan ref: EXPERIMENT_PLAN_FINAL.MD §7.1–§7.2 (supplements C1+C2).
+Theorem ref: thesis/theorem_c.txt — Lemma 3.5, Theorem 3.8, Corollary 3.9.
+Config: D = 64, main partition m = 8, T = 5000, eta = 0.005
+
+Item 1 — Lemma 3.5 band-rotation invariance (paired MC)
+  tol per pair: 5.0σ with N_mc = 10000 (~ const / sqrt(N_mc))
+  n_U per (Q, L) cell: 20
+    L = 1  Q =    random  max |diff| = 3.213e-05  tol@worst = 1.289e-04  PASS
+    L = 1  Q = commutant  max |diff| = 1.110e-16  tol@worst = 1.000e-12  PASS
+    L = 2  Q =    random  max |diff| = 3.319e-05  tol@worst = 1.305e-04  PASS
+    L = 2  Q = commutant  max |diff| = 1.110e-16  tol@worst = 1.000e-12  PASS
+    L = 4  Q =    random  max |diff| = 3.381e-05  tol@worst = 1.317e-04  PASS
+    L = 4  Q = commutant  max |diff| = 0.000e+00  tol@worst = 1.000e-12  PASS
+    L = 8  Q =    random  max |diff| = 3.414e-05  tol@worst = 1.323e-04  PASS
+    L = 8  Q = commutant  max |diff| = 0.000e+00  tol@worst = 1.000e-12  PASS
+  → overall: PASS  (worst |diff| = 3.414e-05)
+
+Item 2 — grouped-loss formula eq. (3.2) direct verification
+  tol: 1e-12
+    L = 1  max rel err = 7.370e-16  max abs err = 3.331e-16
+    L = 2  max rel err = 6.196e-16  max abs err = 3.331e-16
+    L = 4  max rel err = 7.887e-16  max abs err = 4.441e-16
+    L = 8  max rel err = 5.845e-16  max abs err = 3.331e-16
+  → overall: PASS  (worst rel err = 7.887e-16)
+
+Item 3 — induced metric ‖Q‖_F² = Σ_b m_b q_b²
+  tol: 1e-12
+    L = 1  max rel err = 2.811e-16
+    L = 2  max rel err = 2.513e-16
+    L = 4  max rel err = 2.637e-16
+    L = 8  max rel err = 2.610e-16
+  → overall: PASS  (worst rel err = 2.811e-16)
+
+Item 4 — Corollary 3.9 endpoint recovery (L = 4)
+  tol: 1e-12
+    (a) singletons   max |γ(t) − q_per_mode| = 0.000e+00  (rel = 0.000e+00)  PASS
+    (b) single band  max |γ(t) − q_scalar| = 0.000e+00  (rel = 0.000e+00)  within_band_spread = 0.000e+00  PASS
+    (c) m =  8         max |q_mat − q_ode| = 0.000e+00  PASS
+  → overall: PASS
+
+Item 5 — unequal partition (4, 4, 8, 16, 32)
+  tol: 1e-12
+    max commutant violation = 0.000e+00  PASS
+    max |q_mat − q_ode|     = 2.776e-17  PASS
+  → overall: PASS
+
+========================================================================
+Top-line status: PASS
+Category: operator-level exact theorem-C supplement — no learned architecture. Items 2/3/4/5 are algebraic; item 1 is a paired-MC Lemma-3.5 test at ~5σ confidence.
+

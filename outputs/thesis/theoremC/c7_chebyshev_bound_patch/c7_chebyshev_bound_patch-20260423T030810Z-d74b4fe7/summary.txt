@@ -1,0 +1,34 @@
+run_id: c7_chebyshev_bound_patch-20260423T030810Z-d74b4fe7
+phase: theoremC
+script: c7_chebyshev_bound_patch
+status: completed
+wall_clock_seconds: 13.877
+compute_proxy: 10.3884
+
+plan_reference: EXPERIMENT_PLAN_FINAL.MD §7.7 (C7)
+theorem_reference: thesis/theorem_c.txt — Corollary 3.13 (block loss bound (Σ ω·λ)·ρ_b^{2L}).
+category: acceptance-record + figure-fix patch on existing C7 data. Replaces C7's heuristic anchored overlay with the actual Cor 3.13 bound both as a figure overlay and as a formal acceptance gate.
+interpretation: C7's original overlay L★(1)·(ρ★)^{2(L−1)} is an anchored heuristic — NOT the Cor 3.13 bound — and can dip below the empirical L★ at large L. The actual Cor 3.13 bound is (Σ_b (Σ_{i∈B_b} ω_i λ_i) · ρ_b^{2L}); it is a true upper bound by construction (each block uses the condition-number contraction factor ρ_b from its own λ range). This patch adds it as an overlay (dashed) alongside the exact L★ (solid) and the original heuristic (dotted). The acceptance gate chebyshev_bound_resolved_ok restricts to cells where L★ > optimizer_floor = 1e-9, where L-BFGS resolves the observed loss; below-precision cells are reported separately as diagnostic. failing_above_precision must be 0.
+convention: Un-normalized bound, matching C7's un-normalized loss_grid. Formula is un-normalized Σ_b M_b·ρ_b^{2L} (no 1/P). The 1/P-normalized variant is also saved to the npz as bound_grid_over_P for users who need the Theorem-3.8 population-loss scale.
+data_source: recomputed locally (10.4 s)
+D: 64
+m_list: [1, 2, 4, 8, 16, 32]
+kappa_list: [10.0, 20.0, 30.0, 40.0, 50.0]
+L_list: [1, 2, 4, 8, 16, 32, 64]
+m_headline: 8
+strict_tol: 1e-15
+optimizer_floor: 1e-09
+chebyshev_bound_general_L_ok: True
+chebyshev_bound_resolved_ok: True
+raw_count_total: 175
+raw_count_violations: 0
+raw_min_slack: 6.38158320507311e-10
+worst_raw_loc: {'m': 32, 'kappa': 10.0, 'L': 64, 'loss': 2.4695358451258637e-12, 'bound': 6.406278563524368e-10, 'slack': 6.38158320507311e-10}
+resolved_count_total: 170
+resolved_min_slack: 0.00024117382642277103
+max_resolved_ratio: 0.15586590109324408
+failing_above_precision: 0
+failing_below_precision: 0
+all_ok: True
+status: raw_ok+resolved_ok
+patch_summary_path: /scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremC/c7_chebyshev_bound_patch/c7_chebyshev_bound_patch-20260423T030810Z-d74b4fe7/c7_chebyshev_bound_patch_summary.txt

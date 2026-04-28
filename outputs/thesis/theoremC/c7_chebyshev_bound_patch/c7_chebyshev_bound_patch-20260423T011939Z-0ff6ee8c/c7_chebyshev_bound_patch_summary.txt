@@ -1,0 +1,28 @@
+Experiment C7 Chebyshev-bound patch — per-item acceptance summary
+========================================================================
+Plan ref: EXPERIMENT_PLAN_FINAL.MD §7.7 (C7)
+Theorem ref: thesis/theorem_c.txt — Corollary 3.13 (condition-number diagnostic ρ_b = (κ_b − 1)/(κ_b + 1) and block loss bound (Σ ω·λ)·ρ_b^{2L}).
+Config: D = 64, m_list = [1, 2, 4, 8, 16, 32], kappa_list = [1.0, 1.5, 2.0, 3.0, 5.0, 10.0], L_list = [1, 2, 4, 8, 16, 32, 64]
+Data source: canonical C7 npz: outputs/thesis/theoremC/run_theoremC_depth_scaling/run_theoremC_depth_scaling-20260423T011618Z-811a4a56/npz/depth_scaling.npz
+Convention: un-normalized bound Σ_b (Σ_{i∈B_b} ω·λ)·ρ_b^{2L} to match C7's un-normalized loss_grid (Σ_i ω·λ·(1-λq/L)^{2L}).
+
+Check — Corollary 3.13 bound validity at every (m > 1, κ > 1, L)
+  Assertion: L★_obs ≤ bound + 1e-15
+    n_cells evaluated = 175
+    violations        = 45
+    min slack (bound − loss) = -3.400e-11
+    worst cell        = (m = 2, kappa = 5, L = 64)
+      loss = 3.4003e-11  bound = 2.6681e-21  slack = -3.400e-11
+  → chebyshev_bound_general_L_ok: FAIL
+
+Check — resolved diagnostic (loss_obs > 1e-09)
+  n resolved cells = 113
+  failing_above_precision = 0  (must be 0)
+  failing_below_precision = 45  (diagnostic only)
+  max ratio (loss / bound) on resolved cells = 0.8136
+  → chebyshev_bound_resolved_ok: PASS
+
+========================================================================
+Top-line status (raw 1e-15 threshold): FAIL
+Theorem-level status (resolved cells only): PASS
+

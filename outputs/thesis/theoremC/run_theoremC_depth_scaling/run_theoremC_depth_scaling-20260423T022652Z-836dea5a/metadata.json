@@ -1,0 +1,261 @@
+{
+  "run_id": "run_theoremC_depth_scaling-20260423T022652Z-836dea5a",
+  "script_stem": "run_theoremC_depth_scaling",
+  "phase": "theoremC",
+  "root": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremC/run_theoremC_depth_scaling/run_theoremC_depth_scaling-20260423T022652Z-836dea5a",
+  "started_utc": "2026-04-23T02:26:52.976888+00:00",
+  "seeds": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "git_commit": "811d1f0",
+  "git_dirty": true,
+  "env": {
+    "python_version": "3.14.3",
+    "python_full_version": "3.14.3 (main, Mar 20 2026, 00:34:32) [Clang 22.1.1 ]",
+    "python_executable": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/.venv/bin/python",
+    "platform": "Linux-5.14.0-570.106.1.el9_6.x86_64-x86_64-with-glibc2.34",
+    "hostname": "della-i24g1",
+    "torch_version": "2.11.0+cu130",
+    "cuda_available": true,
+    "cuda_version": "13.0",
+    "cudnn_version": 91900,
+    "gpu_count": 1,
+    "gpu_names": [
+      "NVIDIA H200"
+    ]
+  },
+  "notes": "C7 finite-depth scaling in the grouped band-RRS class. Operator-level exact optimization only; NO learned architectures, NO projector estimation, NO hybrid training. Primary overlay is (\u03c1\u2605)^{2L}, not L^{-\u03b2}.",
+  "status": "completed",
+  "finished_utc": "2026-04-23T02:27:11.258153+00:00",
+  "wall_clock_seconds": 18.281599521636963,
+  "compute_proxy": 15.139743715990335,
+  "measured_compute": null,
+  "per_step_wall_clock": {
+    "n_steps": 0,
+    "mean": null,
+    "median": null,
+    "total": null
+  },
+  "error": null,
+  "extras": {
+    "n_converged": 236,
+    "n_total_opts": 252,
+    "singleton_worst": 1.9146353255093077e-11,
+    "kappa_one_worst": 1.9146353255093077e-11,
+    "worst_mono_increase": 7.644221515682656e-12,
+    "worst_mono_cell": {
+      "m": 2,
+      "kappa": 3.0,
+      "L": 32,
+      "L_next": 64,
+      "L_star": 1.681684747283873e-11,
+      "L_star_next": 2.4461068988521385e-11,
+      "delta": 7.644221515682656e-12
+    },
+    "contraction_diagnostic": [
+      {
+        "m": 2,
+        "kappa": 1.5,
+        "L_max": 64,
+        "L_star_observed": 1.387927363578506e-11,
+        "contraction_envelope": 1.616516646156387e-88,
+        "ratio_obs_over_env": 8.585914453022178e+76
+      },
+      {
+        "m": 2,
+        "kappa": 2.0,
+        "L_max": 64,
+        "L_star_observed": 1.892239397551992e-11,
+        "contraction_envelope": 2.554467816872807e-60,
+        "ratio_obs_over_env": 7.4075679679867e+48
+      },
+      {
+        "m": 2,
+        "kappa": 3.0,
+        "L_max": 64,
+        "L_star_observed": 2.4461068988521385e-11,
+        "contraction_envelope": 4.128565524839253e-38,
+        "ratio_obs_over_env": 5.924834870938323e+26
+      },
+      {
+        "m": 2,
+        "kappa": 5.0,
+        "L_max": 64,
+        "L_star_observed": 3.400251163009341e-11,
+        "contraction_envelope": 1.475348046538569e-22,
+        "ratio_obs_over_env": 230471119746.07886
+      },
+      {
+        "m": 2,
+        "kappa": 10.0,
+        "L_max": 64,
+        "L_star_observed": 6.507637560223784e-11,
+        "contraction_envelope": 8.952494241878732e-12,
+        "ratio_obs_over_env": 7.2690776273072695
+      },
+      {
+        "m": 4,
+        "kappa": 1.5,
+        "L_max": 64,
+        "L_star_observed": 7.323370738341393e-12,
+        "contraction_envelope": 1.0981436177943204e-88,
+        "ratio_obs_over_env": 6.668864272098372e+76
+      },
+      {
+        "m": 4,
+        "kappa": 2.0,
+        "L_max": 64,
+        "L_star_observed": 8.341944268475858e-12,
+        "contraction_envelope": 2.341744084755779e-60,
+        "ratio_obs_over_env": 3.56227835602533e+48
+      },
+      {
+        "m": 4,
+        "kappa": 3.0,
+        "L_max": 64,
+        "L_star_observed": 1.1162031350007559e-11,
+        "contraction_envelope": 6.252091103812671e-38,
+        "ratio_obs_over_env": 1.7853276871158663e+26
+      },
+      {
+        "m": 4,
+        "kappa": 5.0,
+        "L_max": 64,
+        "L_star_observed": 1.3938833377858922e-11,
+        "contraction_envelope": 4.533851459983294e-22,
+        "ratio_obs_over_env": 30743912765.7488
+      },
+      {
+        "m": 4,
+        "kappa": 10.0,
+        "L_max": 64,
+        "L_star_observed": 2.601435731716045e-11,
+        "contraction_envelope": 8.009303162885119e-11,
+        "ratio_obs_over_env": 0.3248017560093147
+      },
+      {
+        "m": 8,
+        "kappa": 1.5,
+        "L_max": 64,
+        "L_star_observed": 2.4604438444144187e-12,
+        "contraction_envelope": 8.788375381395928e-89,
+        "ratio_obs_over_env": 2.7996572035633813e+76
+      },
+      {
+        "m": 8,
+        "kappa": 2.0,
+        "L_max": 64,
+        "L_star_observed": 3.6029163318545267e-12,
+        "contraction_envelope": 1.9850099846692245e-60,
+        "ratio_obs_over_env": 1.8150620700554836e+48
+      },
+      {
+        "m": 8,
+        "kappa": 3.0,
+        "L_max": 64,
+        "L_star_observed": 5.810041356542226e-12,
+        "contraction_envelope": 5.826647351458074e-38,
+        "ratio_obs_over_env": 9.971499914248814e+25
+      },
+      {
+        "m": 8,
+        "kappa": 5.0,
+        "L_max": 64,
+        "L_star_observed": 7.486943673756693e-12,
+        "contraction_envelope": 4.766756849517031e-22,
+        "ratio_obs_over_env": 15706577679.780903
+      },
+      {
+        "m": 8,
+        "kappa": 10.0,
+        "L_max": 64,
+        "L_star_observed": 1.2116511010146246e-11,
+        "contraction_envelope": 1.0015121166698335e-10,
+        "ratio_obs_over_env": 0.12098217094402534
+      },
+      {
+        "m": 16,
+        "kappa": 1.5,
+        "L_max": 64,
+        "L_star_observed": 1.923080547064378e-12,
+        "contraction_envelope": 7.839935723616769e-89,
+        "ratio_obs_over_env": 2.452928971434488e+76
+      },
+      {
+        "m": 16,
+        "kappa": 2.0,
+        "L_max": 64,
+        "L_star_observed": 2.0657528484707783e-12,
+        "contraction_envelope": 1.8045888064098682e-60,
+        "ratio_obs_over_env": 1.1447221888627813e+48
+      },
+      {
+        "m": 16,
+        "kappa": 3.0,
+        "L_max": 64,
+        "L_star_observed": 2.472563214834595e-12,
+        "contraction_envelope": 5.461811500486865e-38,
+        "ratio_obs_over_env": 4.527002102899726e+25
+      },
+      {
+        "m": 16,
+        "kappa": 5.0,
+        "L_max": 64,
+        "L_star_observed": 2.625771346100411e-12,
+        "contraction_envelope": 4.626435704213601e-22,
+        "ratio_obs_over_env": 5675581622.606248
+      },
+      {
+        "m": 16,
+        "kappa": 10.0,
+        "L_max": 64,
+        "L_star_observed": 3.858048960612556e-12,
+        "contraction_envelope": 1.011054770873749e-10,
+        "ratio_obs_over_env": 0.038158654424610916
+      },
+      {
+        "m": 32,
+        "kappa": 1.5,
+        "L_max": 64,
+        "L_star_observed": 1.562008160437826e-12,
+        "contraction_envelope": 7.399880199701439e-89,
+        "ratio_obs_over_env": 2.110856011561982e+76
+      },
+      {
+        "m": 32,
+        "kappa": 2.0,
+        "L_max": 64,
+        "L_star_observed": 1.7675993308713277e-12,
+        "contraction_envelope": 1.7165309310525496e-60,
+        "ratio_obs_over_env": 1.0297509348039908e+48
+      },
+      {
+        "m": 32,
+        "kappa": 3.0,
+        "L_max": 64,
+        "L_star_observed": 1.4176470786235491e-12,
+        "contraction_envelope": 5.260222607255949e-38,
+        "ratio_obs_over_env": 2.6950324814543918e+25
+      },
+      {
+        "m": 32,
+        "kappa": 5.0,
+        "L_max": 64,
+        "L_star_observed": 1.6117524064045938e-12,
+        "contraction_envelope": 4.5148727836890115e-22,
+        "ratio_obs_over_env": 3569873357.733157
+      },
+      {
+        "m": 32,
+        "kappa": 10.0,
+        "L_max": 64,
+        "L_star_observed": 2.4695358451258637e-12,
+        "contraction_envelope": 9.98520380958059e-11,
+        "ratio_obs_over_env": 0.02473195231885399
+      }
+    ]
+  }
+}

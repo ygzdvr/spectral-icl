@@ -1,0 +1,63 @@
+{
+  "run_id": "run_theoremA_exact_equivalence_final-20260420T031135Z-a05cd417",
+  "script_stem": "run_theoremA_exact_equivalence_final",
+  "phase": "theoremA",
+  "root": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremA/run_theoremA_exact_equivalence_final/run_theoremA_exact_equivalence_final-20260420T031135Z-a05cd417",
+  "started_utc": "2026-04-20T03:11:35.307962+00:00",
+  "seeds": [
+    0,
+    7,
+    13,
+    19
+  ],
+  "git_commit": "811d1f0",
+  "git_dirty": true,
+  "env": {
+    "python_version": "3.14.3",
+    "python_full_version": "3.14.3 (main, Mar 20 2026, 00:34:32) [Clang 22.1.1 ]",
+    "python_executable": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/.venv/bin/python",
+    "platform": "Linux-5.14.0-570.106.1.el9_6.x86_64-x86_64-with-glibc2.34",
+    "hostname": "della-gpu.princeton.edu",
+    "torch_version": "2.11.0+cu130",
+    "cuda_available": true,
+    "cuda_version": "13.0",
+    "cudnn_version": 91900,
+    "gpu_count": 1,
+    "gpu_names": [
+      "NVIDIA A100-PCIE-40GB"
+    ]
+  },
+  "notes": "A1final: four-way exact theorem-A forward-pass equivalence. Unifies A1 (R1, R2, R3) and A1b (R0, R2, R3) into a single trial running all four routes (R0 = true full-hidden-state aligned structured forward; R1 = iterative reduced AB; R2 = closed-form reduced AB; R3 = feature-space reduced-\u0393). All six pairwise relative errors must lie at float64 machine precision over the (D, P, K, L) sweep.",
+  "status": "completed",
+  "finished_utc": "2026-04-20T03:13:41.802227+00:00",
+  "wall_clock_seconds": 126.49443912506104,
+  "compute_proxy": 122.01277327799471,
+  "measured_compute": null,
+  "per_step_wall_clock": {
+    "n_steps": 192,
+    "mean": 0.6345219084638908,
+    "median": 0.6928779149893671,
+    "total": 121.82820642506704
+  },
+  "error": null,
+  "extras": {
+    "worst_R0_R1": 9.552959237207466e-16,
+    "worst_R0_R2": 1.025238347441516e-15,
+    "worst_R0_R3": 1.4675349532738898e-15,
+    "worst_R1_R2": 3.779777992958291e-16,
+    "worst_R1_R3": 1.1416222735775601e-15,
+    "worst_R2_R3": 1.0267610010029903e-15,
+    "worst_cell": {
+      "D": 64,
+      "P": 8,
+      "K": 16,
+      "L": 8,
+      "err_R0_R1": 9.552959237207466e-16,
+      "err_R0_R2": 1.025238347441516e-15,
+      "err_R0_R3": 1.4675349532738898e-15,
+      "err_R1_R2": 3.779777992958291e-16,
+      "err_R1_R3": 9.3193704243682e-16,
+      "err_R2_R3": 8.877105830191809e-16
+    }
+  }
+}

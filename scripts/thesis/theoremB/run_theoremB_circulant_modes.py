@@ -655,7 +655,7 @@ def _plot_residual_mode_trajectories(
         axes = [axes]
 
     valid_modes = [k for k in cfg.figure_mode_indices if k < cfg.figure_P]
-    mode_colors = sequential_colors(len(valid_modes), palette="rocket")
+    mode_colors = sequential_colors(len(valid_modes), palette="mako")
 
     for ax, trial in zip(axes, slice_trials):
         L = trial["L"]
@@ -677,13 +677,7 @@ def _plot_residual_mode_trajectories(
         r"$\hat{r}_k^{(\ell)}$ in sample-space Fourier basis", fontsize=10
     )
     axes[-1].legend(loc="best", fontsize=8, frameon=True, ncol=2)
-    fig.suptitle(
-        f"B1 Fig 1: residual mode trajectories vs layer index"
-        f" ({cfg.figure_symbol}, P={cfg.figure_P})\n"
-        "dashed black = exact theorem prediction",
-        fontsize=10,
-    )
-    fig.tight_layout(rect=(0, 0, 1, 0.92))
+    fig.tight_layout()
     save_both(fig, run_dir, "b1_exact_residual_mode_trajectories")
     plt.close(fig)
 
@@ -712,7 +706,7 @@ def _plot_transfer_matched(
 
     P = slice_trials[0]["P"]
     k_axis = np.arange(P)
-    depth_colors = sequential_colors(len(slice_trials), palette="rocket")
+    depth_colors = sequential_colors(len(slice_trials), palette="mako")
 
     fig, ax = plt.subplots(figsize=(6.5, 4.0))
     for color, trial in zip(depth_colors, slice_trials):
@@ -728,13 +722,8 @@ def _plot_transfer_matched(
     ax.set_ylabel(
         r"$h_{L,k} = 1 - (1 - \lambda_k/L)^L$", fontsize=10
     )
-    fig.suptitle(
-        f"B1 Fig 2: matched transfer spectrum $h_{{L,k}}$ depth sweep\n"
-        f"({cfg.transfer_symbol}, P={P}); dashed black = theorem",
-        fontsize=10,
-    )
     ax.legend(fontsize=8, frameon=True, ncol=2)
-    fig.tight_layout(rect=(0, 0, 1, 0.92))
+    fig.tight_layout()
     save_both(fig, run_dir, "b1_exact_transfer_spectrum_matched")
     plt.close(fig)
 
@@ -780,14 +769,8 @@ def _plot_transfer_mismatched(
     ax.set_ylabel(
         r"$h_{L,k} = \lambda^*_k \, \phi_L(\lambda_k)$", fontsize=10
     )
-    fig.suptitle(
-        f"B1 Fig 3: mismatched transfer spectrum (G_star != G)\n"
-        f"({cfg.transfer_symbol} train; mismatched query, P={P});"
-        " dashed black = theorem",
-        fontsize=10,
-    )
     ax.legend(fontsize=8, frameon=True, ncol=2)
-    fig.tight_layout(rect=(0, 0, 1, 0.92))
+    fig.tight_layout()
     save_both(fig, run_dir, "b1_exact_transfer_spectrum_mismatched")
     plt.close(fig)
 
@@ -833,10 +816,6 @@ def _plot_error_summary(
     ax.set_xticks(x)
     ax.set_xticklabels(labels, rotation=75, fontsize=6)
     ax.set_ylabel("error (log scale)", fontsize=10)
-    ax.set_title(
-        "B1 Fig 4: exact-closure errors across all (P, L, symbol, match_mode) trials",
-        fontsize=10,
-    )
     ax.legend(fontsize=7, frameon=True, ncol=2)
     fig.tight_layout()
     save_both(fig, run_dir, "b1_exact_error_summary")
@@ -868,7 +847,7 @@ def _plot_residual_contraction_spectrum(
 
     P = slice_trials[0]["P"]
     k_axis = np.arange(P)
-    depth_colors = sequential_colors(len(slice_trials), palette="rocket")
+    depth_colors = sequential_colors(len(slice_trials), palette="mako")
 
     fig, ax = plt.subplots(figsize=(6.5, 4.0))
     for color, trial in zip(depth_colors, slice_trials):
@@ -877,11 +856,6 @@ def _plot_residual_contraction_spectrum(
     ax.set_xlabel("sample-space Fourier mode index $k$", fontsize=10)
     ax.set_ylabel(
         r"terminal residual contraction $c_{L,k} = (1 - \lambda_k/L)^L$",
-        fontsize=10,
-    )
-    ax.set_title(
-        f"B1 Fig 5: terminal residual contraction spectrum\n"
-        f"(NOT the transfer function h_{{L,k}}; {cfg.transfer_symbol}, P={P})",
         fontsize=10,
     )
     ax.legend(fontsize=8, frameon=True)
@@ -920,7 +894,7 @@ def _bridge_plot_gamma_trajectories(
     if n_L == 1:
         axes = [axes]
     valid_modes = [k for k in cfg.figure_mode_indices if k < cfg.figure_P]
-    mode_colors = sequential_colors(len(valid_modes), palette="rocket")
+    mode_colors = sequential_colors(len(valid_modes), palette="mako")
     t_axis = np.arange(cfg.T + 1)
     for ax, trial in zip(axes, slice_trials):
         for color, k in zip(mode_colors, valid_modes):
@@ -934,13 +908,7 @@ def _bridge_plot_gamma_trajectories(
         ax.set_xscale("log")
     axes[0].set_ylabel(r"$\gamma_k(t)$ [bridge: stationary GF, NOT B1 exact]")
     axes[-1].legend(loc="best", fontsize=8, frameon=True)
-    fig.suptitle(
-        f"B1→B2 BRIDGE: gamma_k(t) stationary gradient-flow"
-        f" ({cfg.figure_symbol}, P={cfg.figure_P})\n"
-        "x-axis = optimization step t (NOT layer ell). dashed = theory.",
-        fontsize=9,
-    )
-    fig.tight_layout(rect=(0, 0, 1, 0.90))
+    fig.tight_layout()
     save_both(fig, run_dir, "b1_bridge_stationary_gamma_trajectories")
     plt.close(fig)
 
@@ -965,7 +933,7 @@ def _bridge_plot_gamma_loglog(
     if n_L == 1:
         axes = [axes]
     valid_modes = [k for k in cfg.figure_mode_indices if k < cfg.figure_P]
-    mode_colors = sequential_colors(len(valid_modes), palette="rocket")
+    mode_colors = sequential_colors(len(valid_modes), palette="mako")
     t_axis = np.arange(1, cfg.T + 1, dtype=float)
     for ax, trial in zip(axes, slice_trials):
         for color, k in zip(mode_colors, valid_modes):
@@ -984,12 +952,7 @@ def _bridge_plot_gamma_loglog(
         ax.set_yscale("log")
     axes[0].set_ylabel(r"$\gamma_k(t)$ [bridge, log-log]")
     axes[-1].legend(loc="best", fontsize=8, frameon=True)
-    fig.suptitle(
-        f"B1→B2 BRIDGE: gamma_k(t) log-log ({cfg.figure_symbol}, P={cfg.figure_P})\n"
-        "x-axis = optimization step t (NOT layer ell).",
-        fontsize=9,
-    )
-    fig.tight_layout(rect=(0, 0, 1, 0.90))
+    fig.tight_layout()
     save_both(fig, run_dir, "b1_bridge_stationary_gamma_loglog")
     plt.close(fig)
 

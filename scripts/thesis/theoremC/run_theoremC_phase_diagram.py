@@ -399,15 +399,10 @@ def _plot_phase_diagram_main(
             cbar_label=cbar_label,
             log_z=True, log_x=True, log_y=True,
         )
+        ax.set_title(title)
         _overlay_log_contours(ax, k_arr, m_arr, data)
-        ax.set_title(title, fontsize=10)
 
-    fig.suptitle(
-        rf"C4 theorem-C heterogeneity phase diagram (L = {cfg.L_primary}; "
-        "mass-preserving band-RRS)",
-        fontsize=12,
-    )
-    fig.tight_layout(rect=(0, 0, 1, 0.95))
+    fig.tight_layout()
     save_both(fig, run_dir, "c4_phase_diagram_main")
     plt.close(fig)
 
@@ -429,7 +424,7 @@ def _plot_kappa_slices(
     L_coarse = result["L_coarse"][:, :, i_L]
     gap = result["gap"][:, :, i_L]
 
-    m_colors = sequential_colors(len(m_list), palette="rocket")
+    m_colors = sequential_colors(len(m_list), palette="mako")
     floor = 1e-18
 
     fig, axes = plt.subplots(1, 2, figsize=(11.2, 4.2))
@@ -459,12 +454,70 @@ def _plot_kappa_slices(
         ax.set_title(title, fontsize=10)
         ax.legend(fontsize=8, loc="best")
 
-    fig.suptitle(
-        rf"C4 heterogeneity dependence (L = {cfg.L_primary})",
-        fontsize=11,
-    )
-    fig.tight_layout(rect=(0, 0, 1, 0.94))
+    fig.tight_layout()
     save_both(fig, run_dir, "c4_kappa_slices")
+    plt.close(fig)
+
+
+def _plot_kappa_slices_update(
+    cfg: C4Config, result: dict[str, Any], run_dir: ThesisRunDir
+) -> None:
+    """Variant of the κ-slice figure: the left panel (L_coarse vs κ) omits
+    the m = 1 row so the y-scale is not dominated by its floor-level values;
+    the right panel (refinement gain) is unchanged."""
+    import matplotlib.pyplot as plt
+
+    m_list = list(result["m_list"])
+    k_arr = np.asarray(result["kappa_list"], dtype=float)
+    L_list = list(result["L_list"])
+    if int(cfg.L_primary) not in L_list:
+        return
+    i_L = L_list.index(int(cfg.L_primary))
+
+    L_coarse = result["L_coarse"][:, :, i_L]
+    gap = result["gap"][:, :, i_L]
+
+    m_colors = sequential_colors(len(m_list), palette="mako")
+    floor = 1e-18
+
+    fig, axes = plt.subplots(1, 2, figsize=(11.2, 4.2))
+
+    ax_l = axes[0]
+    for color, i, m in zip(m_colors, range(len(m_list)), m_list):
+        if int(m) == 1:
+            continue
+        y = L_coarse[i, :]
+        y_plot = np.where(y > floor, y, np.nan)
+        ax_l.plot(
+            k_arr, y_plot, color=color, lw=1.5, marker="o", ms=4.0,
+            label=f"m = {m}",
+        )
+    ax_l.set_xscale("log")
+    ax_l.set_yscale("log")
+    ax_l.set_xlabel(r"within-block heterogeneity $\kappa$")
+    ax_l.set_ylabel(r"spectral-only optimum $L^\star_{\mathrm{coarse}}$")
+    ax_l.set_title(
+        r"$L_{\mathrm{coarse}}$ vs $\kappa$ (excluding $m=1$)", fontsize=10
+    )
+    ax_l.legend(fontsize=8, loc="best")
+
+    ax_r = axes[1]
+    for color, i, m in zip(m_colors, range(len(m_list)), m_list):
+        y = gap[i, :]
+        y_plot = np.where(y > floor, y, np.nan)
+        ax_r.plot(
+            k_arr, y_plot, color=color, lw=1.5, marker="o", ms=4.0,
+            label=f"m = {m}",
+        )
+    ax_r.set_xscale("log")
+    ax_r.set_yscale("log")
+    ax_r.set_xlabel(r"within-block heterogeneity $\kappa$")
+    ax_r.set_ylabel(r"$L_{\mathrm{coarse}} - L_{\mathrm{fine}}$")
+    ax_r.set_title(r"refinement gain $\mathrm{gap}$ vs $\kappa$", fontsize=10)
+    ax_r.legend(fontsize=8, loc="best")
+
+    fig.tight_layout()
+    save_both(fig, run_dir, "c4_kappa_slices_update")
     plt.close(fig)
 
 
@@ -522,12 +575,7 @@ def _plot_depth_interaction(
         _overlay_log_contours(ax, L_arr, m_arr, mat_plot)
         ax.set_title(rf"$\kappa = {k_target:.2g}$", fontsize=10)
 
-    fig.suptitle(
-        "C4 depth interaction: refinement gain across (m, L) "
-        "at three heterogeneity levels",
-        fontsize=11,
-    )
-    fig.tight_layout(rect=(0, 0, 1, 0.94))
+    fig.tight_layout()
     save_both(fig, run_dir, "c4_depth_interaction")
     plt.close(fig)
 
@@ -556,11 +604,6 @@ def _plot_full_oracle_sanity(
         log_z=True, log_x=True, log_y=True,
     )
     ax.axhline(float(cfg.full_oracle_tol), color="red", lw=0.8, ls="--")
-    ax.set_title(
-        r"C4 diagnostic: singleton partition $L^\star$ "
-        r"(expected $\equiv 0$ at any depth)",
-        fontsize=10,
-    )
     fig.tight_layout()
     save_both(fig, run_dir, "c4_full_oracle_sanity")
     plt.close(fig)
@@ -661,6 +704,7 @@ def main() -> int:
         # --- Figures ---
         _plot_phase_diagram_main(cfg, result, run)
         _plot_kappa_slices(cfg, result, run)
+        _plot_kappa_slices_update(cfg, result, run)
         _plot_depth_interaction(cfg, result, run)
         if cfg.compute_full_oracle:
             _plot_full_oracle_sanity(cfg, result, run)

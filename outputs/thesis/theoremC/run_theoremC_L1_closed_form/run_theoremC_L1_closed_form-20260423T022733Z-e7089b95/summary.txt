@@ -1,0 +1,24 @@
+run_id: run_theoremC_L1_closed_form-20260423T022733Z-e7089b95
+phase: theoremC
+script: run_theoremC_L1_closed_form
+status: completed
+wall_clock_seconds: 5.730
+compute_proxy: 2.58981
+
+plan_reference: EXPERIMENT_PLAN_FINAL.MD §7.3 (C3)
+category: operator-level exact theorem-C validation — no learned architecture. C3 validates the closed-form L = 1 block-commutant lower bound against direct numerical optimization over block-scalars, and visualizes how the obstruction depends on within-block heterogeneity κ.
+interpretation: At L = 1 the theorem-C block-commutant loss is quadratic in each block scalar, giving the closed-form per-block minimizer q_b* = b_b / c_b and per-block loss L_b* = a_b − b_b² / c_b where (a_b, b_b, c_b) = (Σ ω·λ, Σ ω·λ², Σ ω·λ³) over block b. The closed-form total L* matches L-BFGS numerical optimum to float eps at every (m, κ). The theorem-C finite-depth obstruction is visualized directly: at κ = 1 (homogeneous blocks) L* = 0 — a single q_b matches all λ_j in the block exactly. As κ grows, within-block λ-spread grows and a single q_b can no longer match all λ_{b,j}, so L* rises. (At extreme κ with very small blocks — e.g. m = 2, κ ≳ 3 under the mass-preserving linear-ξ construction — a single mode's weight concentrates so heavily that the obstruction decreases again; this is a property of the specific heterogeneity parameterization, not a theorem failure, and the monotonicity check is therefore diagnostic only.) Blocks of size m = 1 (singleton) give L* ≡ 0 regardless of κ — no commutant restriction.
+device: cuda
+D: 64
+partition_m_list: [1, 2, 4, 8, 16, 32]
+kappa_list: [1.0, 1.1, 1.2, 1.5, 2.0, 3.0, 5.0, 10.0]
+n_trials: 48
+status: cf_vs_num_ok+kappa_1_zero_ok+kappa_monotonic_violated(count=2)
+closed_form_tol: 1e-08
+q_tol: 1e-06
+zero_tol: 1e-10
+rel_err_loss_worst: 1.4215073139417858e-13
+q_err_max_worst: 8.881784197001252e-16
+zero_obstruction_worst: 0.0
+monotonicity_violations: 2
+sweep_wallclock_seconds: 2.59

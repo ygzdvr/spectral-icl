@@ -1,0 +1,27 @@
+run_id: run_theoremB_rank_scaling-20260423T001315Z-d05dab64
+phase: theoremB
+script: run_theoremB_rank_scaling
+status: completed
+wall_clock_seconds: 126.006
+compute_proxy: 101.681
+
+plan_reference: EXPERIMENT_PLAN_FINAL.MD §6.5 (B4)
+framing: B4 validates the FINITE-P spectral-rank floor: primary acceptance compares empirical rank-floor slope to the analytical finite-P tail-sum slope Σ_{k_star ≥ r} ω_k · s_k. The continuum exponent 1 − (ν + νβ) = -0.50 is a REFERENCE asymptote only, not the acceptance target. The observed steeper slope at the chosen P = 256 and fit window [4, 64] is a finite-size effect as r approaches P/2 (tail sum shortens), NOT a theorem failure.
+interpretation: Theorem-B pure-spectral-shape law: rank r is the primary control variable. The matched stationary floor follows the finite-P tail sum Σ_{k_star ≥ r} ω_k · s_k, which for our power-law defaults matches an effective power law in r whose continuum asymptote is r^{1-(ν+νβ)} = r^-0.50. Joint (r, L_S) grid is flat along L_S at the matched asymptote (depth does not change the floor at fixed rank); any nontrivial depth-rank trade-off requires hybridization and belongs to the theorem-C tier. This experiment is the pure-spectral width/rank-bottleneck result BEFORE hybridization.
+device: cuda
+n_trials: {'r': 8, 'L': 4, 'evaluations': 32}
+status: floor_fit_ok+depth_collapse_ok
+theory_asymptotic_exponent: -0.5
+theory_finite_P_slope: -0.8326883346532756
+fit_empirical_L1_slope: -0.8197797082968478
+fit_empirical_L1_r2: 0.9791635729503526
+fit_empirical_L1_err_vs_analytical: 0.015502350422385716
+fit_empirical_L1_err_vs_continuum: 0.6395594165936955
+fit_analytical_slope: -0.8326883346532756
+fit_analytical_r2: 0.9755881282763639
+fit_analytical_err_vs_continuum: 0.6653766693065513
+floor_exponent_tol: 0.15
+floor_fit_window_r: [4, 64]
+depth_collapse_ratio: 1.7725543033868747
+depth_collapse_ratio_max: 5.0
+sweep_wallclock_seconds: 101.681

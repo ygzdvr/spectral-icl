@@ -1,0 +1,35 @@
+{
+  "D": 64,
+  "N": 128,
+  "P": 64,
+  "K": 64,
+  "B": 32,
+  "L_S": 8,
+  "nu": 1.5,
+  "sigma": 0.0,
+  "r_values": [
+    1,
+    4,
+    16,
+    64
+  ],
+  "seeds": [
+    0,
+    1
+  ],
+  "n_steps": 2000,
+  "lr": 0.001,
+  "tail_window": 1000,
+  "fit_window": [
+    4.0,
+    32.0
+  ],
+  "theory_exponent": -0.5,
+  "families": [
+    "linear",
+    "spectral_gd"
+  ],
+  "dtype": "float32",
+  "device": "cuda",
+  "quick": true
+}

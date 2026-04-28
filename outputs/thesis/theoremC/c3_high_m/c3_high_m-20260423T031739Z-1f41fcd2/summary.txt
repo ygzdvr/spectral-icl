@@ -1,0 +1,5 @@
+run_id: c3_high_m-20260423T031739Z-1f41fcd2
+phase: theoremC
+script: c3_high_m
+status: completed
+wall_clock_seconds: 18.849

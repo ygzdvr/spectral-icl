@@ -1,0 +1,27 @@
+run_id: run_theoremB_depth_stationary-20260423T014414Z-282b8962
+phase: theoremB
+script: run_theoremB_depth_stationary
+status: completed
+wall_clock_seconds: 68.557
+compute_proxy: 34.1966
+
+plan_reference: EXPERIMENT_PLAN_FINAL.MD §6.3 (B2)
+theorem_objects: ['Corollary 4: modewise ODE + depth irrelevance', 'Theorem 3 Claim 1: shift invariance', 'Theorem 3 Claim 2: circulant preservation']
+device: cuda
+n_trials: 3
+status: PASS
+gate_monotonicity: {'ok': True, 'max_viol': 0.0, 'slack': 1e-09}
+gate_decay: {'ok': True, 'max_frac': 0.051884423922846076, 'threshold': 0.2, 'worst': {'P': 32, 'L': 4, 'symbol_kind': 'power_law', 'loss_initial': 45.548416741065736, 'loss_final': 2.363253363207914, 'decay_fraction': 0.051884423922846076}}
+gate_ode_agreement: {'ok': True, 'max_ode_rel_err': 0.25220200962249667, 'tol': 0.5}
+gate_loss_theory: {'ok': True, 'max_rel_err': 0.023045578772297178, 'tol': 0.05}
+gate_forward_invariance: {'ok': True, 'max_viol': 0.0, 'tol': 1e-10}
+gate_circulant_preservation: {'ok': True, 'max_viol': 0.0, 'tol': 1e-10}
+gate_circulant_preservation_fullmatrix: {'ok': True, 'max_viol': 3.0978220931193642e-15, 'tol': 1e-10, 'config': 'P=32 L=4 power_law n_steps=1000 eta_full=0.001'}
+fullmatrix_circ_max_violation: 3.0978220931193642e-15
+fullmatrix_circ_ok: True
+discrete_euler_map_rel_err: 0.0
+gate_shift_invariance: {'ok': True, 'max_err': 6.1965878064121655e-15, 'tol': 1e-10, 'config': 'P=32 L=4 power_law'}
+Q_target_rel_err_final: {'P32_L4_power_law': 0.8349336340113006, 'P128_L4_power_law': 0.8787245608375789, 'P256_L4_power_law': 0.8933573018569815}
+equal_tol_spread: None
+depth_ratios: [{'P': 32, 'symbol_kind': 'power_law', 'L_min': 4, 'L_max': 4, 'loss_final_L_min': 2.363253363207914, 'loss_final_L_max': 2.363253363207914, 'ratio': 1.0}, {'P': 128, 'symbol_kind': 'power_law', 'L_min': 4, 'L_max': 4, 'loss_final_L_min': 9.466941300286654, 'loss_final_L_max': 9.466941300286654, 'ratio': 1.0}, {'P': 256, 'symbol_kind': 'power_law', 'L_min': 4, 'L_max': 4, 'loss_final_L_min': 18.544038740009167, 'loss_final_L_max': 18.544038740009167, 'ratio': 1.0}]
+sweep_wallclock_seconds: 34.197

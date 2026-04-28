@@ -1,0 +1,181 @@
+{
+  "run_id": "run_theoremB_symbol_shift-20260422T070430Z-dcf3b0ff",
+  "script_stem": "run_theoremB_symbol_shift",
+  "phase": "theoremB",
+  "root": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremB/run_theoremB_symbol_shift/run_theoremB_symbol_shift-20260422T070430Z-dcf3b0ff",
+  "started_utc": "2026-04-22T07:04:30.362258+00:00",
+  "seeds": [
+    17,
+    23,
+    31,
+    41,
+    47,
+    53,
+    61,
+    71
+  ],
+  "git_commit": "811d1f0",
+  "git_dirty": true,
+  "env": {
+    "python_version": "3.14.3",
+    "python_full_version": "3.14.3 (main, Mar 20 2026, 00:34:32) [Clang 22.1.1 ]",
+    "python_executable": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/.venv/bin/python",
+    "platform": "Linux-5.14.0-570.106.1.el9_6.x86_64-x86_64-with-glibc2.34",
+    "hostname": "della-gpu.princeton.edu",
+    "torch_version": "2.11.0+cu130",
+    "cuda_available": true,
+    "cuda_version": "13.0",
+    "cudnn_version": 91900,
+    "gpu_count": 1,
+    "gpu_names": [
+      "NVIDIA A100-PCIE-40GB"
+    ]
+  },
+  "notes": null,
+  "status": "completed",
+  "finished_utc": "2026-04-22T07:04:54.139596+00:00",
+  "wall_clock_seconds": 23.77786612510681,
+  "compute_proxy": 18.502009690972045,
+  "measured_compute": null,
+  "per_step_wall_clock": {
+    "n_steps": 0,
+    "mean": null,
+    "median": null,
+    "total": null
+  },
+  "error": null,
+  "extras": {
+    "n_L": 5,
+    "n_f1_alphas": 12,
+    "n_f2_alphas": 12,
+    "n_f2_seeds": 8,
+    "matched_baseline_f1_err": 0.0,
+    "matched_baseline_f2_err": 0.0,
+    "brittleness_rows": [
+      {
+        "L": 1,
+        "L_ood_alpha0": 2.434408114143288,
+        "ratio_alpha0": 1.0,
+        "alpha": 1.0,
+        "L_ood": 3.6657572918658663,
+        "baseline": 2.434408114143288,
+        "ratio": 1.5058104968385353
+      },
+      {
+        "L": 2,
+        "L_ood_alpha0": 3.8643263622491006,
+        "ratio_alpha0": 1.0,
+        "alpha": 1.0,
+        "L_ood": 5.43345472053734,
+        "baseline": 3.8643263622491006,
+        "ratio": 1.4060548233237167
+      },
+      {
+        "L": 4,
+        "L_ood_alpha0": 4.77277274374156,
+        "ratio_alpha0": 1.0,
+        "alpha": 1.0,
+        "L_ood": 6.428798661023486,
+        "baseline": 4.77277274374156,
+        "ratio": 1.346973553151769
+      },
+      {
+        "L": 8,
+        "L_ood_alpha0": 5.282218945255922,
+        "ratio_alpha0": 1.0,
+        "alpha": 1.0,
+        "L_ood": 6.950342307232001,
+        "baseline": 5.282218945255922,
+        "ratio": 1.3157997385690074
+      },
+      {
+        "L": 16,
+        "L_ood_alpha0": 5.55120120253417,
+        "ratio_alpha0": 1.0,
+        "alpha": 1.0,
+        "L_ood": 7.216422076014813,
+        "baseline": 5.55120120253417,
+        "ratio": 1.2999748725952243
+      }
+    ],
+    "f2_brittleness_rows": [
+      {
+        "L": 1,
+        "L_ood_alpha0_median": 2.434408114143288,
+        "L_ood_alpha0_min": 2.434408114143288,
+        "L_ood_alpha0_max": 2.434408114143288,
+        "ratio_alpha0_median": 1.0,
+        "alpha": 1.0,
+        "L_ood_median": 3.5902381239164063,
+        "L_ood_min": 3.3880692168321853,
+        "L_ood_max": 3.7323712036587846,
+        "baseline": 2.434408114143288,
+        "ratio_median": 1.4747889242802148
+      },
+      {
+        "L": 2,
+        "L_ood_alpha0_median": 3.8643263622491006,
+        "L_ood_alpha0_min": 3.8643263622491006,
+        "L_ood_alpha0_max": 3.8643263622491006,
+        "ratio_alpha0_median": 1.0,
+        "alpha": 1.0,
+        "L_ood_median": 5.323684527705614,
+        "L_ood_min": 5.043642028129622,
+        "L_ood_max": 5.606971686324119,
+        "baseline": 3.8643263622491006,
+        "ratio_median": 1.3776487875643981
+      },
+      {
+        "L": 4,
+        "L_ood_alpha0_median": 4.77277274374156,
+        "L_ood_alpha0_min": 4.77277274374156,
+        "L_ood_alpha0_max": 4.77277274374156,
+        "ratio_alpha0_median": 1.0,
+        "alpha": 1.0,
+        "L_ood_median": 6.302571966802088,
+        "L_ood_min": 5.981621890202516,
+        "L_ood_max": 6.589428091557495,
+        "baseline": 4.77277274374156,
+        "ratio_median": 1.3205263072846958
+      },
+      {
+        "L": 8,
+        "L_ood_alpha0_median": 5.282218945255922,
+        "L_ood_alpha0_min": 5.282218945255922,
+        "L_ood_alpha0_max": 5.282218945255922,
+        "ratio_alpha0_median": 1.0,
+        "alpha": 1.0,
+        "L_ood_median": 6.812245824917391,
+        "L_ood_min": 6.483409682252223,
+        "L_ood_max": 7.091377086245416,
+        "baseline": 5.282218945255922,
+        "ratio_median": 1.2896560887608834
+      },
+      {
+        "L": 16,
+        "L_ood_alpha0_median": 5.55120120253417,
+        "L_ood_alpha0_min": 5.55120120253417,
+        "L_ood_alpha0_max": 5.55120120253417,
+        "ratio_alpha0_median": 1.0,
+        "alpha": 1.0,
+        "L_ood_median": 7.071787161956662,
+        "L_ood_min": 6.742184652803363,
+        "L_ood_max": 7.345397788185115,
+        "baseline": 5.55120120253417,
+        "ratio_median": 1.2739201668151268
+      }
+    ],
+    "exact_matched_zero_check": 0.0,
+    "max_exact_theory_rel_err_f1": 5.717723289882234e+30,
+    "exact_ood_at_full_shift": {
+      "1": 13.187319537783658,
+      "2": 4.518516717835801,
+      "4": 0.777387118846137,
+      "8": 0.03668402930182013,
+      "16": 0.00011876577933888083
+    },
+    "train_seconds": 18.433030065963976,
+    "f1_seconds": 0.009728637989610434,
+    "f2_seconds": 0.059250987018458545
+  }
+}

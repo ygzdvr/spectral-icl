@@ -1,0 +1,28 @@
+run_id: run_theoremB_symbol_shift-20260422T070430Z-dcf3b0ff
+phase: theoremB
+script: run_theoremB_symbol_shift
+status: completed
+wall_clock_seconds: 23.778
+compute_proxy: 18.502
+
+plan_reference: EXPERIMENT_PLAN_FINAL.MD §6.4 (B3)
+category: theorem-B fixed-basis symbol-native OOD — not a covariance-rotation bridge experiment
+interpretation: Fixed-basis OOD brittleness under symbol-native shifts: structural interpolation (family 1) and frequency-permutation interpolation (family 2). Generic covariance rotation is deliberately excluded from this experiment and belongs to a secondary bridge experiment toward theorem C.
+acceptance_framing: Full-shift brittleness gate: the acceptance ratio is checked at α = 1 (fully-shifted). Small-shift degradation in finite time can be modest because the matched baseline is still partially converged on slow modes (s_k^3 small), inflating the denominator of L_ood / L_matched at modest α; the full-shift gate avoids that confounder.
+device: cuda
+n_trials: {'L': 5, 'f1_alphas': 12, 'f2_alphas': 12, 'f2_seeds': 8}
+status: matched_ok+brittleness_ok
+matched_baseline_tol: 1e-10
+matched_baseline_f1_err: 0.0
+matched_baseline_f2_err: 0.0
+brittleness_alpha: 1.0
+brittleness_ratio_min: 1.25
+brittleness_rows: [{'L': 1, 'L_ood_alpha0': 2.434408114143288, 'ratio_alpha0': 1.0, 'alpha': 1.0, 'L_ood': 3.6657572918658663, 'baseline': 2.434408114143288, 'ratio': 1.5058104968385353}, {'L': 2, 'L_ood_alpha0': 3.8643263622491006, 'ratio_alpha0': 1.0, 'alpha': 1.0, 'L_ood': 5.43345472053734, 'baseline': 3.8643263622491006, 'ratio': 1.4060548233237167}, {'L': 4, 'L_ood_alpha0': 4.77277274374156, 'ratio_alpha0': 1.0, 'alpha': 1.0, 'L_ood': 6.428798661023486, 'baseline': 4.77277274374156, 'ratio': 1.346973553151769}, {'L': 8, 'L_ood_alpha0': 5.282218945255922, 'ratio_alpha0': 1.0, 'alpha': 1.0, 'L_ood': 6.950342307232001, 'baseline': 5.282218945255922, 'ratio': 1.3157997385690074}, {'L': 16, 'L_ood_alpha0': 5.55120120253417, 'ratio_alpha0': 1.0, 'alpha': 1.0, 'L_ood': 7.216422076014813, 'baseline': 5.55120120253417, 'ratio': 1.2999748725952243}]
+f2_brittleness_rows: [{'L': 1, 'L_ood_alpha0_median': 2.434408114143288, 'L_ood_alpha0_min': 2.434408114143288, 'L_ood_alpha0_max': 2.434408114143288, 'ratio_alpha0_median': 1.0, 'alpha': 1.0, 'L_ood_median': 3.5902381239164063, 'L_ood_min': 3.3880692168321853, 'L_ood_max': 3.7323712036587846, 'baseline': 2.434408114143288, 'ratio_median': 1.4747889242802148}, {'L': 2, 'L_ood_alpha0_median': 3.8643263622491006, 'L_ood_alpha0_min': 3.8643263622491006, 'L_ood_alpha0_max': 3.8643263622491006, 'ratio_alpha0_median': 1.0, 'alpha': 1.0, 'L_ood_median': 5.323684527705614, 'L_ood_min': 5.043642028129622, 'L_ood_max': 5.606971686324119, 'baseline': 3.8643263622491006, 'ratio_median': 1.3776487875643981}, {'L': 4, 'L_ood_alpha0_median': 4.77277274374156, 'L_ood_alpha0_min': 4.77277274374156, 'L_ood_alpha0_max': 4.77277274374156, 'ratio_alpha0_median': 1.0, 'alpha': 1.0, 'L_ood_median': 6.302571966802088, 'L_ood_min': 5.981621890202516, 'L_ood_max': 6.589428091557495, 'baseline': 4.77277274374156, 'ratio_median': 1.3205263072846958}, {'L': 8, 'L_ood_alpha0_median': 5.282218945255922, 'L_ood_alpha0_min': 5.282218945255922, 'L_ood_alpha0_max': 5.282218945255922, 'ratio_alpha0_median': 1.0, 'alpha': 1.0, 'L_ood_median': 6.812245824917391, 'L_ood_min': 6.483409682252223, 'L_ood_max': 7.091377086245416, 'baseline': 5.282218945255922, 'ratio_median': 1.2896560887608834}, {'L': 16, 'L_ood_alpha0_median': 5.55120120253417, 'L_ood_alpha0_min': 5.55120120253417, 'L_ood_alpha0_max': 5.55120120253417, 'ratio_alpha0_median': 1.0, 'alpha': 1.0, 'L_ood_median': 7.071787161956662, 'L_ood_min': 6.742184652803363, 'L_ood_max': 7.345397788185115, 'baseline': 5.55120120253417, 'ratio_median': 1.2739201668151268}]
+exact_matched_zero_check: 0.0
+max_exact_theory_rel_err_f1: 5.717723289882234e+30
+exact_ood_at_full_shift: {'1': 13.187319537783658, '2': 4.518516717835801, '4': 0.777387118846137, '8': 0.03668402930182013, '16': 0.00011876577933888083}
+exact_theory_rel_err_note: max_exact_theory_rel_err_f1 compares finite-time empirical L_ood(γ_k(T)) against the analytic Corollary L_ood(γ_k = L/s_tr_k). It is expected to be LARGE because B2-regime training is only partially converged on slow modes (s_k^3 tail). This is documented, not gated — the exact formula's role is to validate the Corollary shape, not to match finite-time runs.
+train_wallclock_seconds: 18.433
+f1_wallclock_seconds: 0.01
+f2_wallclock_seconds: 0.059

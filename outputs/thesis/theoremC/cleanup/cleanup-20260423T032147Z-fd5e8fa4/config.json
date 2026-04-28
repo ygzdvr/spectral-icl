@@ -1,0 +1,14 @@
+{
+  "D": 64,
+  "dtype": "float64",
+  "item2_m": 8,
+  "item2_kappa": 3.0,
+  "item2_inactive_block_idx": 0,
+  "item2_q_probes": [
+    -10.0,
+    0.0,
+    1.0,
+    100.0
+  ],
+  "item2_zero_tol": 1e-12
+}

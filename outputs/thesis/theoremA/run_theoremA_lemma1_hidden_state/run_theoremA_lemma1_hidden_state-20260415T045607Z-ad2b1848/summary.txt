@@ -1,0 +1,34 @@
+run_id: run_theoremA_lemma1_hidden_state-20260415T045607Z-ad2b1848
+phase: theoremA
+script: run_theoremA_lemma1_hidden_state
+status: completed
+wall_clock_seconds: 4.749
+compute_proxy: 2.19903
+
+plan_reference: EXPERIMENT_PLAN_FINAL.MD §8 (theorem-A exact tier, direct Lemma 1 validation)
+framing: A1 / A1b / A1-general bypass the N-dim hidden state by going straight to the scalar recurrence, validating the reduced (A_S, B_S) block but not Lemma 1's invariant-subspace claim. A-Lemma1 constructs explicit (W_x, w_y, W_q, W_k, W_v, w_o) satisfying Assumption 1, runs the full N-dim forward pass of eq. (2), and verifies the two-channel decomposition h_μ^ℓ = W_x x_μ + Δ_μ^ℓ w_y at every depth ℓ and token μ. Residual dimension N = D + 10 strictly exceeds the 2-dim subspace so the hidden state has room to escape if Lemma 1 were false.
+category: exact theorem-A N-dim hidden-state forward-pass validation of Lemma 1 (invariant-subspace closure).
+interpretation: Two gates: (1) N-dim readout w_o^⊤ h_μ^L vs scalar R0 must agree to float64 eps — this is the end-to-end forward-pass equivalence; (2) the per-layer residual ‖h_μ^ℓ - W_x x_μ - Δ_μ^ℓ w_y‖ / ‖h_μ^ℓ‖ must be at machine precision — this is the direct test of Lemma 1's hidden-state ansatz. Gate (2) is the load-bearing new check; without it, A1 / A1b verify the reduced operators but not the algebraic collapse of the N-dim state itself. Both gates hold under GD-compatible and random train-supported S.
+acceptance_framing: prediction_pass: worst prediction err ≤ 1e-10. subspace_pass: worst invariant-subspace residual ≤ 1e-10.
+n_cells: 144
+mask_kinds: ['gd_compatible', 'random_train_supported']
+D_list: [8, 16, 32]
+P_list: [8, 16, 32]
+K_list: [4, 8]
+L_list: [1, 2, 4, 8]
+N_extra: 10
+alpha_v: 1.0
+B: 2
+prediction_tol: 1e-10
+subspace_tol: 1e-10
+worst_prediction_err: 1.2680202578031368e-15
+worst_subspace_residual: 0.0
+worst_assumption1_err: 0.0
+worst_delta0_train_vs_y_err: 0.0
+prediction_pass: True
+subspace_pass: True
+lemma1_pass: True
+per_mask: {'gd_compatible': {'n_cells': 72, 'worst_prediction_err': 1.1291156642160767e-15, 'worst_subspace_residual': 0.0}, 'random_train_supported': {'n_cells': 72, 'worst_prediction_err': 1.2680202578031368e-15, 'worst_subspace_residual': 0.0}}
+status: lemma1=ok (pred=1.27e-15, subspace=0.00e+00)
+device: cuda
+sweep_wallclock_seconds: 2.199

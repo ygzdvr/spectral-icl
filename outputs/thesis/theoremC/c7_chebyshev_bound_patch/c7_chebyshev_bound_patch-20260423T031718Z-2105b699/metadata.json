@@ -1,0 +1,64 @@
+{
+  "run_id": "c7_chebyshev_bound_patch-20260423T031718Z-2105b699",
+  "script_stem": "c7_chebyshev_bound_patch",
+  "phase": "theoremC",
+  "root": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremC/c7_chebyshev_bound_patch/c7_chebyshev_bound_patch-20260423T031718Z-2105b699",
+  "started_utc": "2026-04-23T03:17:18.886136+00:00",
+  "seeds": [
+    0
+  ],
+  "git_commit": "811d1f0",
+  "git_dirty": true,
+  "env": {
+    "python_version": "3.14.3",
+    "python_full_version": "3.14.3 (main, Mar 20 2026, 00:34:32) [Clang 22.1.1 ]",
+    "python_executable": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/.venv/bin/python",
+    "platform": "Linux-5.14.0-570.106.1.el9_6.x86_64-x86_64-with-glibc2.34",
+    "hostname": "della-gpu.princeton.edu",
+    "torch_version": "2.11.0+cu130",
+    "cuda_available": true,
+    "cuda_version": "13.0",
+    "cudnn_version": 91900,
+    "gpu_count": 1,
+    "gpu_names": [
+      "NVIDIA A100-PCIE-40GB"
+    ]
+  },
+  "notes": "C7 Chebyshev-bound patch: recompute per-block \u03c1_b, Mass, and total Cor 3.13 bound; add acceptance gate; emit corrected overlay + tightness figures.",
+  "status": "completed",
+  "finished_utc": "2026-04-23T03:17:33.886292+00:00",
+  "wall_clock_seconds": 15.000673294067383,
+  "compute_proxy": 10.819858433969785,
+  "measured_compute": null,
+  "per_step_wall_clock": {
+    "n_steps": 1,
+    "mean": 10.819858433969785,
+    "median": 10.819858433969785,
+    "total": 10.819858433969785
+  },
+  "error": null,
+  "extras": {
+    "checks": {
+      "chebyshev_bound_general_L_ok": true,
+      "chebyshev_bound_resolved_ok": true,
+      "raw_count_total": 175,
+      "raw_count_violations": 0,
+      "raw_min_slack": 1.1293596059554257e-05,
+      "worst_raw_loc": {
+        "m": 32,
+        "kappa": 16.0,
+        "L": 64,
+        "loss": 1.607599018660619e-08,
+        "bound": 1.1309672049740862e-05,
+        "slack": 1.1293596059554257e-05
+      },
+      "resolved_count_total": 175,
+      "resolved_min_slack": 1.1293596059554257e-05,
+      "max_resolved_ratio": 0.1386291105398724,
+      "failing_above_precision": 0,
+      "failing_above_cells": [],
+      "failing_below_precision": 0
+    },
+    "data_source": "recomputed locally (10.8 s)"
+  }
+}

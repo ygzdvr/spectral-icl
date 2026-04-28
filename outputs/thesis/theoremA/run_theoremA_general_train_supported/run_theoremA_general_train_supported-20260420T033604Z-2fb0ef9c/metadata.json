@@ -1,0 +1,34 @@
+{
+  "run_id": "run_theoremA_general_train_supported-20260420T033604Z-2fb0ef9c",
+  "script_stem": "run_theoremA_general_train_supported",
+  "phase": "theoremA",
+  "root": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremA/run_theoremA_general_train_supported/run_theoremA_general_train_supported-20260420T033604Z-2fb0ef9c",
+  "started_utc": "2026-04-20T03:36:04.390922+00:00",
+  "seeds": [
+    0,
+    7,
+    13,
+    19,
+    31,
+    101
+  ],
+  "git_commit": "811d1f0",
+  "git_dirty": true,
+  "env": {
+    "python_version": "3.14.3",
+    "python_full_version": "3.14.3 (main, Mar 20 2026, 00:34:32) [Clang 22.1.1 ]",
+    "python_executable": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/.venv/bin/python",
+    "platform": "Linux-5.14.0-570.106.1.el9_6.x86_64-x86_64-with-glibc2.34",
+    "hostname": "della-gpu.princeton.edu",
+    "torch_version": "2.11.0+cu130",
+    "cuda_available": true,
+    "cuda_version": "13.0",
+    "cudnn_version": 91900,
+    "gpu_count": 1,
+    "gpu_names": [
+      "NVIDIA A100-PCIE-40GB"
+    ]
+  },
+  "notes": "A1-general: Theorem-1 exactness for every train-supported structured mixer (4 mask kinds including near-GD interpolation, 3 \u0393 kinds including random-nonsymmetric, 2 covariance settings) plus Proposition-3 necessity check that the reduced-\u0393 predictor R3 genuinely fails outside the GD-compatible class.",
+  "status": "started"
+}

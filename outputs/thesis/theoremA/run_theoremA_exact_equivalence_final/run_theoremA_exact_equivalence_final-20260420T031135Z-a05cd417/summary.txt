@@ -1,0 +1,34 @@
+run_id: run_theoremA_exact_equivalence_final-20260420T031135Z-a05cd417
+phase: theoremA
+script: run_theoremA_exact_equivalence_final
+status: completed
+wall_clock_seconds: 126.494
+compute_proxy: 122.013
+
+plan_reference: EXPERIMENT_PLAN_FINAL.MD §8.1 (A1 + A1b unified)
+category: four-way exact theorem-A operator-level forward-pass equivalence test. Four structurally distinct forward routes (R0 = true full-hidden-state aligned structured forward from (X, Γ); R1 = iterative reduced (A_S, B_S) residual stream; R2 = closed-form reduced (A_S, B_S) recursion; R3 = feature-space reduced-Γ closed form) must agree to float64 machine precision in the GD-compatible setting. Reports all six pairwise relative errors — the strictest formulation of theorem A's operator-level claim.
+interpretation: Theorem A asserts that, in the GD-compatible mask regime, the full-hidden-state aligned linear structured forward map, the iterative reduced-AB recursion, the closed-form reduced-AB identity, and the feature-space reduced-Γ iterate are all equal as an algebraic identity. A1final verifies all six pairwise equalities at float eps over (D, P, K, L). Any pair exceeding tolerance indicates an implementation bug, not a theorem failure.
+device: cuda
+routes: ['R0', 'R1', 'R2', 'R3']
+pairs: ['R0_R1', 'R0_R2', 'R0_R3', 'R1_R2', 'R1_R3', 'R2_R3']
+D_list: [8, 16, 32, 64]
+P_list: [8, 16, 32, 64]
+K_list: [4, 8, 16]
+L_list: [1, 2, 4, 8]
+n_cells: 192
+B: 4
+label_norm: sqrt_D
+Sigma_kind: isotropic
+Omega_kind: isotropic
+Gamma_kind: identity
+mask_kind: gd_compatible
+status: R0_R1_ok+R0_R2_ok+R0_R3_ok+R1_R2_ok+R1_R3_ok+R2_R3_ok
+machine_eps_tol: 1e-10
+worst_R0_R1: 9.552959237207466e-16
+worst_R0_R2: 1.025238347441516e-15
+worst_R0_R3: 1.4675349532738898e-15
+worst_R1_R2: 3.779777992958291e-16
+worst_R1_R3: 1.1416222735775601e-15
+worst_R2_R3: 1.0267610010029903e-15
+worst_cell: {'D': 64, 'P': 8, 'K': 16, 'L': 8, 'err_R0_R1': 9.552959237207466e-16, 'err_R0_R2': 1.025238347441516e-15, 'err_R0_R3': 1.4675349532738898e-15, 'err_R1_R2': 3.779777992958291e-16, 'err_R1_R3': 9.3193704243682e-16, 'err_R2_R3': 8.877105830191809e-16}
+sweep_wallclock_seconds: 122.013

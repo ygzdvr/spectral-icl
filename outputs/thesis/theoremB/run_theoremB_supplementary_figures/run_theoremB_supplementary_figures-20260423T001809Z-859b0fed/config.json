@@ -1,0 +1,23 @@
+{
+  "b3_run_dir": "outputs/thesis/theoremB/run_theoremB_symbol_shift/run_theoremB_symbol_shift-20260423T001315Z-9646180c",
+  "b4_run_dir": "outputs/thesis/theoremB/run_theoremB_rank_scaling/run_theoremB_rank_scaling-20260423T001315Z-d05dab64",
+  "L_list": [
+    1,
+    2,
+    4,
+    8,
+    16
+  ],
+  "f1_alphas": [
+    0.1,
+    0.3,
+    0.5,
+    0.8,
+    1.0
+  ],
+  "f2_alphas": [
+    0.2,
+    0.5,
+    1.0
+  ]
+}

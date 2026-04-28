@@ -1,0 +1,58 @@
+Experiment C4 strict-gain patch — per-item acceptance summary
+========================================================================
+Plan ref: EXPERIMENT_PLAN_FINAL.MD §7.4 (C4)
+Theorem ref: thesis/theorem_c.txt — Proposition 3.15 (monotonicity, weak direction), Corollary 3.16 (strict hybrid gain under heterogeneous coarse blocks).
+Config: D = 64, m_list = [1, 2, 4, 8, 16, 32], kappa_list = [1.0, 1.2, 1.5, 2.0, 3.0, 5.0, 10.0], L_list = [1, 2, 4, 8, 16]
+Data source: canonical C4 npz: outputs/thesis/theoremC/run_theoremC_phase_diagram/run_theoremC_phase_diagram-20260423T011734Z-811f77d3/npz/phase_diagram.npz
+
+Check 1 — Corollary 3.16 strict refinement gain
+  Hypothesis: m >= 2 AND kappa > 1 (count = 150 cells)
+  Assertion:  gap = L_coarse - L_fine > 1.0e-15
+    min_strict_gap   = -5.237e-12
+    count_positive   = 133 / 150
+    min cell         = (m = 2, kappa = 1.5, L = 16)
+      L_coarse = 7.2830e-12  L_fine = 1.2520e-11
+  → strict_refinement_gain_ok: FAIL
+
+Check 1-resolved — Corollary 3.16 strict gain on optimizer-resolved cells (diagnostic)
+  Additional hypothesis: max(|L_coarse|, |L_fine|) > 1.0e-09  (count = 123 cells)
+    resolved_min_gap = 1.610e-09
+    resolved_count_positive = 123 / 123
+    resolved min cell = (m = 8, kappa = 3, L = 16)
+      L_coarse = 1.6143e-09  L_fine = 4.3016e-12
+  → strict_refinement_gain_resolved_ok: PASS
+
+Failing-cell breakdown (strict check)
+  failing_below_precision = 17 cells (both L_coarse, L_fine ≤ 1.0e-09; below L-BFGS resolved precision, not a theorem violation)
+  failing_above_precision = 0 cells (true theorem violations if nonzero — must be 0)
+  below-precision failing cells (m, kappa, L, gap, L_coarse, L_fine):
+    (m= 2, k= 1.2, L= 8)  gap=-1.545e-12  Lc=2.370e-12  Lf=3.916e-12
+    (m= 2, k= 1.2, L=16)  gap=-2.999e-12  Lc=7.032e-12  Lf=1.003e-11
+    (m= 2, k= 1.5, L=16)  gap=-5.237e-12  Lc=7.283e-12  Lf=1.252e-11
+    (m= 2, k=   2, L=16)  gap=-3.091e-12  Lc=9.578e-12  Lf=1.267e-11
+    (m= 4, k= 1.2, L= 8)  gap=-6.564e-13  Lc=1.268e-12  Lf=1.924e-12
+    (m= 4, k= 1.2, L=16)  gap=-2.225e-12  Lc=2.947e-12  Lf=5.173e-12
+    (m= 4, k= 1.5, L=16)  gap=-2.164e-12  Lc=3.928e-12  Lf=6.092e-12
+    (m= 4, k=   2, L=16)  gap=-3.428e-12  Lc=2.974e-12  Lf=6.402e-12
+    (m= 8, k= 1.2, L= 8)  gap=-2.456e-13  Lc=8.525e-13  Lf=1.098e-12
+    (m= 8, k= 1.2, L=16)  gap=-1.070e-12  Lc=1.492e-12  Lf=2.561e-12
+    (m= 8, k= 1.5, L=16)  gap=-4.969e-13  Lc=1.739e-12  Lf=2.236e-12
+    (m= 8, k=   2, L=16)  gap=-2.754e-13  Lc=1.863e-12  Lf=2.138e-12
+    (m=16, k= 1.2, L= 8)  gap=-7.332e-15  Lc=1.189e-12  Lf=1.196e-12
+    (m=16, k= 1.2, L=16)  gap=-6.455e-14  Lc=1.242e-12  Lf=1.307e-12
+    (m=16, k=   2, L=16)  gap=-1.573e-13  Lc=1.177e-12  Lf=1.334e-12
+    (m=32, k= 1.5, L=16)  gap=-1.880e-13  Lc=1.106e-12  Lf=1.294e-12
+    (m=32, k=   2, L=16)  gap=-8.112e-14  Lc=1.293e-12  Lf=1.374e-12
+
+Check 2 — zero-gain region
+  Hypothesis: m = 1 OR kappa = 1 (count = 60 cells)
+  Assertion:  |gap| < 1.0e-09
+    zero_worst_abs_gap = 4.087e-12
+    worst cell         = (m = 2, kappa = 1, L = 16)
+      gap = -4.087e-12
+  → zero_region_ok: PASS
+
+========================================================================
+Top-line status (raw 1e-15 threshold): FAIL
+Theorem-level status (resolved cells only): PASS
+

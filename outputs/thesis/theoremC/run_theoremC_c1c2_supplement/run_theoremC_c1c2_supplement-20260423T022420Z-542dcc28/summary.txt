@@ -1,0 +1,34 @@
+run_id: run_theoremC_c1c2_supplement-20260423T022420Z-542dcc28
+phase: theoremC
+script: run_theoremC_c1c2_supplement
+status: completed
+wall_clock_seconds: 76.545
+compute_proxy: 76.3642
+
+plan_reference: EXPERIMENT_PLAN_FINAL.MD §7.1–§7.2 (supplements the main C1+C2 script)
+theorem_reference: thesis/theorem_c.txt: Lemma 3.5 (band-rotation invariance of the population loss), Theorem 3.8 (exact grouped closure, grouped loss formula eq. 3.2, induced metric, grouped gradient-flow ODE eq. 3.3), Corollary 3.9 (endpoint recovery: singletons ↔ modewise; single band ↔ scalar isotropic).
+category: operator-level exact theorem-C supplement — no learned architecture. Items 2/3/4/5 are algebraic (machine-precision acceptance); item 1 is a paired-MC Lemma-3.5 test with tolerance item1_tol_sigmas · std(paired_diff) / sqrt(N_mc).
+interpretation: Item 1 confirms Lemma 3.5 (band-rotation invariance of E_L) holds for both Q ∈ C(B) and Q ∉ C(B) under paired MC over N_mc block-Haar samples, at ~5σ confidence. Item 2 confirms that equation (3.2) is the correct closed form of the matrix population loss for block-scalar Q, by independent P×P matrix-product evaluation vs direct modewise sum. Item 3 confirms the Frobenius induced-metric identity ‖Q‖_F² = Σ_b m_b q_b² from Theorem 3.8 step 5. Item 4 confirms Corollary 3.9 endpoint recovery: the band-RRS grouped machinery specializes to Theorem-B modewise dynamics at M = P and to scalar isotropic dynamics at M = 1. Item 5 confirms the theorem holds for a non-uniform block partition (4,4,8,16,32).
+device: cuda
+D: 64
+main_partition_m: 8
+n_blocks_main: 8
+L_list: [1, 2, 4, 8]
+T: 5000
+eta: 0.005
+n_checkpoints: 50
+item1_n_U: 20
+item1_n_mc: 10000
+item1_tol_sigmas: 5.0
+item4_L: 4
+item5_block_sizes: [4, 4, 8, 16, 32]
+tol_exact: 1e-12
+status: item1_ok+item2_ok+item3_ok+item4_ok+item5_ok
+all_ok: True
+worst_item1_abs_diff: 3.413618351633119e-05
+worst_item2_rel_err: 7.88652403192672e-16
+worst_item3_rel_err: 2.8112518896962965e-16
+item4: {'L': 4, 'singleton': {'abs_err': 0.0, 'rel_err': 0.0, 'ok': True}, 'single_band': {'abs_err': 0.0, 'rel_err': 0.0, 'within_band_spread': 0.0, 'ok': True}, 'm8': {'abs_err': 0.0, 'ok': True}, 'ok': True}
+item5: {'block_sizes': [4, 4, 8, 16, 32], 'L': 4, 'cv_max': 0.0, 'q_err_max': 2.7755575615628914e-17, 'cv_ok': True, 'q_err_ok': True, 'ok': True}
+total_wallclock_seconds: 76.364
+supplement_summary_path: /scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremC/run_theoremC_c1c2_supplement/run_theoremC_c1c2_supplement-20260423T022420Z-542dcc28/c1c2_supplement_summary.txt

@@ -1,0 +1,70 @@
+{
+  "D_list": [
+    8,
+    16,
+    32,
+    64
+  ],
+  "P_list": [
+    8,
+    16,
+    32
+  ],
+  "K_list": [
+    4,
+    8
+  ],
+  "L_list": [
+    1,
+    2,
+    4,
+    8
+  ],
+  "mask_settings": [
+    [
+      "gd_compatible",
+      null
+    ],
+    [
+      "lower_triangular",
+      null
+    ],
+    [
+      "random_dense",
+      null
+    ],
+    [
+      "near_gd",
+      0.01
+    ],
+    [
+      "near_gd",
+      0.1
+    ],
+    [
+      "near_gd",
+      0.5
+    ]
+  ],
+  "gamma_kinds": [
+    "identity",
+    "random_symmetric",
+    "random_nonsymmetric"
+  ],
+  "sigma_kinds": [
+    "isotropic",
+    "structured"
+  ],
+  "label_norm": "sqrt_D",
+  "sigma_noise": 0.0,
+  "B": 2,
+  "base_seed": 0,
+  "machine_eps_tol": 1e-10,
+  "necessity_threshold": 0.001,
+  "heatmap_K": 8,
+  "heatmap_L": 4,
+  "heatmap_gamma_kind": "random_nonsymmetric",
+  "heatmap_sigma_kind": "structured",
+  "dtype": "float64",
+  "device": "cuda"
+}

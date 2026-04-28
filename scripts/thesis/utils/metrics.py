@@ -217,6 +217,29 @@ def ab_perturbation_bound(
 # ---------------------------------------------------------------------------
 
 
+@torch.jit.script
+def _gamma_star_euler_loop(
+    traj: torch.Tensor,
+    s64: torch.Tensor,
+    w64: torch.Tensor,
+    s_sq: torch.Tensor,
+    eta_f: float,
+    L_int: int,
+    T_int: int,
+) -> None:
+    """In-place Euler recursion ``g_{t+1} = g_t + η·ω·s²·(1 − s·g_t/L)^{2L−1}``.
+
+    JIT-scripted so Python-level per-step overhead does not dominate the
+    10⁷-step trajectories used by theorem-B.
+    """
+    exponent = 2 * L_int - 1
+    L_f = float(L_int)
+    for t in range(T_int):
+        g = traj[t]
+        step = eta_f * w64 * s_sq * (1.0 - s64 * g / L_f).pow(exponent)
+        traj[t + 1] = g + step
+
+
 def gamma_star_trajectory_circulant(
     s_tr: torch.Tensor,
     omega: torch.Tensor,
@@ -256,29 +279,27 @@ def gamma_star_trajectory_circulant(
         raise ValueError(f"T must be a non-negative int; got {T}")
 
     P = s_tr.shape[0]
-    s64 = s_tr.to(torch.float64)
-    w64 = omega.to(torch.float64)
+    dev = s_tr.device
+    s64 = s_tr.to(dtype=torch.float64, device=dev)
+    w64 = omega.to(dtype=torch.float64, device=dev)
 
     if gamma0 is None:
-        g0 = torch.zeros(P, dtype=torch.float64)
+        g0 = torch.zeros(P, dtype=torch.float64, device=dev)
     elif isinstance(gamma0, (int, float)):
-        g0 = torch.full((P,), float(gamma0), dtype=torch.float64)
+        g0 = torch.full((P,), float(gamma0), dtype=torch.float64, device=dev)
     else:
         if gamma0.shape != (P,):
             raise ValueError(
                 f"gamma0 must have shape ({P},); got {tuple(gamma0.shape)}"
             )
-        g0 = gamma0.to(torch.float64).clone()
+        g0 = gamma0.to(dtype=torch.float64, device=dev).clone()
 
-    traj = torch.zeros(T_int + 1, P, dtype=torch.float64)
+    traj = torch.zeros(T_int + 1, P, dtype=torch.float64, device=dev)
     traj[0] = g0
-    exponent = 2 * L_int - 1
-    eta_f = float(eta)
     s_sq = s64.pow(2)
-    for t in range(T_int):
-        g = traj[t]
-        step = eta_f * w64 * s_sq * (1.0 - s64 * g / L_int).pow(exponent)
-        traj[t + 1] = g + step
+    _gamma_star_euler_loop(
+        traj, s64, w64, s_sq, float(eta), int(L_int), int(T_int),
+    )
     return traj
 
 

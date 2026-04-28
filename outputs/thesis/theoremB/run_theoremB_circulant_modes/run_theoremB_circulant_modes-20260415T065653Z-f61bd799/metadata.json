@@ -1,0 +1,55 @@
+{
+  "run_id": "run_theoremB_circulant_modes-20260415T065653Z-f61bd799",
+  "script_stem": "run_theoremB_circulant_modes",
+  "phase": "theoremB",
+  "root": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremB/run_theoremB_circulant_modes/run_theoremB_circulant_modes-20260415T065653Z-f61bd799",
+  "started_utc": "2026-04-15T06:56:53.140299+00:00",
+  "seeds": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "git_commit": "811d1f0",
+  "git_dirty": true,
+  "env": {
+    "python_version": "3.14.3",
+    "python_full_version": "3.14.3 (main, Mar 20 2026, 00:34:32) [Clang 22.1.1 ]",
+    "python_executable": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/.venv/bin/python",
+    "platform": "Linux-5.14.0-570.106.1.el9_6.x86_64-x86_64-with-glibc2.34",
+    "hostname": "della-i21g3",
+    "torch_version": "2.11.0+cu130",
+    "cuda_available": true,
+    "cuda_version": "13.0",
+    "cudnn_version": 91900,
+    "gpu_count": 1,
+    "gpu_names": [
+      "NVIDIA H200"
+    ]
+  },
+  "notes": null,
+  "status": "completed",
+  "finished_utc": "2026-04-15T06:56:58.465302+00:00",
+  "wall_clock_seconds": 5.325817346572876,
+  "compute_proxy": 1.409854041005019,
+  "measured_compute": null,
+  "per_step_wall_clock": {
+    "n_steps": 72,
+    "mean": 0.019534749693977775,
+    "median": 0.0011896180076291785,
+    "total": 1.4065019779663999
+  },
+  "error": null,
+  "extras": {
+    "n_trials": 72,
+    "n_failures": 0,
+    "failures": [],
+    "bridge_to_b2": false,
+    "max_errors": {
+      "residual_mode_rel_err": 1.2087553180606392e-14,
+      "transfer_rel_err": 1.418838780152995e-14,
+      "train_offdiag_fourier_energy": 0.0,
+      "query_offdiag_fourier_energy": 0.0
+    }
+  }
+}

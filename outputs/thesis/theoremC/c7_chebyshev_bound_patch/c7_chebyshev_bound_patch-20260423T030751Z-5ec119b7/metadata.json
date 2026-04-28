@@ -1,0 +1,40 @@
+{
+  "run_id": "c7_chebyshev_bound_patch-20260423T030751Z-5ec119b7",
+  "script_stem": "c7_chebyshev_bound_patch",
+  "phase": "theoremC",
+  "root": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremC/c7_chebyshev_bound_patch/c7_chebyshev_bound_patch-20260423T030751Z-5ec119b7",
+  "started_utc": "2026-04-23T03:07:51.513025+00:00",
+  "seeds": [
+    0
+  ],
+  "git_commit": "811d1f0",
+  "git_dirty": true,
+  "env": {
+    "python_version": "3.14.3",
+    "python_full_version": "3.14.3 (main, Mar 20 2026, 00:34:32) [Clang 22.1.1 ]",
+    "python_executable": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/.venv/bin/python",
+    "platform": "Linux-5.14.0-570.106.1.el9_6.x86_64-x86_64-with-glibc2.34",
+    "hostname": "della-gpu.princeton.edu",
+    "torch_version": "2.11.0+cu130",
+    "cuda_available": true,
+    "cuda_version": "13.0",
+    "cudnn_version": 91900,
+    "gpu_count": 1,
+    "gpu_names": [
+      "NVIDIA A100-PCIE-40GB"
+    ]
+  },
+  "notes": "C7 Chebyshev-bound patch: recompute per-block \u03c1_b, Mass, and total Cor 3.13 bound; add acceptance gate; emit corrected overlay + tightness figures.",
+  "status": "failed",
+  "finished_utc": "2026-04-23T03:07:51.925093+00:00",
+  "wall_clock_seconds": 0.4128448963165283,
+  "compute_proxy": null,
+  "measured_compute": null,
+  "per_step_wall_clock": {
+    "n_steps": 0,
+    "mean": null,
+    "median": null,
+    "total": null
+  },
+  "error": "TypeError(\"C7Config.__init__() got an unexpected keyword argument 'partition_m_list'\")"
+}

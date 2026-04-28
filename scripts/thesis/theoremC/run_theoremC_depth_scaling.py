@@ -359,7 +359,7 @@ def _plot_loss_vs_depth(
     i_m = m_list.index(cfg.headline_m)
     kappa_list = list(result["kappa_list"])
     L_arr = np.asarray(result["L_list"], dtype=float)
-    colors = sequential_colors(len(kappa_list), palette="rocket")
+    colors = sequential_colors(len(kappa_list), palette="mako")
     floor = 1e-18
 
     fig, ax = plt.subplots(figsize=(6.4, 4.4))
@@ -374,10 +374,6 @@ def _plot_loss_vs_depth(
     ax.set_yscale("log")
     ax.set_xlabel(r"depth $L$")
     ax.set_ylabel(r"grouped spectral-only $L^\star(m, \kappa; L)$")
-    ax.set_title(
-        rf"C7 (a) empirical depth scaling at $m = {cfg.headline_m}$",
-        fontsize=10,
-    )
     ax.legend(fontsize=8, loc="best")
     fig.tight_layout()
     save_both(fig, run_dir, "c7_loss_vs_depth")
@@ -397,7 +393,7 @@ def _plot_contraction_overlay(
     i_m = m_list.index(cfg.headline_m)
     kappa_list = list(result["kappa_list"])
     L_arr = np.asarray(result["L_list"], dtype=float)
-    colors = sequential_colors(len(kappa_list), palette="rocket")
+    colors = sequential_colors(len(kappa_list), palette="mako")
     floor = 1e-18
 
     fig, ax = plt.subplots(figsize=(6.6, 4.4))
@@ -425,11 +421,6 @@ def _plot_contraction_overlay(
     ax.set_yscale("log")
     ax.set_xlabel(r"depth $L$")
     ax.set_ylabel(r"$L^\star$")
-    ax.set_title(
-        rf"C7 (b) contraction overlay $\rho^\star = (\kappa-1)/(\kappa+1)$ "
-        rf"at $m = {cfg.headline_m}$",
-        fontsize=10,
-    )
     ax.legend(fontsize=7, loc="best")
     fig.tight_layout()
     save_both(fig, run_dir, "c7_contraction_overlay")
@@ -463,7 +454,7 @@ def _plot_interpolation(
         kappas_show = [
             k for k in cfg.headline_kappas if k in kappa_list
         ] or kappa_list
-        colors = sequential_colors(len(kappas_show), palette="rocket")
+        colors = sequential_colors(len(kappas_show), palette="mako")
         for color, kappa in zip(colors, kappas_show):
             i_k = kappa_list.index(kappa)
             y = result["loss_grid"][i_m, i_k, :]
@@ -498,7 +489,7 @@ def _plot_interpolation(
     )
     if kappa_right in kappa_list:
         i_k = kappa_list.index(kappa_right)
-        colors = sequential_colors(len(m_list), palette="rocket")
+        colors = sequential_colors(len(m_list), palette="mako")
         for color, m in zip(colors, m_list):
             i_m = m_list.index(m)
             y = result["loss_grid"][i_m, i_k, :]
@@ -518,12 +509,7 @@ def _plot_interpolation(
     )
     ax.legend(fontsize=8, loc="best")
 
-    fig.suptitle(
-        "C7 headline: interpolation between theorem-B-like depth "
-        "irrelevance and heterogeneous grouped contraction",
-        fontsize=11,
-    )
-    fig.tight_layout(rect=(0, 0, 1, 0.94))
+    fig.tight_layout()
     save_both(fig, run_dir, "c7_interpolation")
     plt.close(fig)
 
@@ -543,7 +529,7 @@ def _plot_m_sweep(
 
     m_list = list(result["m_list"])
     L_arr = np.asarray(result["L_list"], dtype=float)
-    colors = sequential_colors(len(m_list), palette="rocket")
+    colors = sequential_colors(len(m_list), palette="mako")
     floor = 1e-18
 
     fig, ax = plt.subplots(figsize=(6.2, 4.2))
@@ -559,10 +545,6 @@ def _plot_m_sweep(
     ax.set_yscale("log")
     ax.set_xlabel(r"depth $L$")
     ax.set_ylabel(r"$L^\star$")
-    ax.set_title(
-        rf"C7 diagnostic: m-sweep at $\kappa = {kappa_target}$",
-        fontsize=10,
-    )
     ax.legend(fontsize=8, loc="best")
     fig.tight_layout()
     save_both(fig, run_dir, "c7_m_sweep")
@@ -608,11 +590,6 @@ def _plot_empirical_slope_vs_theory(
     )
     ax.set_xlabel(r"theoretical slope $2 \log \rho^\star$")
     ax.set_ylabel(r"empirical semi-log slope of $\log L^\star$ vs $L$")
-    ax.set_title(
-        "C7 diagnostic: empirical contraction rate vs theory "
-        "(this is NOT a β_b power-law fit)",
-        fontsize=10,
-    )
     ax.legend(fontsize=8, loc="best")
     ax.grid(True, alpha=0.4)
     fig.tight_layout()

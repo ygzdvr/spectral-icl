@@ -1,0 +1,28 @@
+run_id: run_theoremC_refinement_monotonicity-20260423T045803Z-2bb596b7
+phase: theoremC
+script: run_theoremC_refinement_monotonicity
+status: completed
+wall_clock_seconds: 25.259
+compute_proxy: 17.969
+
+plan_reference: EXPERIMENT_PLAN_FINAL.MD §7.5 (C5)
+category: operator-level exact theorem-C validation — multi-level refinement ladder from coarsest single-block to singleton partition. Extends C4's one-step dyadic gain to the full monotone staircase. No learned architecture.
+interpretation: For every κ and every depth L, the block-commutant optimum L★(j) is monotonically non-increasing along the dyadic refinement ladder of 7 ladder levels and 6 refinement steps (j = 0 → J), reaching 0 at the singleton partition. At κ = 1 every level attains 0 (trivial flat ladder, no heterogeneity to resolve). At large κ, every dyadic step that separates heterogeneous modes produces a strict drop, and the full ladder traces a monotone staircase from a large L★(0) down to 0. The κ sweep makes this transition visually explicit. Depth enters only as a secondary axis; the staircase structure persists across L, confirming that the theorem-C hybrid-refinement story is depth-robust. The singleton level is an oracle sanity endpoint only, not the theorem object under test.
+device: cuda
+D: 128
+n_ladder_levels: 7
+n_refinement_steps: 6
+level_sizes: [128, 64, 32, 16, 8, 4, 2]
+per_level_nblocks: [1, 2, 4, 8, 16, 32, 64]
+kappa_list: [1.2, 1.5, 2.0, 3.0, 5.0, 10.0, 20.0]
+L_list: [1, 3]
+L_primary: 1
+L_deeper: 3
+status: monotonicity_ok+kappa1_zero_ok
+monotonicity_tol: 1e-08
+kappa_1_tol: 1e-09
+worst_mono_increase: 0.0
+worst_mono_cell: None
+kappa_one_worst: 0.0
+strict_drop_counts: [{'kappa': 1.2, 'L_star_0': 0.35515939850648653, 'strict_drops': 6, 'total_steps': 6}, {'kappa': 1.5, 'L_star_0': 1.6654198177380395, 'strict_drops': 6, 'total_steps': 6}, {'kappa': 2.0, 'L_star_0': 4.327698858744485, 'strict_drops': 6, 'total_steps': 6}, {'kappa': 3.0, 'L_star_0': 8.683593362912152, 'strict_drops': 6, 'total_steps': 6}, {'kappa': 5.0, 'L_star_0': 13.605634298273259, 'strict_drops': 6, 'total_steps': 6}, {'kappa': 10.0, 'L_star_0': 18.818817990692793, 'strict_drops': 6, 'total_steps': 6}, {'kappa': 20.0, 'L_star_0': 23.255902186464155, 'strict_drops': 6, 'total_steps': 6}]
+sweep_wallclock_seconds: 17.969

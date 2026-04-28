@@ -1,0 +1,64 @@
+{
+  "run_id": "run_theoremA_lemma1_hidden_state-20260415T045607Z-ad2b1848",
+  "script_stem": "run_theoremA_lemma1_hidden_state",
+  "phase": "theoremA",
+  "root": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremA/run_theoremA_lemma1_hidden_state/run_theoremA_lemma1_hidden_state-20260415T045607Z-ad2b1848",
+  "started_utc": "2026-04-15T04:56:07.955775+00:00",
+  "seeds": [
+    0,
+    7,
+    97,
+    997
+  ],
+  "git_commit": "811d1f0",
+  "git_dirty": true,
+  "env": {
+    "python_version": "3.14.3",
+    "python_full_version": "3.14.3 (main, Mar 20 2026, 00:34:32) [Clang 22.1.1 ]",
+    "python_executable": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/.venv/bin/python",
+    "platform": "Linux-5.14.0-570.106.1.el9_6.x86_64-x86_64-with-glibc2.34",
+    "hostname": "della-i23g3",
+    "torch_version": "2.11.0+cu130",
+    "cuda_available": true,
+    "cuda_version": "13.0",
+    "cudnn_version": 91900,
+    "gpu_count": 1,
+    "gpu_names": [
+      "NVIDIA H200"
+    ]
+  },
+  "notes": "A-Lemma1: builds explicit weight matrices satisfying Assumption 1, runs the full N-dim residual-stream forward pass of chapter eq. (2), and verifies (i) the N-dim readout agrees with the scalar R0 recurrence to float64 eps and (ii) the invariant-subspace ansatz h_\u03bc^\u2113 = W_x x_\u03bc + \u0394_\u03bc^\u2113 w_y holds at every layer \u2113 for every token \u03bc. Tested under both GD-compatible and random train-supported S.",
+  "status": "completed",
+  "finished_utc": "2026-04-15T04:56:12.704192+00:00",
+  "wall_clock_seconds": 4.748873710632324,
+  "compute_proxy": 2.1990331730339676,
+  "measured_compute": null,
+  "per_step_wall_clock": {
+    "n_steps": 144,
+    "mean": 0.01526644938510597,
+    "median": 0.002314642013516277,
+    "total": 2.1983687114552595
+  },
+  "error": null,
+  "extras": {
+    "worst_prediction_err": 1.2680202578031368e-15,
+    "worst_subspace_residual": 0.0,
+    "worst_assumption1_err": 0.0,
+    "worst_delta0_train_vs_y_err": 0.0,
+    "prediction_pass": true,
+    "subspace_pass": true,
+    "lemma1_pass": true,
+    "per_mask": {
+      "gd_compatible": {
+        "n_cells": 72,
+        "worst_prediction_err": 1.1291156642160767e-15,
+        "worst_subspace_residual": 0.0
+      },
+      "random_train_supported": {
+        "n_cells": 72,
+        "worst_prediction_err": 1.2680202578031368e-15,
+        "worst_subspace_residual": 0.0
+      }
+    }
+  }
+}

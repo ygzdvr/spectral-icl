@@ -123,10 +123,24 @@ def _latest_run(project_root: Path, script_stem: str) -> Path | None:
 # ---------------------------------------------------------------------------
 
 
+def _log_cell_edges(coords: np.ndarray) -> np.ndarray:
+    """Return length-``n+1`` cell-edge array for log-scaled centers.
+
+    Edges sit halfway between neighbouring centers in log-space, and the
+    outer edges are extrapolated symmetrically. Matches the convention
+    used for log-scaled pcolormesh so hatched overlays align exactly.
+    """
+    log_c = np.log10(np.asarray(coords, dtype=float))
+    mids = 0.5 * (log_c[:-1] + log_c[1:])
+    left = log_c[0] - 0.5 * (log_c[1] - log_c[0])
+    right = log_c[-1] + 0.5 * (log_c[-1] - log_c[-2])
+    return 10.0 ** np.concatenate([[left], mids, [right]])
+
+
 def _hatch_masked_region(
     ax,
-    x_coords: np.ndarray,
-    y_coords: np.ndarray,
+    x_edges: np.ndarray,
+    y_edges: np.ndarray,
     mask: np.ndarray,
     *,
     hatch_color: str = "lightgray",
@@ -135,35 +149,24 @@ def _hatch_masked_region(
 ) -> None:
     """Overlay hatched rectangles at every ``True`` cell of ``mask``.
 
-    ``x_coords`` and ``y_coords`` are the pcolormesh coordinates (length
-    ``n_x`` and ``n_y``; the heatmap is shape ``(n_y, n_x)``). For
-    log-scaled axes we draw each cell as a rectangle whose edges sit
-    halfway (in log-space) between neighbouring coordinate values.
+    ``x_edges`` (length ``n_x+1``) and ``y_edges`` (length ``n_y+1``) are
+    the shared pcolormesh cell-edge arrays; the heatmap is shape
+    ``(n_y, n_x)``. Using the same edges for the mesh and the overlay
+    guarantees the hatched cells sit flush against their unmasked
+    neighbours.
 
     The default style matches the thesis convention: light-gray fill
     with diagonal hatch, thin gray border.
     """
     from matplotlib.patches import Rectangle
 
-    def _bounds_log(coords: np.ndarray, i: int) -> tuple[float, float]:
-        log_c = np.log10(coords)
-        if i == 0:
-            left = log_c[0] - 0.5 * (log_c[1] - log_c[0])
-        else:
-            left = 0.5 * (log_c[i - 1] + log_c[i])
-        if i == len(coords) - 1:
-            right = log_c[-1] + 0.5 * (log_c[-1] - log_c[-2])
-        else:
-            right = 0.5 * (log_c[i] + log_c[i + 1])
-        return 10.0 ** left, 10.0 ** right
-
     n_y, n_x = mask.shape
     for j in range(n_y):
         for i in range(n_x):
             if not bool(mask[j, i]):
                 continue
-            x0, x1 = _bounds_log(x_coords, i)
-            y0, y1 = _bounds_log(y_coords, j)
+            x0, x1 = x_edges[i], x_edges[i + 1]
+            y0, y1 = y_edges[j], y_edges[j + 1]
             rect = Rectangle(
                 (x0, y0), x1 - x0, y1 - y0,
                 facecolor=hatch_color,
@@ -183,7 +186,7 @@ def _hatch_legend_proxy(ax) -> None:
         facecolor="lightgray",
         edgecolor="gray",
         hatch="///",
-        label="≡ 0 (Cor. 3.12)",
+        label="≡ 0 (Cor.)",
     )
     handles = [proxy]
     ax.legend(
@@ -202,7 +205,7 @@ def _plot_masked_heatmap(
     xlabel: str,
     ylabel: str,
     cbar_label: str,
-    title: str,
+    title: str = "",
     floor: float = 1e-18,
 ) -> None:
     """Core helper: draw a log-scale pcolormesh and overlay hatched cells
@@ -226,17 +229,22 @@ def _plot_masked_heatmap(
         if vmax <= vmin:
             vmax = vmin * 10
     cmap = PALETTE_PHASE  # 'mako' per plotting.py
+    x_edges = _log_cell_edges(x_coords)
+    y_edges = _log_cell_edges(y_coords)
     mesh = ax.pcolormesh(
-        x_coords, y_coords, vals_display,
+        x_edges, y_edges, vals_display,
         cmap=cmap, norm=LogNorm(vmin=vmin, vmax=vmax),
-        shading="auto",
+        shading="flat",
     )
     ax.set_xscale("log")
     ax.set_yscale("log")
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
-    _hatch_masked_region(ax, x_coords, y_coords, mask)
-    ax.set_title(title, fontsize=10)
+    _hatch_masked_region(ax, x_edges, y_edges, mask)
+    ax.set_xlim(float(min(x_edges[0], x_edges[-1])),
+                float(max(x_edges[0], x_edges[-1])))
+    ax.set_ylim(float(min(y_edges[0], y_edges[-1])),
+                float(max(y_edges[0], y_edges[-1])))
     cbar = ax.figure.colorbar(mesh, ax=ax, fraction=0.045, pad=0.04)
     cbar.set_label(cbar_label)
 
@@ -252,6 +260,58 @@ def _mask_m_or_kappa_zero(
     mask |= (np.isclose(y_coords, 1.0).reshape(-1, 1))
     mask |= (np.isclose(x_coords, 1.0).reshape(1, -1))
     return mask
+
+
+def _mask_c6_hybrid_zero(
+    m_coords: np.ndarray, k_coords: np.ndarray
+) -> np.ndarray:
+    """C6 L_hybrid mask: κ=1 column (Cor 3.12) AND m=2 row (refined
+    partition at m = 2 IS the singleton, so L_hybrid ≡ L_unconstrained = 0
+    in the matched regime). This is the panel where the zero-region
+    hatching most clearly applies in the three-way figure."""
+    mask = _mask_m_or_kappa_zero(m_coords, k_coords)
+    mask |= np.isclose(m_coords, 2.0).reshape(-1, 1)
+    return mask
+
+
+def _plot_masked_heatmap_linear(
+    ax,
+    values: np.ndarray,
+    x_coords: np.ndarray,
+    y_coords: np.ndarray,
+    mask: np.ndarray,
+    *,
+    xlabel: str,
+    ylabel: str,
+    cbar_label: str,
+    vmin: float = 0.0,
+    vmax: float = 1.0,
+) -> None:
+    """Linear-colorscale variant of ``_plot_masked_heatmap`` for bounded
+    ratios (e.g. C6's captured fraction ``F ∈ [0, 1]``). Uses the same
+    log-scaled cell-edge grid and hatched-mask overlay as the log variant
+    so that the two styles align visually in a shared three-panel figure.
+    """
+    vals = np.where(mask, np.nan, values)
+    cmap = PALETTE_PHASE
+    x_edges = _log_cell_edges(x_coords)
+    y_edges = _log_cell_edges(y_coords)
+    mesh = ax.pcolormesh(
+        x_edges, y_edges, vals,
+        cmap=cmap, vmin=vmin, vmax=vmax,
+        shading="flat",
+    )
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    _hatch_masked_region(ax, x_edges, y_edges, mask)
+    ax.set_xlim(float(min(x_edges[0], x_edges[-1])),
+                float(max(x_edges[0], x_edges[-1])))
+    ax.set_ylim(float(min(y_edges[0], y_edges[-1])),
+                float(max(y_edges[0], y_edges[-1])))
+    cbar = ax.figure.colorbar(mesh, ax=ax, fraction=0.045, pad=0.04)
+    cbar.set_label(cbar_label)
 
 
 # ---------------------------------------------------------------------------
@@ -295,11 +355,45 @@ def _regen_c3_heatmap(
     return run_dir.png(output_stem)
 
 
+def _overlay_log_contours(
+    ax: Any, x_coords: np.ndarray, y_coords: np.ndarray, values: np.ndarray,
+    *, mask: np.ndarray | None = None,
+) -> None:
+    """White log-spaced contour lines (matching the canonical C4 plotting
+    style). Cells in ``mask`` are set to NaN so contours skip them.
+    """
+    vals = values.astype(float).copy()
+    if mask is not None:
+        vals[mask] = np.nan
+    positive = vals[np.isfinite(vals) & (vals > 0)]
+    if positive.size == 0:
+        return
+    vmin = max(float(positive.min()), 1e-12)
+    vmax = float(np.nanmax(vals))
+    if vmax <= vmin:
+        return
+    exps = np.arange(
+        int(np.floor(np.log10(vmin))),
+        int(np.ceil(np.log10(vmax))) + 1,
+    )
+    levels = tuple(float(10.0 ** e) for e in exps)
+    X, Y = np.meshgrid(x_coords, y_coords)
+    cs = ax.contour(
+        X, Y, vals, levels=levels, colors="white", linewidths=0.8, alpha=0.75,
+    )
+    ax.clabel(cs, cs.levels, fontsize=6, inline=True, fmt="%.0e")
+
+
 def _regen_c4_main(
     run_dir: ThesisRunDir, npz_path: Path
 ) -> Path | None:
     """Regenerate the 3-panel C4 phase diagram with zero-region masking.
-    Uses the L = 4 slice (C4's default L_primary)."""
+    Uses the L = 4 slice (C4's default L_primary). Two variants are saved:
+    the plain masked heatmap (``cleaned_c4_phase_diagram_main``) and the
+    same heatmap with white log-spaced contour overlays
+    (``cleaned_c4_phase_diagram_main_with_lines``), matching the canonical
+    C4 plotting style.
+    """
     import matplotlib.pyplot as plt
 
     if not npz_path.is_file():
@@ -316,42 +410,52 @@ def _regen_c4_main(
     gap = np.asarray(d["gap"])[:, :, i_L].astype(float)
 
     mask = _mask_m_or_kappa_zero(m_arr, k_arr)
-
-    fig, axes = plt.subplots(1, 3, figsize=(15.0, 4.6))
     panels = [
         (
-            axes[0], L_coarse,
-            r"(a) coarse class optimum $L_{\mathrm{coarse}}(m, \kappa)$",
+            L_coarse,
             r"$L^\star$ (coarse class)",
+            r"(a) spectral-only optimum $L_{\mathrm{coarse}}(m, \kappa)$",
         ),
         (
-            axes[1], L_fine,
-            r"(b) refined class optimum $L_{\mathrm{fine}}(m, \kappa)$",
+            L_fine,
             r"$L^\star$ (dyadic finer class)",
+            r"(b) oracle refined optimum $L_{\mathrm{fine}}(m, \kappa)$",
         ),
         (
-            axes[2], gap,
-            r"(c) refinement gain $L_{\mathrm{coarse}} - L_{\mathrm{fine}}$",
+            gap,
             r"refinement gain",
+            r"(c) theorem-C refinement gain "
+            r"$\mathrm{gap} = L_{\mathrm{coarse}} - L_{\mathrm{fine}}$",
         ),
     ]
-    for ax, data, title, cbar_label in panels:
-        _plot_masked_heatmap(
-            ax, data, x_coords=k_arr, y_coords=m_arr, mask=mask,
-            xlabel=r"within-block heterogeneity $\kappa$",
-            ylabel=r"block size $m$",
-            cbar_label=cbar_label,
-            title=title,
-        )
-        _hatch_legend_proxy(ax)
-    fig.suptitle(
-        f"Cleaned C4 phase diagram (L = {target}) — exact-zero "
-        "region hatched",
-        fontsize=12,
-    )
-    fig.tight_layout(rect=(0, 0, 1, 0.95))
+
+    def _build_fig():
+        fig, axes = plt.subplots(1, 3, figsize=(15.0, 4.6))
+        for ax, (data, cbar_label, title) in zip(axes, panels):
+            _plot_masked_heatmap(
+                ax, data, x_coords=k_arr, y_coords=m_arr, mask=mask,
+                xlabel=r"within-block heterogeneity $\kappa$",
+                ylabel=r"block size $m$",
+                cbar_label=cbar_label,
+            )
+            ax.set_title(title)
+            _hatch_legend_proxy(ax)
+        return fig, axes
+
+    # Plain version.
+    fig, _ = _build_fig()
+    fig.tight_layout()
     save_both(fig, run_dir, "cleaned_c4_phase_diagram_main")
     plt.close(fig)
+
+    # Version with white contour overlays.
+    fig, axes = _build_fig()
+    for ax, (data, _, _) in zip(axes, panels):
+        _overlay_log_contours(ax, k_arr, m_arr, data, mask=mask)
+    fig.tight_layout()
+    save_both(fig, run_dir, "cleaned_c4_phase_diagram_main_with_lines")
+    plt.close(fig)
+
     return run_dir.png("cleaned_c4_phase_diagram_main")
 
 
@@ -394,6 +498,114 @@ def _regen_c5_ladder(
     save_both(fig, run_dir, "cleaned_c5_ladder_heatmap")
     plt.close(fig)
     return run_dir.png("cleaned_c5_ladder_heatmap")
+
+
+def _regen_c6_three_way_heatmap(
+    run_dir: ThesisRunDir, npz_path: Path
+) -> Path | None:
+    """Regenerate C6's three-way heatmap with theorem-level zero regions
+    hatched. Panel (a) L_coarse: κ=1 column (Cor 3.12 — homogeneous block).
+    Panel (b) L_hybrid (the middle panel, where the zero-region convention
+    most clearly applies): κ=1 column AND m=2 row — at m=2 the refined
+    partition IS the singleton, so L_hybrid ≡ L_unconstrained = 0 in the
+    matched regime. Panel (c) F: κ=1 column, where F is a 0/0 NaN.
+
+    Two variants are saved, matching the C4 convention: a plain version
+    with no contour overlays (``cleaned_c6_three_way_heatmap``) and a
+    ``_with_lines`` version with white log-spaced contours on panels (a)
+    and (b) and linear F-contours on panel (c).
+    """
+    import matplotlib.pyplot as plt
+
+    if not npz_path.is_file():
+        return None
+    d = np.load(npz_path)
+    m_arr = np.asarray(d["m_list"]).astype(float)
+    k_arr = np.asarray(d["kappa_list"]).astype(float)
+    L_list = list(np.asarray(d["L_list"]).astype(int).tolist())
+    target = 4 if 4 in L_list else L_list[0]
+    i_L = L_list.index(target)
+    L_coarse = np.asarray(d["L_coarse"])[:, :, i_L].astype(float)
+    L_hybrid = np.asarray(d["L_hybrid"])[:, :, i_L].astype(float)
+    F = np.asarray(d["captured_fraction"])[:, :, i_L].astype(float)
+
+    mask_coarse = _mask_m_or_kappa_zero(m_arr, k_arr)
+    mask_hybrid = _mask_c6_hybrid_zero(m_arr, k_arr)
+    mask_F = np.isnan(F) | mask_coarse
+
+    def _build_fig():
+        fig, axes = plt.subplots(1, 3, figsize=(15.5, 4.6))
+        _plot_masked_heatmap(
+            axes[0], L_coarse,
+            x_coords=k_arr, y_coords=m_arr, mask=mask_coarse,
+            xlabel=r"within-block heterogeneity $\kappa$",
+            ylabel=r"coarse block size $m$",
+            cbar_label=r"$L_{\mathrm{coarse}}$",
+        )
+        axes[0].set_title(
+            r"(a) spectral-only coarse-class optimum $L_{\mathrm{coarse}}$",
+            fontsize=10,
+        )
+        _hatch_legend_proxy(axes[0])
+
+        _plot_masked_heatmap(
+            axes[1], L_hybrid,
+            x_coords=k_arr, y_coords=m_arr, mask=mask_hybrid,
+            xlabel=r"within-block heterogeneity $\kappa$",
+            ylabel=r"coarse block size $m$",
+            cbar_label=(
+                r"$L_{\mathrm{hybrid}}$ "
+                r"(refined class $C(\mathfrak{B}_{m/2})$)"
+            ),
+        )
+        axes[1].set_title(
+            r"(b) oracle hybrid $L_{\mathrm{hybrid}}$, refined commutant",
+            fontsize=10,
+        )
+        _hatch_legend_proxy(axes[1])
+
+        _plot_masked_heatmap_linear(
+            axes[2], F,
+            x_coords=k_arr, y_coords=m_arr, mask=mask_F,
+            xlabel=r"within-block heterogeneity $\kappa$",
+            ylabel=r"coarse block size $m$",
+            cbar_label=(
+                r"$F = (L_{\mathrm{coarse}} - L_{\mathrm{hybrid}}) / "
+                r"L_{\mathrm{coarse}}$"
+            ),
+            vmin=0.0, vmax=1.0,
+        )
+        axes[2].set_title("(c) captured fraction $F$", fontsize=10)
+        _hatch_legend_proxy(axes[2])
+        return fig, axes
+
+    fig, _ = _build_fig()
+    fig.tight_layout()
+    save_both(fig, run_dir, "cleaned_c6_three_way_heatmap")
+    plt.close(fig)
+
+    fig, axes = _build_fig()
+    _overlay_log_contours(axes[0], k_arr, m_arr, L_coarse, mask=mask_coarse)
+    _overlay_log_contours(axes[1], k_arr, m_arr, L_hybrid, mask=mask_hybrid)
+    F_for_contour = np.where(mask_F, np.nan, F)
+    F_finite = F_for_contour[np.isfinite(F_for_contour)]
+    if F_finite.size > 0:
+        # Data-adaptive quantile levels: F saturates near 1 in the matched
+        # regime, so fixed levels like 0.25 / 0.5 / 0.75 fall below the
+        # observed minimum and draw nothing.
+        f_levels = tuple(np.unique(np.quantile(F_finite, (0.2, 0.4, 0.6, 0.8))))
+        if len(f_levels) >= 2:
+            X, Y = np.meshgrid(k_arr, m_arr)
+            cs = axes[2].contour(
+                X, Y, F_for_contour, levels=f_levels,
+                colors="white", linewidths=0.8, alpha=0.85,
+            )
+            axes[2].clabel(cs, cs.levels, fontsize=6, inline=True, fmt="%.3f")
+    fig.tight_layout()
+    save_both(fig, run_dir, "cleaned_c6_three_way_heatmap_with_lines")
+    plt.close(fig)
+
+    return run_dir.png("cleaned_c6_three_way_heatmap")
 
 
 # ---------------------------------------------------------------------------
@@ -955,6 +1167,16 @@ def main() -> int:
             )
         else:
             regen["cleaned_c5_ladder_heatmap"] = None
+
+        c6_run = _latest_run(project_root, "run_theoremC_oracle_hybrid")
+        if c6_run is not None:
+            regen["cleaned_c6_three_way_heatmap"] = (
+                _regen_c6_three_way_heatmap(
+                    run, c6_run / "npz" / "oracle_hybrid.npz"
+                )
+            )
+        else:
+            regen["cleaned_c6_three_way_heatmap"] = None
 
         item1 = {"regenerated": regen}
         dt_1 = time.perf_counter() - t0

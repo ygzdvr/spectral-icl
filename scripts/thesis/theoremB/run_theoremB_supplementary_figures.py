@@ -157,7 +157,7 @@ def _plot_corollary5(
     L_arr = np.asarray(cfg.L_list, dtype=int)
 
     # ---- Left panel: family-1 attenuation regime ---------------------------
-    f1_colors = sequential_colors(len(cfg.f1_alphas), palette="rocket")
+    f1_colors = sequential_colors(len(cfg.f1_alphas), palette="mako")
     f1_data: dict[str, dict[str, Any]] = {}
     f1_deviations: dict[str, float] = {}
     for alpha in cfg.f1_alphas:
@@ -173,7 +173,7 @@ def _plot_corollary5(
         f1_deviations[f"{alpha:.2f}"] = float(np.max(np.abs(1.0 - s_te / s_tr)))
 
     # ---- Right panel: family-2 amplification regime ------------------------
-    f2_colors = sequential_colors(len(cfg.f2_alphas), palette="rocket")
+    f2_colors = sequential_colors(len(cfg.f2_alphas), palette="mako")
     f2_data: dict[str, dict[str, Any]] = {}
     f2_n_modes_over1: dict[str, int] = {}
     for alpha in cfg.f2_alphas:
@@ -240,12 +240,7 @@ def _plot_corollary5(
     )
     axR.legend(fontsize=8, loc="best", frameon=True)
 
-    fig.suptitle(
-        "Corollary 5: OOD loss at the converged optimum vs spectral depth "
-        "(attenuation and amplification regimes)",
-        fontsize=11,
-    )
-    fig.tight_layout(rect=(0, 0, 1, 0.95))
+    fig.tight_layout()
     save_both(fig, run_dir, "b3_corollary5_ood_depth")
     plt.close(fig)
 
@@ -317,7 +312,7 @@ def _plot_corollary6(
         r: int(np.sum(k_star < r)) for r in b4_r_list
     }
 
-    colors = sequential_colors(len(b4_L_list), palette="rocket")
+    colors = sequential_colors(len(b4_L_list), palette="mako")
     fig, ax = plt.subplots(figsize=(7.0, 4.6))
 
     # Theoretical magnitude-ordered floor — single curve, L-independent.
@@ -364,11 +359,6 @@ def _plot_corollary6(
         r"(= $|\{k : \lambda_k \text{ in top-}m\}|$)"
     )
     ax.set_ylabel(r"loss floor  $\mathcal{E}_L^\star(r)$")
-    ax.set_title(
-        "Corollary 6: spectral-rank floor is depth-independent "
-        "(single theoretical curve, empirical overlays per L)",
-        fontsize=11,
-    )
     ax.legend(fontsize=8, loc="best", frameon=True)
     fig.tight_layout()
     save_both(fig, run_dir, "b4_corollary6_rank_floor")

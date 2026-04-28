@@ -397,7 +397,7 @@ def _plot_c3_closed_form_vs_numeric(
         cbar_label=r"$|L^\star_{\mathrm{cf}} - L^\star_{\mathrm{num}}| / L^\star_{\mathrm{cf}}$",
         log_z=True, log_x=True, log_y=True,
     )
-    axes[0].set_title("C3 relative loss error")
+    axes[0].set_title("relative loss error")
 
     # Panel (b): absolute loss error.
     abs_display = np.where(abs_grid > floor, abs_grid, floor)
@@ -409,7 +409,7 @@ def _plot_c3_closed_form_vs_numeric(
         cbar_label=r"$|L^\star_{\mathrm{cf}} - L^\star_{\mathrm{num}}|$",
         log_z=True, log_x=True, log_y=True,
     )
-    axes[1].set_title("C3 absolute loss error")
+    axes[1].set_title("absolute loss error")
 
     # Panel (c): max |q_cf - q_num|.
     q_display = np.where(q_err_grid > floor, q_err_grid, floor)
@@ -421,13 +421,9 @@ def _plot_c3_closed_form_vs_numeric(
         cbar_label=r"$\max_b |q^\star_{\mathrm{cf},b} - q^\star_{\mathrm{num},b}|$",
         log_z=True, log_x=True, log_y=True,
     )
-    axes[2].set_title("C3 max block-scalar error")
+    axes[2].set_title("max block-scalar error")
 
-    fig.suptitle(
-        "C3 L = 1 closed-form vs. numerical-opt agreement",
-        fontsize=11,
-    )
-    fig.tight_layout(rect=(0, 0, 1, 0.95))
+    fig.tight_layout()
     save_both(fig, run_dir, "c3_closed_form_vs_numeric")
     plt.close(fig)
 
@@ -443,7 +439,7 @@ def _plot_c3_obstruction_vs_kappa(
     L_grid = _build_grid(trials, cfg, "L_cf")
     m_list = list(cfg.partition_m_list)
     k_arr = np.asarray(cfg.kappa_list, dtype=float)
-    colors = sequential_colors(len(m_list), palette="rocket")
+    colors = sequential_colors(len(m_list), palette="mako")
 
     fig, ax = plt.subplots(figsize=(6.2, 4.2))
     floor = 1e-18
@@ -459,11 +455,6 @@ def _plot_c3_obstruction_vs_kappa(
     ax.set_xlabel(r"within-block heterogeneity $\kappa$")
     ax.set_ylabel(
         r"theorem-C obstruction $L^\star_{L=1}(m, \kappa)$"
-    )
-    ax.set_title(
-        r"C3 L = 1 block-commutant obstruction: grows with $\kappa$, "
-        r"vanishes at $\kappa = 1$",
-        fontsize=10,
     )
     ax.legend(fontsize=8, loc="best")
     fig.tight_layout()
@@ -494,10 +485,6 @@ def _plot_c3_obstruction_heatmap(
         cbar_label=r"$L^\star_{L=1}(m, \kappa)$",
         log_z=True, log_x=True, log_y=True,
     )
-    ax.set_title(
-        "C3 theorem-C obstruction map (L = 1 block-commutant lower bound)",
-        fontsize=11,
-    )
     fig.tight_layout()
     save_both(fig, run_dir, "c3_obstruction_heatmap")
     plt.close(fig)
@@ -526,7 +513,7 @@ def _plot_c3_loss_landscape(
     # Use block 0 for the landscape — every block is homogeneous by
     # construction, so block 0 is representative.
     fig, ax = plt.subplots(figsize=(6.2, 4.2))
-    colors = sequential_colors(len(slice_trials), palette="rocket")
+    colors = sequential_colors(len(slice_trials), palette="mako")
     for color, trial in zip(colors, slice_trials):
         partition = trial["partition"]
         lam = trial["lam"]
@@ -557,11 +544,6 @@ def _plot_c3_loss_landscape(
         )
     ax.set_xlabel(r"block scalar $q_b$")
     ax.set_ylabel(r"single-block loss $L_b(q_b)$ at $L = 1$")
-    ax.set_title(
-        f"C3 L = 1 block-loss landscape (block 0, m = {m_target}); "
-        r"points mark closed-form $q_b^\star$",
-        fontsize=10,
-    )
     ax.legend(fontsize=8, loc="best")
     fig.tight_layout()
     save_both(fig, run_dir, "c3_loss_landscape")

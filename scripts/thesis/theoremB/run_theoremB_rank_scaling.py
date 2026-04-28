@@ -361,7 +361,7 @@ def _plot_rank_floor(
     r_arr = np.asarray(cfg.r_list, dtype=float)
     analytical_arr = np.asarray([analytical[int(r)] for r in cfg.r_list])
 
-    L_colors = sequential_colors(len(cfg.L_list), palette="rocket")
+    L_colors = sequential_colors(len(cfg.L_list), palette="mako")
     fig, ax = plt.subplots(figsize=(6.0, 4.2))
     for color, L in zip(L_colors, cfg.L_list):
         y = np.asarray([empirical[int(L)][int(r)] for r in cfg.r_list])
@@ -399,12 +399,6 @@ def _plot_rank_floor(
     )
     ax.set_xlabel(r"spectral rank $r$")
     ax.set_ylabel(r"matched stationary loss $\mathcal{L}(T, r, L)$")
-    ax.set_title(
-        "B4 spectral-rank bottleneck floor (theorem-B pure-spectral shape)\n"
-        f"P = {cfg.P}; finite-P slope steeper than continuum due to tail "
-        "truncation",
-        fontsize=10,
-    )
     ax.legend(fontsize=8, loc="best", frameon=True)
     fig.tight_layout()
     save_both(fig, run_dir, "rank_floor")
@@ -426,7 +420,7 @@ def _plot_loss_vs_depth_at_fixed_rank(
         return
 
     L_arr = np.asarray(cfg.L_list, dtype=float)
-    r_colors = sequential_colors(len(r_values), palette="rocket")
+    r_colors = sequential_colors(len(r_values), palette="mako")
     fig, ax = plt.subplots(figsize=(5.8, 4.0))
     for color, r in zip(r_colors, r_values):
         y = np.asarray(
@@ -441,11 +435,6 @@ def _plot_loss_vs_depth_at_fixed_rank(
     ax.set_yscale("log")
     ax.set_xlabel(r"depth $L$")
     ax.set_ylabel(r"matched stationary loss $\mathcal{L}(T, r, L)$")
-    ax.set_title(
-        "B4 depth effect at fixed rank (matched: expected flat at $t \\to "
-        "\\infty$)",
-        fontsize=11,
-    )
     ax.legend(fontsize=8, loc="best", frameon=True)
     fig.tight_layout()
     save_both(fig, run_dir, "loss_vs_depth_at_fixed_rank")
@@ -477,11 +466,6 @@ def _plot_joint_rL_grid(
         log_z=True,
         log_x=True,
         log_y=True,
-    )
-    ax.set_title(
-        "B4 joint (r, L) spectral-shape grid — matched stationary, T = "
-        f"{cfg.T}",
-        fontsize=11,
     )
     fig.tight_layout()
     save_both(fig, run_dir, "joint_rL_grid")
@@ -518,11 +502,6 @@ def _plot_depth_independence_ratio(
         log_z=True,
         log_x=True,
         log_y=True,
-    )
-    ax.set_title(
-        f"B4 depth-independence ratio (theoretical limit = 1 at $t \\to "
-        f"\\infty$)",
-        fontsize=11,
     )
     fig.tight_layout()
     save_both(fig, run_dir, "depth_independence_ratio")

@@ -1,0 +1,42 @@
+{
+  "configs": {
+    "alpha_1": {
+      "D": 32,
+      "N": 64,
+      "P": 32,
+      "K": 16
+    },
+    "alpha_2": {
+      "D": 32,
+      "N": 64,
+      "P": 64,
+      "K": 32
+    }
+  },
+  "L_values": [
+    1,
+    2,
+    4,
+    8,
+    16
+  ],
+  "families": [
+    "linear",
+    "spectral_gd",
+    "spectral_zero"
+  ],
+  "seeds": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "n_steps": 5000,
+  "lr": 0.001,
+  "batch_size": 64,
+  "sigma": 0.0,
+  "r_bottleneck": 8,
+  "tail_window": 500,
+  "dtype": "float32",
+  "device": "cuda"
+}

@@ -99,6 +99,7 @@ Run
 from __future__ import annotations
 
 import argparse
+import dataclasses
 import json
 import sys
 import time
@@ -526,7 +527,7 @@ def _plot_corrected_overlay(
 
     # Drop κ = 1 from the overlay (ρ = 0, bound is 0 and L★ is ~eps).
     plotted_k = [(j, k) for j, k in enumerate(k_list) if float(k) > 1.0]
-    colors = sequential_colors(len(plotted_k), palette="rocket")
+    colors = sequential_colors(len(plotted_k), palette="mako")
 
     fig, ax = plt.subplots(figsize=(7.0, 4.4))
     floor = 1e-18
@@ -556,7 +557,7 @@ def _plot_corrected_overlay(
     # Legend proxies for the three line styles.
     ax.plot(
         [], [], color="gray", lw=1.1, ls="--",
-        label="Cor 3.13 bound $(\\Sigma\\ \\omega\\lambda)\\,"
+        label="Cor. bound $(\\Sigma\\ \\omega\\lambda)\\,"
         "\\rho_b^{2L}$",
     )
     ax.plot(
@@ -568,11 +569,6 @@ def _plot_corrected_overlay(
     ax.set_yscale("log")
     ax.set_xlabel(r"depth $L$")
     ax.set_ylabel(r"block-commutant optimum $L^\star(m, \kappa, L)$")
-    ax.set_title(
-        f"C7 patch: contraction overlay at m = {m_used}; Cor 3.13 bound "
-        "(dashed) stays ≥ empirical optimum (solid)",
-        fontsize=9.5,
-    )
     ax.legend(fontsize=7.2, loc="best", ncol=2)
     fig.tight_layout()
     save_both(fig, run_dir, "c7_contraction_overlay")
@@ -601,7 +597,7 @@ def _plot_bound_tightness(
     m_used = m_list[m_idx]
 
     plotted_k = [(j, k) for j, k in enumerate(k_list) if float(k) > 1.0]
-    colors = sequential_colors(len(plotted_k), palette="rocket")
+    colors = sequential_colors(len(plotted_k), palette="mako")
 
     fig, ax = plt.subplots(figsize=(6.4, 4.2))
     for color, (j, kappa) in zip(colors, plotted_k):
@@ -626,11 +622,6 @@ def _plot_bound_tightness(
     ax.set_yscale("log")
     ax.set_xlabel(r"depth $L$")
     ax.set_ylabel(r"$L^\star_{\mathrm{obs}}\ /\ L^{\mathrm{Cheb}}$")
-    ax.set_title(
-        f"C7 patch: Cor 3.13 bound tightness at m = {m_used} "
-        "(≤ 1 everywhere on resolved cells)",
-        fontsize=9.5,
-    )
     ax.legend(fontsize=7.5, loc="best")
     fig.tight_layout()
     save_both(fig, run_dir, "c7_bound_tightness")
@@ -790,6 +781,31 @@ def _cli() -> argparse.Namespace:
             "loading the canonical npz."
         ),
     )
+    p.add_argument(
+        "--kappa-list", type=str, default=None,
+        help=(
+            "Override default kappa_list (comma-separated floats). "
+            "Auto-enables --recompute."
+        ),
+    )
+    p.add_argument(
+        "--L-list", type=str, default=None,
+        help=(
+            "Override default L_list (comma-separated ints). "
+            "Auto-enables --recompute."
+        ),
+    )
+    p.add_argument(
+        "--m-list", type=str, default=None,
+        help=(
+            "Override default m_list (comma-separated ints). "
+            "Auto-enables --recompute."
+        ),
+    )
+    p.add_argument(
+        "--m-headline", type=int, default=None,
+        help="Override the headline m used for the overlay figure.",
+    )
     p.add_argument("--no-show", action="store_true")
     return p.parse_args()
 
@@ -804,7 +820,7 @@ def _recompute_c7(
 
     c7_cfg = _c7.C7Config(
         D=cfg.D,
-        partition_m_list=cfg.m_list,
+        m_list=cfg.m_list,
         kappa_list=cfg.kappa_list,
         L_list=cfg.L_list,
         block_mean_lam=cfg.block_mean_lam,
@@ -830,6 +846,28 @@ def main() -> int:
         matplotlib.use("Agg")
 
     cfg = C7ChebyshevPatchConfig()
+    overrides: dict[str, Any] = {}
+    if args.kappa_list:
+        overrides["kappa_list"] = tuple(
+            float(x) for x in args.kappa_list.split(",") if x.strip()
+        )
+    if args.L_list:
+        overrides["L_list"] = tuple(
+            int(x) for x in args.L_list.split(",") if x.strip()
+        )
+    if args.m_list:
+        overrides["m_list"] = tuple(
+            int(x) for x in args.m_list.split(",") if x.strip()
+        )
+    if args.m_headline is not None:
+        overrides["m_headline"] = int(args.m_headline)
+    if overrides:
+        cfg = dataclasses.replace(cfg, **overrides)
+        if not args.recompute:
+            print(
+                "[C7-CHEB] custom axes provided; auto-enabling --recompute"
+            )
+            args.recompute = True
 
     synthetic_script = Path(__file__).parent / "c7_chebyshev_bound_patch.py"
     run = ThesisRunDir(synthetic_script, phase="theoremC")

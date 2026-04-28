@@ -1,0 +1,33 @@
+{
+  "D": 64,
+  "J": null,
+  "reference_partition_index": 0,
+  "base_block_mean_lam": 1.0,
+  "base_block_mean_omega": 1.0,
+  "kappa_list": [
+    1.0,
+    1.2,
+    1.5,
+    2.0,
+    3.0,
+    5.0,
+    10.0,
+    20.0
+  ],
+  "L_list": [
+    1,
+    4
+  ],
+  "L_primary": 1,
+  "L_deeper": 4,
+  "xi_shape": "linear",
+  "spectral_basis_kind": "dct2",
+  "monotonicity_tol": 1e-08,
+  "kappa_1_tol": 1e-09,
+  "finest_tol": 1e-08,
+  "strict_drop_fraction": 0.0001,
+  "optimizer": "lbfgs",
+  "max_iter": 500,
+  "dtype": "float64",
+  "device": "cuda"
+}

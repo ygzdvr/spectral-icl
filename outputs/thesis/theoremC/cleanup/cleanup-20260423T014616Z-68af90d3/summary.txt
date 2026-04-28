@@ -1,0 +1,17 @@
+run_id: cleanup-20260423T014616Z-68af90d3
+phase: theoremC
+script: cleanup
+status: completed
+wall_clock_seconds: 13.687
+
+plan_reference: EXPERIMENT_PLAN_FINAL.MD §7.3 (C3), §7.4 (C4), §7.5 (C5)
+theorem_reference: thesis/theorem_c.txt — Corollary 3.11 (inactive-block convention), Corollary 3.12 (heterogeneity criterion).
+category: theorem-C cleanup: three non-blocking items bundled into one artifact run. No re-training; item 1 regenerates figures from saved npz, item 2 is a small G2 + closed-form calculation, item 3 is a verification + LaTeX-ready footnote.
+interpretation: Item 1 fixes the visual ambiguity introduced by rendering Cor 3.12-exact zeros at the log colorbar floor by masking them explicitly and hatching. Item 2 validates the Cor 3.11 inactive-block convention numerically. Item 3 verifies and documents the κ-monotonicity artifact already flagged in C3 (state-dump entry) — the thesis note at cleanup_nonmonotonicity_note.txt is ready to be inserted as a footnote.
+item1_regenerated: {'cleaned_c3_obstruction_heatmap': '/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremC/cleanup/cleanup-20260423T014616Z-68af90d3/figures/cleaned_c3_obstruction_heatmap.png', 'cleaned_c3_obstruction_heatmap_from_patch': '/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremC/cleanup/cleanup-20260423T014616Z-68af90d3/figures/cleaned_c3_obstruction_heatmap_from_patch.png', 'cleaned_c4_phase_diagram_main': '/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremC/cleanup/cleanup-20260423T014616Z-68af90d3/figures/cleaned_c4_phase_diagram_main.png', 'cleaned_c5_ladder_heatmap': '/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremC/cleanup/cleanup-20260423T014616Z-68af90d3/figures/cleaned_c5_ladder_heatmap.png'}
+item2: {'D': 64, 'm': 8, 'n_blocks': 8, 'kappa': 3.0, 'inactive_block_idx': 0, 'inactive_indices': [0, 1, 2, 3, 4, 5, 6, 7], 'probes': [{'q_b': -10.0, 'block_loss_L1': 0.0, 'ok': True}, {'q_b': 0.0, 'block_loss_L1': 0.0, 'ok': True}, {'q_b': 1.0, 'block_loss_L1': 0.0, 'ok': True}, {'q_b': 100.0, 'block_loss_L1': 0.0, 'ok': True}], 'max_probe_loss': 0.0, 'probes_ok': True, 'cf_total_loss': 4.337167957429482, 'cf_per_block_loss': [0.0, 0.619595422489926, 0.619595422489926, 0.619595422489926, 0.619595422489926, 0.619595422489926, 0.619595422489926, 0.619595422489926], 'cf_inactive_contribution': 0.0, 'cf_inactive_zero_ok': True, 'numerical_total_loss': 4.337167957429497, 'cf_vs_num_abs_err': 1.4210854715202004e-14, 'cf_vs_num_rel_err': 3.2765285676472577e-15, 'cf_vs_num_ok': True, 'inactive_block_zero_ok': True}
+item3: {'c3_npz_found': True, 'violations_only_at_m2': True, 'm_all_gte_4_monotonic': True, 'violation_m_values': [2]}
+top_line_ok: True
+status: item1_ok+item2_ok+item3_ok
+cleanup_summary_path: /scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremC/cleanup/cleanup-20260423T014616Z-68af90d3/cleanup_summary.txt
+cleanup_nonmonotonicity_note_path: /scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremC/cleanup/cleanup-20260423T014616Z-68af90d3/cleanup_nonmonotonicity_note.txt

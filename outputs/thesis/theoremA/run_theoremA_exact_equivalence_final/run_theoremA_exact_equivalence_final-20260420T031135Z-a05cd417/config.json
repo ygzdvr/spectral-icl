@@ -1,0 +1,37 @@
+{
+  "D_list": [
+    8,
+    16,
+    32,
+    64
+  ],
+  "P_list": [
+    8,
+    16,
+    32,
+    64
+  ],
+  "K_list": [
+    4,
+    8,
+    16
+  ],
+  "L_list": [
+    1,
+    2,
+    4,
+    8
+  ],
+  "Sigma_kind": "isotropic",
+  "Omega_kind": "isotropic",
+  "Gamma_kind": "identity",
+  "label_norm": "sqrt_D",
+  "sigma": 0.0,
+  "B": 4,
+  "base_seed": 0,
+  "machine_eps_tol": 1e-10,
+  "heatmap_K": 8,
+  "heatmap_L": 4,
+  "dtype": "float64",
+  "device": "cuda"
+}

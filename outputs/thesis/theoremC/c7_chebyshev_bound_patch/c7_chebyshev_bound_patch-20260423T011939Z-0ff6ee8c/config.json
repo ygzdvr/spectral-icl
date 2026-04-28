@@ -1,0 +1,37 @@
+{
+  "D": 64,
+  "m_list": [
+    1,
+    2,
+    4,
+    8,
+    16,
+    32
+  ],
+  "kappa_list": [
+    1.0,
+    1.5,
+    2.0,
+    3.0,
+    5.0,
+    10.0
+  ],
+  "L_list": [
+    1,
+    2,
+    4,
+    8,
+    16,
+    32,
+    64
+  ],
+  "block_mean_lam": 1.0,
+  "block_mean_omega": 1.0,
+  "kappa_omega_matches_lam": true,
+  "xi_shape": "linear",
+  "spectral_basis_kind": "dct2",
+  "strict_tol": 1e-15,
+  "optimizer_floor": 1e-09,
+  "m_headline": 8,
+  "dtype": "float64"
+}

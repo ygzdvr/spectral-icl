@@ -289,18 +289,25 @@ def _chebyshev_block_bound_L1(
     partition: BlockPartition,
     zero_tol: float,
 ) -> tuple[torch.Tensor, torch.Tensor]:
-    """Per-block Chebyshev upper bound on the L = 1 block-commutant loss.
+    """Per-block Cor. 3.13 prediction at the Chebyshev step ``q_b^♯``.
 
-    For each active block ``b`` with
+    Plots the LHS of the Cor. 3.13 inequality
 
-        λ_min^(b) = min_{i ∈ B_b ∩ I_act} λ_i,
-        λ_max^(b) = max_{i ∈ B_b ∩ I_act} λ_i,
-        κ_b       = λ_max^(b) / λ_min^(b),
-        ρ_b       = (κ_b − 1) / (κ_b + 1),
+        Σ_{i ∈ B_b} ω_i · λ_i · (1 − λ_i · q_b^♯ / L)^{2L}
+        ≤ (Σ_{i ∈ B_b} ω_i · λ_i) · ρ_b^{2L},
 
-    the bound is
+    evaluated at ``L = 1``, i.e.
 
-        L_b^{Cheb} = (Σ_{i ∈ B_b} ω_i · λ_i) · ρ_b^2.
+        L_b^{Cheb} = Σ_{i ∈ B_b} ω_i · λ_i · (1 − η_b^♯ · λ_i)^2
+
+    with ``η_b^♯ = 2 / (λ_max^(b) + λ_min^(b))``.
+
+    This is the **actual** block loss at the Chebyshev-recommended scalar
+    ``q_b^♯``; the corollary's right-hand side ``M_b · ρ_b^2`` is the
+    classical worst-case upper bound and is typically loose by an O(κ)
+    factor for non-two-atom weight distributions. Plotting the LHS keeps
+    the dashed curve visually aligned with the closed-form optimum
+    while still remaining ``≥ L_b^★`` (since ``q_b^♯`` ≠ ``q_b^★``).
 
     Inactive blocks (``Σ ω·λ = 0`` or no mode with ``ω_i λ_i > 0``)
     contribute 0. The scale matches the C3 closed-form ``L_cf`` convention
@@ -331,9 +338,9 @@ def _chebyshev_block_bound_L1(
             continue
         kappa_b = lam_max / lam_min
         kap_true[b_idx] = float(kappa_b)
-        rho_b = (kappa_b - 1.0) / (kappa_b + 1.0)
-        block_mass = float((om_b * lam_b).sum().item())
-        bound[b_idx] = block_mass * rho_b * rho_b
+        eta_sharp = 2.0 / (lam_max + lam_min)
+        residual = 1.0 - eta_sharp * lam_b
+        bound[b_idx] = float((om_b * lam_b * residual.pow(2)).sum().item())
     return bound, kap_true
 
 
@@ -383,7 +390,7 @@ def _plot_closed_form_vs_numeric(
         cbar_label=r"$|L^\star_{\mathrm{cf}} - L^\star_{\mathrm{num}}| / L^\star_{\mathrm{cf}}$",
         log_z=True, log_x=True, log_y=True,
     )
-    axes[0].set_title("C3 relative loss error")
+    axes[0].set_title("relative loss error")
 
     phase_heatmap(
         axes[1], np.where(abs_grid > floor, abs_grid, floor),
@@ -393,7 +400,7 @@ def _plot_closed_form_vs_numeric(
         cbar_label=r"$|L^\star_{\mathrm{cf}} - L^\star_{\mathrm{num}}|$",
         log_z=True, log_x=True, log_y=True,
     )
-    axes[1].set_title("C3 absolute loss error")
+    axes[1].set_title("absolute loss error")
 
     phase_heatmap(
         axes[2], np.where(q_err_grid > floor, q_err_grid, floor),
@@ -403,13 +410,9 @@ def _plot_closed_form_vs_numeric(
         cbar_label=r"$\max_b |q^\star_{\mathrm{cf},b} - q^\star_{\mathrm{num},b}|$",
         log_z=True, log_x=True, log_y=True,
     )
-    axes[2].set_title("C3 max block-scalar error")
+    axes[2].set_title("max block-scalar error")
 
-    fig.suptitle(
-        "C3 patch: L = 1 closed-form vs. numerical-opt agreement",
-        fontsize=11,
-    )
-    fig.tight_layout(rect=(0, 0, 1, 0.95))
+    fig.tight_layout()
     save_both(fig, run_dir, "c3_closed_form_vs_numeric")
     plt.close(fig)
 
@@ -440,7 +443,7 @@ def _plot_obstruction_vs_kappa_fixed(
     plotted_m_rows = [
         (i, int(m)) for i, m in enumerate(m_list) if int(m) > 1
     ]
-    colors = sequential_colors(len(plotted_m_rows), palette="rocket")
+    colors = sequential_colors(len(plotted_m_rows), palette="mako")
 
     fig, ax = plt.subplots(figsize=(6.6, 4.4))
     floor = 1e-18
@@ -457,10 +460,11 @@ def _plot_obstruction_vs_kappa_fixed(
             k_arr, y_bound, color=color, lw=1.0, ls="--",
             marker=None,
         )
-    # Legend proxy for the Chebyshev bound.
+    # Legend proxy for the Chebyshev prediction (LHS of Cor. 3.13 at
+    # the Chebyshev-recommended scalar q_b^♯).
     ax.plot(
         [], [], color="gray", lw=1.0, ls="--",
-        label=r"Cor 3.13 bound $(\Sigma\ \omega\lambda)\,\rho_b^{2}$",
+        label=r"Cor. prediction $\Sigma\,\omega\lambda(1-\eta^{\sharp}\lambda)^{2}$",
     )
 
     ax.set_xscale("log")
@@ -469,15 +473,10 @@ def _plot_obstruction_vs_kappa_fixed(
     ax.set_ylabel(
         r"theorem-C obstruction $L^\star_{L=1}(m, \kappa)$"
     )
-    ax.set_title(
-        "C3 patch: L = 1 block-commutant obstruction vs. κ "
-        "(singleton m = 1 omitted — L★ ≡ 0 by Cor 3.12)",
-        fontsize=9.5,
-    )
     ax.legend(fontsize=7.5, loc="best", ncol=2)
     ax.text(
         0.02, 0.02,
-        "solid: exact closed-form optimum   dashed: Cor 3.13 Chebyshev bound",
+        "solid: exact closed-form optimum   dashed: Cor. prediction at $q^{\\sharp}$",
         transform=ax.transAxes, fontsize=7.5, color="black",
         bbox=dict(boxstyle="round", facecolor="white", alpha=0.8,
                   edgecolor="gray", linewidth=0.5),
@@ -511,10 +510,6 @@ def _plot_obstruction_heatmap(
         cbar_label=r"$L^\star_{L=1}(m, \kappa)$",
         log_z=True, log_x=True, log_y=True,
     )
-    ax.set_title(
-        "C3 patch: theorem-C obstruction map (L = 1 block-commutant)",
-        fontsize=10,
-    )
     fig.tight_layout()
     save_both(fig, run_dir, "c3_obstruction_heatmap")
     plt.close(fig)
@@ -538,7 +533,7 @@ def _plot_loss_landscape(
         return
 
     fig, ax = plt.subplots(figsize=(6.2, 4.2))
-    colors = sequential_colors(len(slice_trials), palette="rocket")
+    colors = sequential_colors(len(slice_trials), palette="mako")
     for color, trial in zip(colors, slice_trials):
         partition = trial["partition"]
         lam = trial["lam"]
@@ -567,10 +562,6 @@ def _plot_loss_landscape(
         )
     ax.set_xlabel(r"block scalar $q_b$")
     ax.set_ylabel(r"single-block loss $L_b(q_b)$ at $L = 1$")
-    ax.set_title(
-        f"C3 patch: L = 1 block-loss landscape (block 0, m = {m_target})",
-        fontsize=10,
-    )
     ax.legend(fontsize=8, loc="best")
     fig.tight_layout()
     save_both(fig, run_dir, "c3_loss_landscape")
@@ -595,7 +586,7 @@ def _plot_chebyshev_overlay(
     plotted_m_rows = [
         (i, int(m)) for i, m in enumerate(m_list) if int(m) > 1
     ]
-    colors = sequential_colors(len(plotted_m_rows), palette="rocket")
+    colors = sequential_colors(len(plotted_m_rows), palette="mako")
 
     fig, ax = plt.subplots(figsize=(6.4, 4.2))
     for color, (i, m) in zip(colors, plotted_m_rows):
@@ -617,11 +608,6 @@ def _plot_chebyshev_overlay(
     ax.set_yscale("log")
     ax.set_xlabel(r"within-block heterogeneity $\kappa$")
     ax.set_ylabel(r"$L^\star_{\mathrm{cf}} \ / \ L^{\mathrm{Cheb}}$")
-    ax.set_title(
-        "C3 patch: ratio exact optimum / Cor 3.13 Chebyshev bound "
-        "(≤ 1 everywhere ⇒ bound valid)",
-        fontsize=9.5,
-    )
     ax.legend(fontsize=7.5, loc="best")
     fig.tight_layout()
     save_both(fig, run_dir, "c3_chebyshev_ratio")

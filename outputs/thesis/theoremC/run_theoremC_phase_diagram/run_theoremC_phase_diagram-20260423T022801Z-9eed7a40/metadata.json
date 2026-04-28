@@ -1,0 +1,64 @@
+{
+  "run_id": "run_theoremC_phase_diagram-20260423T022801Z-9eed7a40",
+  "script_stem": "run_theoremC_phase_diagram",
+  "phase": "theoremC",
+  "root": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremC/run_theoremC_phase_diagram/run_theoremC_phase_diagram-20260423T022801Z-9eed7a40",
+  "started_utc": "2026-04-23T02:28:01.363019+00:00",
+  "seeds": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "git_commit": "811d1f0",
+  "git_dirty": true,
+  "env": {
+    "python_version": "3.14.3",
+    "python_full_version": "3.14.3 (main, Mar 20 2026, 00:34:32) [Clang 22.1.1 ]",
+    "python_executable": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/.venv/bin/python",
+    "platform": "Linux-5.14.0-570.106.1.el9_6.x86_64-x86_64-with-glibc2.34",
+    "hostname": "della-i24g1",
+    "torch_version": "2.11.0+cu130",
+    "cuda_available": true,
+    "cuda_version": "13.0",
+    "cudnn_version": 91900,
+    "gpu_count": 1,
+    "gpu_names": [
+      "NVIDIA H200"
+    ]
+  },
+  "notes": "C4 theorem-C heterogeneity phase diagram. Operator-level exact optimization only (L-BFGS over block scalars); no learned architectures. Depth swept as a secondary axis.",
+  "status": "completed",
+  "finished_utc": "2026-04-23T02:28:17.016428+00:00",
+  "wall_clock_seconds": 15.653881549835205,
+  "compute_proxy": 11.331581576028839,
+  "measured_compute": null,
+  "per_step_wall_clock": {
+    "n_steps": 0,
+    "mean": null,
+    "median": null,
+    "total": null
+  },
+  "error": null,
+  "extras": {
+    "worst_neg_gap": -5.2372630487944275e-12,
+    "worst_neg_cell": {
+      "m": 2,
+      "kappa": 1.5,
+      "L": 16,
+      "gap": -5.2372630487944275e-12
+    },
+    "kappa_one_worst": 9.691188990238273e-12,
+    "full_oracle_worst": 2.1580392740705694e-10,
+    "aggregates_at_L_primary": {
+      "max_L_coarse_at_L_primary": 0.560020256008645,
+      "max_gap_at_L_primary": 0.5227542680370822,
+      "argmax_cell": {
+        "m": 8,
+        "kappa": 10.0,
+        "L": 4,
+        "gap": 0.5227542680370822
+      }
+    }
+  }
+}

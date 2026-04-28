@@ -121,7 +121,7 @@ class B2Config:
     long_context_symbol: str = "power_law"
 
     # Recursion horizon and step size.
-    T: int = 100000
+    T: int = 1_000_000
     eta: float = 5e-5
 
     # Symbol parameters.
@@ -190,15 +190,18 @@ def _loss_exact_traj_chunked(
     Uses chunked evaluation to avoid materializing the full (T+1, P) delta array.
     Peak memory is O(chunk_size * P) instead of O(T * P).  Returns (T+1,) float64.
     """
-    s64 = s.to(torch.float64).cpu()
-    w64 = omega.to(torch.float64).cpu()
+    dev = s.device
+    s64 = s.to(dtype=torch.float64, device=dev)
+    w64 = omega.to(dtype=torch.float64, device=dev)
     alpha = float(eta) * w64 * s64.pow(3)           # (P,)
     coeff = 2.0 * (L - 1) / L if L > 1 else None
     exp_2L = float(2 * L)
-    loss_arr = torch.zeros(T + 1, dtype=torch.float64)
+    loss_arr = torch.zeros(T + 1, dtype=torch.float64, device=dev)
     for start in range(0, T + 1, chunk_size):
         end = min(start + chunk_size, T + 1)
-        t_chunk = torch.arange(start, end, dtype=torch.float64)  # (c,)
+        t_chunk = torch.arange(
+            start, end, dtype=torch.float64, device=dev
+        )                                                        # (c,)
         at = t_chunk[:, None] * alpha[None, :]                   # (c, P)
         if L == 1:
             delta = torch.exp(-at)
@@ -227,10 +230,11 @@ def _delta_k_exact_traj(
 
     Returns (T+1, P) float64 tensor (time index 0..T × mode index 0..P-1).
     """
-    s64 = s.to(torch.float64).cpu()
-    w64 = omega.to(torch.float64).cpu()
+    dev = s.device
+    s64 = s.to(dtype=torch.float64, device=dev)
+    w64 = omega.to(dtype=torch.float64, device=dev)
     alpha = (float(eta) * w64 * s64.pow(3))       # (P,) rate per mode
-    t_vec = torch.arange(T + 1, dtype=torch.float64)  # (T+1,)
+    t_vec = torch.arange(T + 1, dtype=torch.float64, device=dev)  # (T+1,)
     at = t_vec.unsqueeze(1) * alpha.unsqueeze(0)   # (T+1, P)
     if L == 1:
         return torch.exp(-at)                       # (T+1, P)
@@ -249,7 +253,7 @@ def _gamma_k_from_delta(
 
     ``delta`` can be (T+1, P) or (P,).  Returns same shape.
     """
-    s64 = s.to(torch.float64).cpu()
+    s64 = s.to(dtype=torch.float64, device=s.device)
     L_f = float(L)
     # Guard against s_k ≈ 0 (inactive modes): set gamma_k = 0 there.
     safe_s = s64.clamp(min=eps)
@@ -269,8 +273,9 @@ def _loss_from_delta_traj(
 
     ``delta`` is (T+1, P); returns (T+1,).
     """
-    s64 = s.to(torch.float64).cpu()
-    w64 = omega.to(torch.float64).cpu()
+    dev = s.device
+    s64 = s.to(dtype=torch.float64, device=dev)
+    w64 = omega.to(dtype=torch.float64, device=dev)
     return (w64.unsqueeze(0) * s64.unsqueeze(0) * delta.pow(2 * L)).sum(dim=1)
 
 
@@ -284,8 +289,9 @@ def _operator_target_err_traj(
 
     gamma_star[k] = L / s_k (active modes).  Returns (T+1,).
     """
-    s64 = s.to(torch.float64).cpu()
-    g_traj = gamma_traj.to(torch.float64).cpu()
+    dev = gamma_traj.device
+    s64 = s.to(dtype=torch.float64, device=dev)
+    g_traj = gamma_traj.to(dtype=torch.float64, device=dev)
     safe_s = s64.clamp(min=eps)
     gamma_star = float(L) / safe_s                 # (P,)
     diff = g_traj - gamma_star.unsqueeze(0)        # (T+1, P)
@@ -393,6 +399,7 @@ def _check_circulant_preservation_fullmatrix(
     n_steps: int = 1000,
     eta_full: float = 1e-3,
     log_every: int = 20,
+    device: str = "cuda",
 ) -> dict[str, Any]:
     """Non-tautological test of Theorem 3 Claim 2.
 
@@ -417,19 +424,20 @@ def _check_circulant_preservation_fullmatrix(
     of 1e-15 to 1e-14.
     """
     dtype = torch.float64
+    dev = torch.device(device)
     g1_cfg = _build_g1_config(cfg, P, symbol_kind)
     op = g1_generate(g1_cfg)
-    s_tr = op["s_tr"].to(dtype)
-    omega = op["omega"].to(dtype)
+    s_tr_cpu = op["s_tr"].to(dtype=dtype)
+    omega_cpu = op["omega"].to(dtype=dtype)
 
-    T_mat = circulant_from_symbol(s_tr).to(dtype)
-    Omega_mat = circulant_from_symbol(omega).to(dtype)
+    T_mat = circulant_from_symbol(s_tr_cpu).to(device=dev)
+    Omega_mat = circulant_from_symbol(omega_cpu).to(device=dev)
 
-    F = dft_matrix(P)                               # complex128, (P, P)
+    F = dft_matrix(P).to(dev)                       # complex128, (P, P)
     F_H = F.conj().T.contiguous()
 
-    I_P = torch.eye(P, dtype=dtype)
-    Q = torch.zeros(P, P, dtype=dtype, requires_grad=True)
+    I_P = torch.eye(P, dtype=dtype, device=dev)
+    Q = torch.zeros(P, P, dtype=dtype, device=dev, requires_grad=True)
 
     def _circ_viol(Q_det: torch.Tensor) -> float:
         Qc = Q_det.to(torch.complex128)
@@ -508,7 +516,8 @@ def _build_g1_config(cfg: B2Config, P: int, symbol_kind: str) -> G1Config:
 
 
 def _run_trial(
-    cfg: B2Config, P: int, L: int, symbol_kind: str
+    cfg: B2Config, P: int, L: int, symbol_kind: str,
+    *, device: str | torch.device = "cuda",
 ) -> dict[str, Any]:
     """Run one (P, L, symbol_kind) trial.
 
@@ -517,26 +526,36 @@ def _run_trial(
     via a chunked loop to avoid a second large allocation.  The only returned
     arrays with a P-dimension are the subsampled per-mode trajectories
     (n_sub × P ≈ 200 × P), which are small.
+
+    Compute device: ``s_tr`` and ``omega`` are moved to ``device`` (CUDA by
+    default) so the Euler recursion and all per-step helpers run on the GPU.
+    Slurm requires demonstrable GPU activity for long jobs; without this the
+    trial loop would be entirely CPU-bound.
     """
     import gc
 
+    dev = torch.device(device)
+
     g1_cfg = _build_g1_config(cfg, P, symbol_kind)
     op = g1_generate(g1_cfg)
-    s_tr = op["s_tr"]
-    omega = op["omega"]
+    s_tr = op["s_tr"].to(dtype=torch.float64, device=dev)
+    omega = op["omega"].to(dtype=torch.float64, device=dev)
 
     # --- Build log-spaced subsample index set (needed before gamma_traj) ---
     T_val = cfg.T
     n_plot = cfg.n_plot_times
-    t_sub_idx = np.unique(
+    t_sub_idx_np = np.unique(
         np.round(np.geomspace(1, T_val, n_plot)).astype(int).clip(1, T_val)
     )
-    t_sub_idx = np.concatenate([[0], t_sub_idx])   # include t=0
+    t_sub_idx_np = np.concatenate([[0], t_sub_idx_np])   # include t=0
+    t_sub_idx = torch.from_numpy(t_sub_idx_np.astype(np.int64)).to(dev)
 
     t0 = time.perf_counter()
     gamma_traj = gamma_star_trajectory_circulant(
         s_tr, omega, L=L, eta=cfg.eta, T=T_val
-    )  # (T+1, P) float64 CPU
+    )  # (T+1, P) float64 on dev
+    if dev.type == "cuda":
+        torch.cuda.synchronize()
     t_rec = time.perf_counter() - t0
 
     # --- Extract everything needed while gamma_traj is alive ---
@@ -548,23 +567,25 @@ def _run_trial(
     diffs = loss_traj[1:] - loss_traj[:-1]
     max_monotonicity_violation = float(diffs.max().clamp_min(0.0).item())
 
-    s_tr_64 = s_tr.to(torch.float64).cpu()
-    final_residual = 1.0 - s_tr_64 * gamma_traj[-1].to(torch.float64) / int(L)
+    s_tr_64 = s_tr  # already float64 on dev
+    final_residual = 1.0 - s_tr_64 * gamma_traj[-1] / int(L)
     final_transfer_sq = final_residual.pow(2 * int(L))
 
     target_err_traj = _operator_target_err_traj(gamma_traj, s_tr, L)  # (T+1,)
 
     # Subsample gamma for ODE comparison (small: n_sub × P)
-    gamma_sub = gamma_traj[t_sub_idx].to(torch.float64)   # (n_sub, P)
+    gamma_sub = gamma_traj[t_sub_idx]                       # (n_sub, P) on dev
 
     # Free the large gamma_traj — no longer needed.
     del gamma_traj
+    if dev.type == "cuda":
+        torch.cuda.empty_cache()
     gc.collect()
 
     # --- Closed-form ODE at subsampled times only (for ODE figure + rel-err) ---
-    alpha = float(cfg.eta) * omega.to(torch.float64).cpu() * s_tr_64.pow(3)  # (P,)
-    t_sub_f = torch.from_numpy(t_sub_idx.astype(np.float64))                 # (n_sub,)
-    at_sub = t_sub_f[:, None] * alpha[None, :]                                # (n_sub, P)
+    alpha = float(cfg.eta) * omega * s_tr_64.pow(3)          # (P,) on dev
+    t_sub_f = t_sub_idx.to(torch.float64)                    # (n_sub,) on dev
+    at_sub = t_sub_f[:, None] * alpha[None, :]               # (n_sub, P)
     if L == 1:
         delta_sub = torch.exp(-at_sub)
     else:
@@ -585,7 +606,7 @@ def _run_trial(
     loss_exact_traj = _loss_exact_traj_chunked(s_tr, omega, L, cfg.eta, T_val)
 
     # Loss theory relative error.
-    loss_emp_64 = loss_traj.to(torch.float64).cpu()
+    loss_emp_64 = loss_traj
     loss_th_64 = loss_exact_traj
     loss_mask = loss_th_64 > 1e-15
     if loss_mask.any():
@@ -624,14 +645,14 @@ def _run_trial(
         "s_tr": s_tr.detach().cpu(),
         "omega": omega.detach().cpu(),
         # Subsampled per-mode trajectories (ODE figure)
-        "t_sub_idx": t_sub_idx,
-        "gamma_sub": gamma_sub,            # (n_sub, P)
-        "gamma_exact_sub": gamma_exact_sub,  # (n_sub, P)
-        "gamma_disc_sub": gamma_disc_sub,    # (n_sub, P) — discrete Euler = gamma_sub
+        "t_sub_idx": t_sub_idx_np,
+        "gamma_sub": gamma_sub.detach().cpu(),                  # (n_sub, P)
+        "gamma_exact_sub": gamma_exact_sub.detach().cpu(),      # (n_sub, P)
+        "gamma_disc_sub": gamma_disc_sub.detach().cpu(),        # (n_sub, P) — discrete Euler = gamma_sub
         # Full scalar trajectories
-        "loss_traj": loss_traj.detach().cpu(),     # (T+1,)
-        "loss_exact_traj": loss_exact_traj,        # (T+1,)
-        "target_err_traj": target_err_traj,        # (T+1,)
+        "loss_traj": loss_traj.detach().cpu(),                  # (T+1,)
+        "loss_exact_traj": loss_exact_traj.detach().cpu(),      # (T+1,)
+        "target_err_traj": target_err_traj.detach().cpu(),      # (T+1,)
         # Terminal per-mode diagnostic
         "final_residual": final_residual.detach().cpu(),
         "final_transfer_sq": final_transfer_sq.detach().cpu(),
@@ -686,6 +707,16 @@ def _select(
 # ---------------------------------------------------------------------------
 
 
+def _logspace_indices(T: int, n: int = 2000) -> np.ndarray:
+    """Log-spaced integer indices in [1, T], inclusive of endpoints."""
+    if T <= n:
+        return np.arange(1, T + 1, dtype=int)
+    idx = np.unique(
+        np.round(np.geomspace(1.0, float(T), n)).astype(int).clip(1, T)
+    )
+    return idx
+
+
 def _plot_loss_vs_time(
     trials: list[dict[str, Any]], cfg: B2Config, run_dir: ThesisRunDir
 ) -> None:
@@ -707,13 +738,14 @@ def _plot_loss_vs_time(
     fig, axes = plt.subplots(1, n_sub, figsize=(4.8 * n_sub, 3.8), sharey=True)
     if n_sub == 1:
         axes = [axes]
-    L_colors = sequential_colors(len(cfg.figure_L_list), palette="rocket")
-    t_axis = np.arange(1, cfg.T + 1, dtype=float)
+    L_colors = sequential_colors(len(cfg.figure_L_list), palette="mako")
+    sub_idx = _logspace_indices(cfg.T)
+    t_axis = sub_idx.astype(float)
     for ax, (sym, P) in zip(axes, valid_subplots):
         slice_trials = _select(trials, P=P, symbol_kind=sym, L_in=cfg.figure_L_list)
         slice_trials.sort(key=lambda t: t["L"])
         for color, trial in zip(L_colors, slice_trials):
-            loss = trial["loss_traj"][1:].numpy()
+            loss = trial["loss_traj"][sub_idx].numpy()
             loss = np.where(loss > 0.0, loss, np.nan)
             ax.plot(t_axis, loss, color=color, lw=1.4,
                     label=f"L = {trial['L']}", alpha=0.95)
@@ -728,8 +760,7 @@ def _plot_loss_vs_time(
         ax.set_xlabel("step t")
     axes[0].set_ylabel(r"matched stationary loss $\mathcal{L}(t)$")
     axes[-1].legend(loc="best", fontsize=8, frameon=True)
-    fig.suptitle("B2 matched stationary loss (Bordelon Fig 3b analogue)", fontsize=11)
-    fig.tight_layout(rect=(0, 0, 1, 0.94))
+    fig.tight_layout()
     save_both(fig, run_dir, "loss_vs_time")
     plt.close(fig)
 
@@ -758,7 +789,7 @@ def _plot_finite_time_loss_vs_depth(
     fig, axes = plt.subplots(1, n_sub, figsize=(4.8 * n_sub, 3.8), sharey=True)
     if n_sub == 1:
         axes = [axes]
-    snap_colors = sequential_colors(len(snapshot_idx), palette="rocket")
+    snap_colors = sequential_colors(len(snapshot_idx), palette="mako")
     for ax, (sym, P) in zip(axes, valid_subplots):
         slice_trials = _select(trials, P=P, symbol_kind=sym, L_in=cfg.L_list)
         slice_trials.sort(key=lambda t: t["L"])
@@ -774,11 +805,7 @@ def _plot_finite_time_loss_vs_depth(
         ax.set_xlabel(r"depth $L$")
     axes[0].set_ylabel(r"matched stationary loss $\mathcal{L}(t)$")
     axes[-1].legend(loc="best", fontsize=8, frameon=True)
-    fig.suptitle(
-        "B2 finite-time depth ordering\n(rate effect, not asymptotic floor)",
-        fontsize=11,
-    )
-    fig.tight_layout(rect=(0, 0, 1, 0.94))
+    fig.tight_layout()
     save_both(fig, run_dir, "b2_finite_time_loss_vs_depth")
     plt.close(fig)
 
@@ -795,10 +822,11 @@ def _plot_finite_time_P_dependence(
     L_plot = cfg.long_context_L
     sym = cfg.long_context_symbol
     all_P = tuple(sorted(set(cfg.P_list) | set(cfg.long_context_P_list)))
-    P_colors = sequential_colors(max(1, len(all_P)), palette="rocket")
+    P_colors = sequential_colors(max(1, len(all_P)), palette="mako")
 
     fig, ax = plt.subplots(figsize=(5.8, 3.8))
-    t_axis = np.arange(1, cfg.T + 1, dtype=float)
+    sub_idx = _logspace_indices(cfg.T)
+    t_axis = sub_idx.astype(float)
     slice_trials = _select(trials, L=L_plot, symbol_kind=sym)
     slice_trials.sort(key=lambda t: t["P"])
     if not slice_trials:
@@ -807,20 +835,15 @@ def _plot_finite_time_P_dependence(
     color_map = {P: P_colors[i] for i, P in enumerate(all_P)}
     for trial in slice_trials:
         color = color_map.get(trial["P"], "C0")
-        loss = trial["loss_traj"][1:].numpy()
+        loss = trial["loss_traj"][sub_idx].numpy()
         loss = np.where(loss > 0.0, loss, np.nan)
         ax.plot(t_axis, loss, color=color, lw=1.4, label=f"P = {trial['P']}")
-    ax.set_title(f"{sym}, L = {L_plot}", fontsize=11)
     ax.set_xscale("log")
     ax.set_yscale("log")
     ax.set_xlabel("step t")
     ax.set_ylabel(r"matched stationary loss $\mathcal{L}(t)$")
     ax.legend(loc="best", fontsize=8, frameon=True)
-    fig.suptitle(
-        f"B2 finite-time P-dependence: matched stationary loss at L = {L_plot}",
-        fontsize=11,
-    )
-    fig.tight_layout(rect=(0, 0, 1, 0.94))
+    fig.tight_layout()
     save_both(fig, run_dir, "b2_finite_time_P_dependence")
     plt.close(fig)
 
@@ -844,7 +867,7 @@ def _plot_terminal_residual_factor_spectrum(
     fig, axes = plt.subplots(1, n_sub, figsize=(4.8 * n_sub, 3.8), sharey=True)
     if n_sub == 1:
         axes = [axes]
-    L_colors = sequential_colors(len(cfg.figure_L_list), palette="rocket")
+    L_colors = sequential_colors(len(cfg.figure_L_list), palette="mako")
     for ax, (sym, P) in zip(axes, valid_subplots):
         slice_trials = _select(trials, P=P, symbol_kind=sym, L_in=cfg.figure_L_list)
         slice_trials.sort(key=lambda t: t["L"])
@@ -861,11 +884,7 @@ def _plot_terminal_residual_factor_spectrum(
         r"terminal residual factor $\delta_k(T)^{2L} = (1 - L^{-1} s_k \gamma_k(T))^{2L}$"
     )
     axes[-1].legend(loc="best", fontsize=8, frameon=True)
-    fig.suptitle(
-        f"B2 terminal residual factor spectrum at t = T = {cfg.T}",
-        fontsize=11,
-    )
-    fig.tight_layout(rect=(0, 0, 1, 0.94))
+    fig.tight_layout()
     save_both(fig, run_dir, "b2_terminal_residual_factor_spectrum")
     plt.close(fig)
 
@@ -1004,7 +1023,7 @@ def _plot_modewise_ode_trajectories(
     legend_elements = [
         Line2D([0], [0], color="k", lw=1.3, label="empirical"),
         Line2D([0], [0], color="k", lw=0.9, ls="--",
-               label="ODE closed form (Cor. 4)"),
+               label="ODE closed form (Cor.)"),
         Line2D([0], [0], color="0.6", lw=1.8, ls=":",
                label="discrete Euler (≡ empirical)"),
         Line2D([0], [0], color="k", lw=0.5, ls=(0, (1, 4)),
@@ -1012,11 +1031,7 @@ def _plot_modewise_ode_trajectories(
     ]
     fig.legend(handles=legend_elements, loc="lower center", ncol=4,
                fontsize=7.5, frameon=True, bbox_to_anchor=(0.5, 0.0))
-    fig.suptitle(
-        f"B2 Corollary 4 modewise ODE: empirical / ODE / discrete Euler (P={P})",
-        fontsize=11,
-    )
-    fig.tight_layout(rect=(0, 0.07, 1, 0.96))
+    fig.tight_layout(rect=(0, 0.07, 1, 1))
     save_both(fig, run_dir, "b2_modewise_ode_trajectories")
     plt.close(fig)
 
@@ -1080,8 +1095,10 @@ def _plot_modewise_ode_normalized(
                 mc = mode_colors[k_modes.index(k)]
                 label = f"k={k}" if col == 0 else None
                 ax.plot(t_idx, emp_list[i], color=mc, lw=1.3, alpha=0.9,
-                        label=label)
-                ax.plot(t_idx, ode_list[i], "--", color=mc, lw=0.9, alpha=0.65)
+                        label=label, zorder=2)
+                # ODE closed form (Cor. 4) — pitch black, on top
+                ax.plot(t_idx, ode_list[i], "--", color="black", lw=0.9,
+                        alpha=1.0, zorder=3)
                 ax.plot(t_idx, disc_list[i], ":", color="0.6", lw=1.8, alpha=0.45,
                         zorder=0)
                 # Ceiling at 1.0 (forward invariance)
@@ -1101,9 +1118,9 @@ def _plot_modewise_ode_normalized(
                 )
 
     legend_elements = [
-        Line2D([0], [0], color="k", lw=1.3, label="empirical"),
-        Line2D([0], [0], color="k", lw=0.9, ls="--",
-               label="ODE closed form (Cor. 4)"),
+        Line2D([0], [0], color="0.3", lw=1.3, label="empirical"),
+        Line2D([0], [0], color="black", lw=0.9, ls="--",
+               label="ODE closed form (Cor.)"),
         Line2D([0], [0], color="0.6", lw=1.8, ls=":",
                label="discrete Euler (≡ empirical)"),
         Line2D([0], [0], color="0.4", lw=0.6, ls=(0, (5, 8)),
@@ -1111,13 +1128,7 @@ def _plot_modewise_ode_normalized(
     ]
     fig.legend(handles=legend_elements, loc="lower center", ncol=4,
                fontsize=7.5, frameon=True, bbox_to_anchor=(0.5, 0.0))
-    fig.suptitle(
-        f"B2 normalized modewise ODE: "
-        r"$\gamma_k(t)\,/\,(L/\lambda_k)$"
-        f" (P={P})",
-        fontsize=11,
-    )
-    fig.tight_layout(rect=(0, 0.07, 1, 0.96))
+    fig.tight_layout(rect=(0, 0.07, 1, 1))
     save_both(fig, run_dir, "b2_modewise_ode_normalized")
     plt.close(fig)
 
@@ -1143,22 +1154,24 @@ def _plot_loss_vs_time_theory_overlay(
     fig, axes = plt.subplots(1, n_sub, figsize=(4.8 * n_sub, 3.8), sharey=True)
     if n_sub == 1:
         axes = [axes]
-    L_colors = sequential_colors(len(cfg.figure_L_list), palette="rocket")
-    t_axis = np.arange(1, cfg.T + 1, dtype=float)
+    L_colors = sequential_colors(len(cfg.figure_L_list), palette="mako")
+    sub_idx = _logspace_indices(cfg.T)
+    t_axis = sub_idx.astype(float)
 
     for ax, (sym, P) in zip(axes, valid_subplots):
         slice_trials = _select(trials, P=P, symbol_kind=sym, L_in=cfg.figure_L_list)
         slice_trials.sort(key=lambda t: t["L"])
         for color, trial in zip(L_colors, slice_trials):
             # Empirical
-            loss_emp = trial["loss_traj"][1:].numpy()
+            loss_emp = trial["loss_traj"][sub_idx].numpy()
             loss_emp = np.where(loss_emp > 0.0, loss_emp, np.nan)
             ax.plot(t_axis, loss_emp, color=color, lw=1.4,
-                    label=f"L={trial['L']}", alpha=0.9)
-            # Theory (Corollary 4 exact ODE solution)
-            loss_th = trial["loss_exact_traj"][1:].numpy()
+                    label=f"L={trial['L']}", alpha=0.9, zorder=2)
+            # Theory (Corollary 4 exact ODE solution) — pitch black, on top
+            loss_th = trial["loss_exact_traj"][sub_idx].numpy()
             loss_th = np.where(loss_th > 0.0, loss_th, np.nan)
-            ax.plot(t_axis, loss_th, "--", color=color, lw=0.8, alpha=0.6)
+            ax.plot(t_axis, loss_th, "--", color="black", lw=0.9, alpha=1.0,
+                    zorder=3)
         ax.set_title(f"{sym}, P = {P}", fontsize=11)
         ax.set_xscale("log")
         ax.set_yscale("log")
@@ -1169,15 +1182,10 @@ def _plot_loss_vs_time_theory_overlay(
     from matplotlib.lines import Line2D
     legend_elements = [
         Line2D([0], [0], color="k", lw=1.4, label="empirical"),
-        Line2D([0], [0], color="k", lw=0.8, ls="--", label="ODE theory (Cor. 4)"),
+        Line2D([0], [0], color="k", lw=0.8, ls="--", label="ODE theory (Cor.)"),
     ]
     axes[-1].legend(handles=legend_elements, loc="best", fontsize=8, frameon=True)
-    fig.suptitle(
-        "B2 loss-vs-time with Corollary 4 exact theory overlay\n"
-        r"$E_L(t) = \sum_k \omega_k \lambda_k \delta_k(t)^{2L}$",
-        fontsize=11,
-    )
-    fig.tight_layout(rect=(0, 0, 1, 0.93))
+    fig.tight_layout()
     save_both(fig, run_dir, "b2_loss_vs_time_theory_overlay")
     plt.close(fig)
 
@@ -1203,14 +1211,15 @@ def _plot_operator_target_error(
     fig, axes = plt.subplots(1, n_sub, figsize=(4.8 * n_sub, 3.8), sharey=True)
     if n_sub == 1:
         axes = [axes]
-    L_colors = sequential_colors(len(cfg.figure_L_list), palette="rocket")
-    t_axis = np.arange(0, cfg.T + 1, dtype=float)
+    L_colors = sequential_colors(len(cfg.figure_L_list), palette="mako")
+    sub_idx = _logspace_indices(cfg.T)
+    t_axis = sub_idx.astype(float)
 
     for ax, (sym, P) in zip(axes, valid_subplots):
         slice_trials = _select(trials, P=P, symbol_kind=sym, L_in=cfg.figure_L_list)
         slice_trials.sort(key=lambda t: t["L"])
         for color, trial in zip(L_colors, slice_trials):
-            err = trial["target_err_traj"].numpy()
+            err = trial["target_err_traj"][sub_idx].numpy()
             err = np.where(err > 0.0, err, np.nan)
             ax.plot(t_axis, err, color=color, lw=1.3,
                     label=f"L={trial['L']}", alpha=0.9)
@@ -1225,11 +1234,7 @@ def _plot_operator_target_error(
         r"$\|\gamma(t) - \gamma^\star\|_2 \,/\, \|\gamma^\star\|_2$"
     )
     axes[-1].legend(loc="best", fontsize=8, frameon=True)
-    fig.suptitle(
-        r"B2 operator target convergence: $\gamma^\star_k = L/\lambda_k$",
-        fontsize=11,
-    )
-    fig.tight_layout(rect=(0, 0, 1, 0.94))
+    fig.tight_layout()
     save_both(fig, run_dir, "b2_operator_target_error")
     plt.close(fig)
 
@@ -1296,12 +1301,7 @@ def _plot_equal_tolerance_collapse(
 
     axes[0].set_ylabel(r"$t_{\varepsilon}(L)$ (first step with loss $\leq \varepsilon$)")
     axes[-1].legend(loc="best", fontsize=8, frameon=True)
-    fig.suptitle(
-        "B2 equal-tolerance collapse\n"
-        r"(rate cost of depth: $t_\varepsilon(L)$ vs $L$ at each $\varepsilon$)",
-        fontsize=11,
-    )
-    fig.tight_layout(rect=(0, 0, 1, 0.93))
+    fig.tight_layout()
     save_both(fig, run_dir, "b2_equal_tolerance_collapse")
     plt.close(fig)
 
@@ -1333,7 +1333,7 @@ def _plot_circulant_preservation(
     fig, axes = plt.subplots(1, n_sub, figsize=(4.8 * n_sub, 3.0), sharey=True)
     if n_sub == 1:
         axes = [axes]
-    L_colors = sequential_colors(len(cfg.figure_L_list), palette="rocket")
+    L_colors = sequential_colors(len(cfg.figure_L_list), palette="mako")
 
     for ax, (sym, P) in zip(axes, valid_subplots):
         slice_trials = _select(trials, P=P, symbol_kind=sym, L_in=cfg.figure_L_list)
@@ -1353,12 +1353,7 @@ def _plot_circulant_preservation(
 
     axes[0].set_ylabel(r"$\|Q(t) - \mathrm{Proj}_{\mathrm{Circ}}(Q(t))\|_F$")
     axes[-1].legend(loc="upper right", fontsize=8, frameon=True)
-    fig.suptitle(
-        "B2 circulant preservation (Theorem 3 Claim 2)\n"
-        "circ_violation(t) = 0 identically for per-mode recursion",
-        fontsize=11,
-    )
-    fig.tight_layout(rect=(0, 0, 1, 0.93))
+    fig.tight_layout()
     save_both(fig, run_dir, "b2_circulant_preservation")
     plt.close(fig)
 
@@ -1381,12 +1376,16 @@ def _plot_circulant_preservation_fullmatrix(
 
     fig, (ax_v, ax_l) = plt.subplots(1, 2, figsize=(9.2, 3.6))
 
+    mako_pair = sequential_colors(4, palette="mako")
+    c_viol = mako_pair[0]
+    c_loss = mako_pair[2]
+
     eps_floor = 1e-17
     viol_plot = np.maximum(circ_viol, eps_floor)
-    ax_v.plot(step_idx, viol_plot, "o-", lw=1.2, markersize=3, color="C0",
+    ax_v.plot(step_idx, viol_plot, "o-", lw=1.2, markersize=3, color=c_viol,
               label=r"$\|Q(t) - \mathrm{Proj}_{\mathrm{Circ}}(Q(t))\|_F / \|Q(t)\|_F$")
     ax_v.axhline(cfg.circ_tol, color="gray", ls="--", lw=0.8,
-                 label=f"gate tol = {cfg.circ_tol:.0e}")
+                 label=f"tolerance = {cfg.circ_tol:.0e}")
     ax_v.axhline(1e-14, color="0.5", ls=":", lw=0.8, alpha=0.6,
                  label=r"$10^{-14}$ (~float64 rounding)")
     ax_v.set_xlabel("step t")
@@ -1403,7 +1402,7 @@ def _plot_circulant_preservation_fullmatrix(
     ax_v.grid(alpha=0.3)
 
     loss_plot = np.where(loss_vals > 0, loss_vals, np.nan)
-    ax_l.plot(step_idx, loss_plot, "o-", lw=1.2, markersize=3, color="C1",
+    ax_l.plot(step_idx, loss_plot, "o-", lw=1.2, markersize=3, color=c_loss,
               label=r"$E_L(Q(t))$")
     ax_l.set_xlabel("step t")
     ax_l.set_ylabel(r"$E_L(Q)$")
@@ -1412,11 +1411,7 @@ def _plot_circulant_preservation_fullmatrix(
     ax_l.legend(loc="best", fontsize=8, frameon=True)
     ax_l.grid(alpha=0.3)
 
-    fig.suptitle(
-        "Theorem 3 Claim 2: unconstrained gradient flow preserves Circ$_P$",
-        fontsize=11,
-    )
-    fig.tight_layout(rect=(0, 0, 1, 0.93))
+    fig.tight_layout()
     save_both(fig, run_dir, "b2_circulant_preservation_fullmatrix")
     plt.close(fig)
 
@@ -1518,6 +1513,7 @@ def main() -> int:
         fm_result = _check_circulant_preservation_fullmatrix(
             cfg, P=32, L=4, symbol_kind="power_law",
             n_steps=1000, eta_full=1e-3, log_every=20,
+            device=args.device,
         )
         fullmatrix_circ_max_viol = fm_result["max_circ_viol"]
         fullmatrix_circ_ok = fullmatrix_circ_max_viol < cfg.circ_tol
@@ -1544,7 +1540,7 @@ def main() -> int:
         t_sweep_start = time.perf_counter()
         for idx, (P, L, symbol_kind) in enumerate(trial_specs, start=1):
             t0 = time.perf_counter()
-            trial = _run_trial(cfg, P, L, symbol_kind)
+            trial = _run_trial(cfg, P, L, symbol_kind, device=device)
             dt = time.perf_counter() - t0
             ctx.record_step_time(dt)
             print(
@@ -1561,13 +1557,19 @@ def main() -> int:
         t_sweep = time.perf_counter() - t_sweep_start
 
         # ---- Save NPZ ----
-        npz_payload: dict[str, np.ndarray] = {}
+        # At long horizons (T = 1e7) the raw (T+1,) trajectories are too big
+        # to keep on disk (~80 MB × 30 trials × 3 arrays = GB-scale).  Save
+        # log-spaced subsamples (the same resolution the figures use) plus
+        # the absolute endpoints so downstream analyses can reconstruct the
+        # floor/tail without scanning 10 million steps.
+        sub_idx = _logspace_indices(cfg.T)
+        npz_payload: dict[str, np.ndarray] = {"subsample_idx": sub_idx.astype(np.int64)}
         for t in trials:
             key = f"P{t['P']}_L{t['L']}_{t['symbol_kind']}"
-            npz_payload[f"{key}__loss"] = t["loss_traj"].numpy()
-            npz_payload[f"{key}__loss_exact"] = t["loss_exact_traj"].numpy()
+            npz_payload[f"{key}__loss"] = t["loss_traj"][sub_idx].numpy()
+            npz_payload[f"{key}__loss_exact"] = t["loss_exact_traj"][sub_idx].numpy()
             npz_payload[f"{key}__final_transfer_sq"] = t["final_transfer_sq"].numpy()
-            npz_payload[f"{key}__target_err"] = t["target_err_traj"].numpy()
+            npz_payload[f"{key}__target_err"] = t["target_err_traj"][sub_idx].numpy()
         seen_pairs: set[tuple[int, str]] = set()
         for t in trials:
             pair = (t["P"], t["symbol_kind"])

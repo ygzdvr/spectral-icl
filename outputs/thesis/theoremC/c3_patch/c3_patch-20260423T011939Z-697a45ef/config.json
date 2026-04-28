@@ -1,0 +1,43 @@
+{
+  "D": 64,
+  "partition_m_list": [
+    1,
+    2,
+    4,
+    8,
+    16,
+    32
+  ],
+  "kappa_list": [
+    1.0,
+    1.1,
+    1.2,
+    1.5,
+    2.0,
+    3.0,
+    5.0,
+    10.0
+  ],
+  "block_mean_lam": 1.0,
+  "block_mean_omega": 1.0,
+  "kappa_omega_matches_lam": true,
+  "xi_shape": "linear",
+  "spectral_basis_kind": "dct2",
+  "closed_form_tol": 1e-08,
+  "q_tol": 1e-06,
+  "zero_tol": 1e-10,
+  "positive_tol": 1e-15,
+  "landscape_m": 8,
+  "landscape_kappas": [
+    1.0,
+    2.0,
+    5.0,
+    10.0
+  ],
+  "landscape_q_range_multiplier": 2.0,
+  "landscape_n_points": 201,
+  "optimizer": "lbfgs",
+  "max_iter": 500,
+  "dtype": "float64",
+  "device": "cuda"
+}

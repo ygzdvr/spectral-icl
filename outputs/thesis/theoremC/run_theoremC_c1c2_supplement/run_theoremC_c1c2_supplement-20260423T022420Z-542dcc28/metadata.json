@@ -1,0 +1,79 @@
+{
+  "run_id": "run_theoremC_c1c2_supplement-20260423T022420Z-542dcc28",
+  "script_stem": "run_theoremC_c1c2_supplement",
+  "phase": "theoremC",
+  "root": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/outputs/thesis/theoremC/run_theoremC_c1c2_supplement/run_theoremC_c1c2_supplement-20260423T022420Z-542dcc28",
+  "started_utc": "2026-04-23T02:24:20.267066+00:00",
+  "seeds": [
+    12345
+  ],
+  "git_commit": "811d1f0",
+  "git_dirty": true,
+  "env": {
+    "python_version": "3.14.3",
+    "python_full_version": "3.14.3 (main, Mar 20 2026, 00:34:32) [Clang 22.1.1 ]",
+    "python_executable": "/scratch/gpfs/EHAZAN/hd0216/Senior-Thesis/scaling/spectral-scaling/spectral_scaling/.venv/bin/python",
+    "platform": "Linux-5.14.0-570.106.1.el9_6.x86_64-x86_64-with-glibc2.34",
+    "hostname": "della-i24g1",
+    "torch_version": "2.11.0+cu130",
+    "cuda_available": true,
+    "cuda_version": "13.0",
+    "cudnn_version": 91900,
+    "gpu_count": 1,
+    "gpu_names": [
+      "NVIDIA H200"
+    ]
+  },
+  "notes": "C1+C2 supplement: Lemma 3.5 invariance (item 1), grouped loss formula (item 2), induced metric (item 3), Corollary 3.9 endpoints (item 4), unequal partition (item 5).",
+  "status": "completed",
+  "finished_utc": "2026-04-23T02:25:36.811850+00:00",
+  "wall_clock_seconds": 76.5451807975769,
+  "compute_proxy": 76.36417813110165,
+  "measured_compute": null,
+  "per_step_wall_clock": {
+    "n_steps": 4,
+    "mean": 18.085060716985026,
+    "median": 13.05020981701091,
+    "total": 72.3402428679401
+  },
+  "error": null,
+  "extras": {
+    "worst_item1_abs_diff": 3.413618351633119e-05,
+    "worst_item2_rel_err": 7.88652403192672e-16,
+    "worst_item3_rel_err": 2.8112518896962965e-16,
+    "item4": {
+      "L": 4,
+      "singleton": {
+        "abs_err": 0.0,
+        "rel_err": 0.0,
+        "ok": true
+      },
+      "single_band": {
+        "abs_err": 0.0,
+        "rel_err": 0.0,
+        "within_band_spread": 0.0,
+        "ok": true
+      },
+      "m8": {
+        "abs_err": 0.0,
+        "ok": true
+      },
+      "ok": true
+    },
+    "item5": {
+      "block_sizes": [
+        4,
+        4,
+        8,
+        16,
+        32
+      ],
+      "L": 4,
+      "cv_max": 0.0,
+      "q_err_max": 2.7755575615628914e-17,
+      "cv_ok": true,
+      "q_err_ok": true,
+      "ok": true
+    }
+  }
+}

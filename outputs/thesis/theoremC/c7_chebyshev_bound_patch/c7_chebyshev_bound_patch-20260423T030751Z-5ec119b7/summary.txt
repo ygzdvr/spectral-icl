@@ -1,0 +1,6 @@
+run_id: c7_chebyshev_bound_patch-20260423T030751Z-5ec119b7
+phase: theoremC
+script: c7_chebyshev_bound_patch
+status: failed
+wall_clock_seconds: 0.413
+error: TypeError("C7Config.__init__() got an unexpected keyword argument 'partition_m_list'")

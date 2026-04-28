@@ -1,0 +1,28 @@
+{
+  "D": 64,
+  "kappa_list": [
+    1.0,
+    1.2,
+    1.5,
+    2.0,
+    3.0,
+    5.0,
+    10.0
+  ],
+  "L_list": [
+    1,
+    4
+  ],
+  "expected_level_sizes": [
+    64,
+    32,
+    16,
+    8,
+    4,
+    2,
+    1
+  ],
+  "strict_tol": 1e-15,
+  "optimizer_floor": 1e-09,
+  "L_deeper": 4
+}

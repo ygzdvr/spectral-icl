@@ -1,0 +1,27 @@
+run_id: run_theoremB_depth_stationary-20260423T044731Z-d504b35d
+phase: theoremB
+script: run_theoremB_depth_stationary
+status: completed
+wall_clock_seconds: 395.024
+compute_proxy: 379.573
+
+plan_reference: EXPERIMENT_PLAN_FINAL.MD §6.3 (B2)
+theorem_objects: ['Corollary 4: modewise ODE + depth irrelevance', 'Theorem 3 Claim 1: shift invariance', 'Theorem 3 Claim 2: circulant preservation']
+device: cuda
+n_trials: 30
+status: PASS
+gate_monotonicity: {'ok': True, 'max_viol': 0.0, 'slack': 1e-09}
+gate_decay: {'ok': True, 'max_frac': 0.007901608583036977, 'threshold': 0.2, 'worst': {'P': 32, 'L': 16, 'symbol_kind': 'power_law', 'loss_initial': 45.548416741065736, 'loss_final': 0.35990576066495017, 'decay_fraction': 0.007901608583036977}}
+gate_ode_agreement: {'ok': True, 'max_ode_rel_err': 0.42059092811997534, 'tol': 0.5}
+gate_loss_theory: {'ok': True, 'max_rel_err': 0.03543783279894436, 'tol': 0.05}
+gate_forward_invariance: {'ok': True, 'max_viol': 0.0, 'tol': 1e-10}
+gate_circulant_preservation: {'ok': True, 'max_viol': 0.0, 'tol': 1e-10}
+gate_circulant_preservation_fullmatrix: {'ok': True, 'max_viol': 3.0726785805162688e-15, 'tol': 1e-10, 'config': 'P=32 L=4 power_law n_steps=1000 eta_full=0.001'}
+fullmatrix_circ_max_violation: 3.0726785805162688e-15
+fullmatrix_circ_ok: True
+discrete_euler_map_rel_err: 0.0
+gate_shift_invariance: {'ok': True, 'max_err': 5.52515492431076e-15, 'tol': 1e-10, 'config': 'P=64 L=1 power_law'}
+Q_target_rel_err_final: {'P32_L1_multiband': 0.9999999999996567, 'P32_L2_multiband': 0.9999999999996576, 'P32_L4_multiband': 0.9999999999996856, 'P32_L8_multiband': 0.9999999999997712, 'P32_L16_multiband': 0.999999999999861, 'P32_L1_power_law': 0.006971952584614985, 'P32_L2_power_law': 0.3176903662702879, 'P32_L4_power_law': 0.6206963255065495, 'P32_L8_power_law': 0.8015746739728511, 'P32_L16_power_law': 0.8986840634675789, 'P64_L1_multiband': 0.9999999999998559, 'P64_L2_multiband': 0.9999999999998602, 'P64_L4_multiband': 0.9999999999998672, 'P64_L8_multiband': 0.9999999999998945, 'P64_L16_multiband': 0.9999999999999319, 'P64_L1_power_law': 0.0226818934017211, 'P64_L2_power_law': 0.365393173026042, 'P64_L4_power_law': 0.6522133985455932, 'P64_L8_power_law': 0.818910867222357, 'P64_L16_power_law': 0.9077021891325889, 'P128_L1_power_law': 0.0491834242998835, 'P128_L2_power_law': 0.40904599122579627, 'P128_L4_power_law': 0.679583880000005, 'P128_L8_power_law': 0.8337851959656039, 'P128_L16_power_law': 0.9154117326644823, 'P256_L1_power_law': 0.08231873414853175, 'P256_L2_power_law': 0.4471726438108723, 'P256_L4_power_law': 0.7025361598875824, 'P256_L8_power_law': 0.846119429986496, 'P256_L16_power_law': 0.9217800407793809}
+equal_tol_spread: {'power_law_P64': {0.1: nan, 0.01: nan, 0.001: nan}, 'multiband_P64': {0.1: 69.25149700598803, 0.01: 435.59914712153517, 0.001: 482.9255663430421}}
+depth_ratios: [{'P': 32, 'symbol_kind': 'multiband', 'L_min': 1, 'L_max': 16, 'loss_final_L_min': 4.101407319577663e-05, 'loss_final_L_max': 0.008576675285539173, 'ratio': 209.11542349376663}, {'P': 32, 'symbol_kind': 'power_law', 'L_min': 1, 'L_max': 16, 'loss_final_L_min': 0.00017807419244126097, 'loss_final_L_max': 0.35990576066495017, 'ratio': 2021.1000579641411}, {'P': 64, 'symbol_kind': 'multiband', 'L_min': 1, 'L_max': 16, 'loss_final_L_min': 0.000211196660713375, 'loss_final_L_max': 0.0020104410127834956, 'ratio': 9.519284092810352}, {'P': 64, 'symbol_kind': 'power_law', 'L_min': 1, 'L_max': 16, 'loss_final_L_min': 0.0030676842438083765, 'loss_final_L_max': 0.7790744919057514, 'ratio': 253.96176072494652}, {'P': 128, 'symbol_kind': 'power_law', 'L_min': 1, 'L_max': 16, 'loss_final_L_min': 0.024137522685713158, 'loss_final_L_max': 1.6572008654014094, 'ratio': 68.65662590893372}, {'P': 256, 'symbol_kind': 'power_law', 'L_min': 1, 'L_max': 16, 'loss_final_L_min': 0.11653806803291672, 'loss_final_L_max': 3.4626045839415123, 'ratio': 29.712218868803312}]
+sweep_wallclock_seconds: 379.573
